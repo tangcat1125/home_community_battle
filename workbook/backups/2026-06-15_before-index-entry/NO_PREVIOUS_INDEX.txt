@@ -1,0 +1,1 @@
+﻿No existing index.html was found before creating the game entry page.

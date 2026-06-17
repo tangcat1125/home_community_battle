@@ -1,0 +1,88 @@
+{
+  "category": "defense_cards",
+  "categoryLabel": "防禦卡",
+  "version": 1,
+  "cards": [
+    {
+      "id": "defense_guided_tour",
+      "name": "導覽",
+      "image": "images/01_guided_tour.png",
+      "defenseType": "文化防禦",
+      "cost": { "manpower": 1, "time": 1 },
+      "counters": ["只賣貨", "說錯", "文化誤讀", "玩壞", "失傳"],
+      "success": { "culture": 1 }
+    },
+    {
+      "id": "defense_friendly_farming",
+      "name": "友善農法",
+      "image": "images/02_friendly_farming.png",
+      "defenseType": "生態防禦",
+      "cost": { "manpower": 1, "time": 2 },
+      "counters": ["過開發", "棲地危機", "缺水", "環境衝突"],
+      "success": { "ecology": 2, "income": -1 }
+    },
+    {
+      "id": "defense_route_planning",
+      "name": "動線",
+      "image": "images/03_route_planning.png",
+      "defenseType": "人潮防禦",
+      "cost": { "time": 1, "manpower": 1 },
+      "counters": ["爆量", "塞爆", "搶車位", "改路線", "拍照干擾"],
+      "success": { "efficiency": 1 }
+    },
+    {
+      "id": "defense_etiquette_explanation",
+      "name": "禮俗解說",
+      "image": "images/04_etiquette_explanation.png",
+      "defenseType": "文化防禦",
+      "cost": { "manpower": 1, "time": 1 },
+      "counters": ["說錯", "假表演", "文化誤讀", "拍照干擾"],
+      "success": { "culture": 1, "publicSupport": 1 }
+    },
+    {
+      "id": "defense_sorting_station",
+      "name": "分類站",
+      "image": "images/05_sorting_station.png",
+      "defenseType": "環境防禦",
+      "cost": { "money": 1, "manpower": 1 },
+      "counters": ["髒亂", "垃圾問題", "過開發"],
+      "success": { "ecology": 1 }
+    },
+    {
+      "id": "defense_town_meeting",
+      "name": "說明會",
+      "image": "images/06_town_meeting.png",
+      "defenseType": "溝通防禦",
+      "cost": { "manpower": 1, "time": 1 },
+      "counters": ["抗議", "施壓", "居民抱怨", "走後門", "改路線"],
+      "success": { "publicSupport": 1 }
+    },
+    {
+      "id": "defense_budget_sheet",
+      "name": "預算表",
+      "image": "images/07_budget_sheet.png",
+      "defenseType": "成本防禦",
+      "cost": { "time": 1 },
+      "counters": ["破財", "維修費", "故障", "缺水", "古蹟漏水"],
+      "success": { "efficiency": 1 }
+    },
+    {
+      "id": "defense_heritage_repair",
+      "name": "古蹟修繕",
+      "image": "images/08_heritage_repair.png",
+      "defenseType": "古蹟防禦",
+      "cost": { "money": 2, "tech": 1 },
+      "counters": ["古蹟漏水", "維修費", "故障"],
+      "success": { "culture": 1 }
+    },
+    {
+      "id": "defense_shuttle_bus",
+      "name": "接駁",
+      "image": "images/09_shuttle_bus.png",
+      "defenseType": "人潮防禦",
+      "cost": { "money": 2, "tech": 1 },
+      "counters": ["塞爆", "搶車位", "朝聖塞車", "船班滿"],
+      "success": { "tourism": 1, "efficiency": 1 }
+    }
+  ]
+}

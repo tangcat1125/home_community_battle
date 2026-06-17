@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>愛我家鄉 - 社區營造大作戰</title>
+  <style>
+    :root {
+      --ink: #17324a;
+      --paper: rgba(255, 255, 255, 0.8);
+      --panel: rgba(255, 255, 255, 0.92);
+      --blue: #1378b8;
+      --green: #198754;
+      --gold: #f2b84b;
+      --orange: #d97912;
+      --shadow: 0 26px 70px rgba(23, 50, 74, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.6) 42%, rgba(255, 255, 255, 0.12)),
+        url("assets/taiwan-community-table-map.png") center / cover fixed no-repeat;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.92), transparent 24%),
+        radial-gradient(circle at 82% 12%, rgba(255, 232, 170, 0.66), transparent 20%),
+        linear-gradient(180deg, rgba(118, 209, 255, 0.12), rgba(6, 69, 110, 0.18));
+      pointer-events: none;
+    }
+
+    .entry {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(420px, 0.94fr) minmax(460px, 0.72fr);
+      gap: clamp(22px, 4vw, 54px);
+      align-items: center;
+      padding: clamp(26px, 5vw, 74px);
+    }
+
+    .hero,
+    .setup-panel {
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      background: var(--paper);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      border-radius: 38px;
+      padding: clamp(28px, 4vw, 52px);
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(19, 120, 184, 0.12);
+      color: #075985;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 22px 0 14px;
+      font-size: clamp(46px, 6vw, 88px);
+      line-height: 0.98;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #0f766e;
+      font-size: clamp(22px, 2.1vw, 34px);
+      font-weight: 900;
+    }
+
+    .description {
+      max-width: 760px;
+      color: #31556f;
+      font-size: clamp(16px, 1.3vw, 21px);
+      line-height: 1.75;
+    }
+
+    .setup-panel {
+      border-radius: 32px;
+      padding: 26px;
+      max-height: calc(100vh - 52px);
+      overflow: auto;
+    }
+
+    .setup-panel h2 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 3vw, 42px);
+    }
+
+    .setup-copy {
+      color: #42657e;
+      line-height: 1.65;
+      margin: 0 0 16px;
+    }
+
+    .setup-block {
+      margin-top: 16px;
+    }
+
+    .setup-label {
+      margin-bottom: 8px;
+      color: #345a74;
+      font-size: 15px;
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+    }
+
+    .player-count-row,
+    .condition-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .button,
+    button {
+      border: 0;
+      min-height: 58px;
+      border-radius: 18px;
+      padding: 14px 18px;
+      color: white;
+      background: linear-gradient(180deg, #2fb7ff, var(--blue));
+      box-shadow: 0 16px 34px rgba(19, 120, 184, 0.24);
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 1000;
+      text-decoration: none;
+      touch-action: manipulation;
+      transition: transform 0.16s ease, filter 0.16s ease;
+    }
+
+    button:hover,
+    .button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    button.ghost {
+      background: linear-gradient(180deg, #7aa2c8, #49677f);
+    }
+
+    button.active {
+      background: linear-gradient(180deg, #25b47e, var(--green));
+      box-shadow: 0 16px 34px rgba(25, 135, 84, 0.24);
+    }
+
+    .seat-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .seat-card {
+      border-radius: 22px;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid rgba(23, 50, 74, 0.12);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .seat-card.inactive {
+      opacity: 0.62;
+      background: rgba(236, 244, 250, 0.78);
+    }
+
+    .seat-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-weight: 1000;
+    }
+
+    .seat-head span:last-child {
+      color: #63829a;
+      font-size: 14px;
+    }
+
+    .role-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .role-toggle label {
+      display: grid;
+      place-items: center;
+      min-height: 56px;
+      border-radius: 17px;
+      border: 2px solid rgba(19, 120, 184, 0.12);
+      background: rgba(240, 248, 255, 0.86);
+      cursor: pointer;
+      font-weight: 1000;
+    }
+
+    .role-toggle label:has(input:checked) {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(180deg, #25b47e, var(--green));
+      box-shadow: 0 12px 24px rgba(25, 135, 84, 0.22);
+    }
+
+    .role-toggle label.ai:has(input:checked) {
+      background: linear-gradient(180deg, #ffbf5b, var(--orange));
+      box-shadow: 0 12px 24px rgba(192, 107, 17, 0.22);
+    }
+
+    .role-toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .condition-pill {
+      min-height: 86px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255, 248, 224, 0.9);
+      border: 1px solid rgba(242, 184, 75, 0.4);
+      display: grid;
+      gap: 5px;
+      align-content: center;
+    }
+
+    .condition-pill strong {
+      font-size: 22px;
+      color: #9a4d00;
+    }
+
+    .condition-pill span {
+      color: #49677f;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .preview {
+      margin: 18px 0;
+      padding: 15px 17px;
+      border-radius: 20px;
+      background: rgba(232, 250, 255, 0.9);
+      border: 1px solid rgba(19, 120, 184, 0.22);
+      line-height: 1.6;
+    }
+
+    .start-button {
+      width: 100%;
+      min-height: 74px;
+      font-size: 24px;
+    }
+
+    .footer {
+      position: fixed;
+      right: 18px;
+      bottom: 14px;
+      z-index: 2;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #24455f;
+      font-size: 13px;
+      font-weight: 900;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (max-width: 980px) {
+      body { background-attachment: scroll; }
+      .entry {
+        grid-template-columns: 1fr;
+        align-items: start;
+        padding: 18px;
+      }
+      .setup-panel { max-height: none; }
+      .player-count-row,
+      .condition-list {
+        grid-template-columns: 1fr;
+      }
+      .footer {
+        position: static;
+        margin: 14px 18px 18px;
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="entry">
+    <section class="hero" aria-label="遊戲入口">
+      <div class="badge">觸碰大螢幕版｜老師開局</div>
+      <h1>愛我家鄉<br>社區營造大作戰</h1>
+      <p class="subtitle">讓家鄉被看見，也讓家鄉住得下去。</p>
+      <p class="description">四人社區營造攻防卡牌遊戲。老師先設定玩家數與 AI 代玩座位，學生再透過主線、攻擊、防禦、陷阱與加成，在觀光、收入、文化、生態、民心與效率之間做取捨。</p>
+    </section>
+
+    <section class="setup-panel" aria-label="老師開局設定">
+      <h2>開局設定</h2>
+      <p class="setup-copy">選擇玩家數，並決定座位是否交給 AI 代玩。</p>
+
+      <div class="setup-block">
+        <div class="setup-label">玩家數</div>
+        <div class="player-count-row" aria-label="玩家數">
+          <button class="ghost active" type="button" data-player-count="1">1 位玩家</button>
+          <button class="ghost" type="button" data-player-count="2">2 位玩家</button>
+          <button class="ghost" type="button" data-player-count="3">3 位玩家</button>
+          <button class="ghost" type="button" data-player-count="4">4 位玩家</button>
+        </div>
+      </div>
+
+      <div class="setup-block">
+        <div class="setup-label">座位與 AI 代玩</div>
+        <div class="seat-list">
+          <article class="seat-card">
+            <div class="seat-head"><span>你 / P1</span><span>底部座位</span></div>
+            <div class="role-toggle" data-seat="0">
+              <label><input type="radio" name="seat0" value="human" checked><span>真人玩家</span></label>
+              <label class="ai"><input type="radio" name="seat0" value="ai"><span>AI 代玩</span></label>
+            </div>
+          </article>
+
+          <article class="seat-card inactive">
+            <div class="seat-head"><span>右手 / P2</span><span>右側座位</span></div>
+            <div class="role-toggle" data-seat="1">
+              <label><input type="radio" name="seat1" value="human"><span>真人玩家</span></label>
+              <label class="ai"><input type="radio" name="seat1" value="ai" checked><span>AI 代玩</span></label>
+            </div>
+          </article>
+
+          <article class="seat-card inactive">
+            <div class="seat-head"><span>左手 / P3</span><span>左側座位</span></div>
+            <div class="role-toggle" data-seat="2">
+              <label><input type="radio" name="seat2" value="human"><span>真人玩家</span></label>
+              <label class="ai"><input type="radio" name="seat2" value="ai" checked><span>AI 代玩</span></label>
+            </div>
+          </article>
+
+          <article class="seat-card inactive">
+            <div class="seat-head"><span>對家 / P4</span><span>上方座位</span></div>
+            <div class="role-toggle" data-seat="3">
+              <label><input type="radio" name="seat3" value="human"><span>真人玩家</span></label>
+              <label class="ai"><input type="radio" name="seat3" value="ai" checked><span>AI 代玩</span></label>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="setup-block">
+        <div class="setup-label">勝敗條件</div>
+        <div class="condition-list">
+          <div class="condition-pill">
+            <strong>30 分鐘</strong>
+            <span>時間到後結算社區成果。</span>
+          </div>
+          <div class="condition-pill">
+            <strong>玩家倒閉</strong>
+            <span>玩家無法營運時，立即進入結局分析。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview">
+        <strong>目前設定</strong>
+        <div id="setupPreview"></div>
+      </div>
+
+      <button class="start-button" id="startGame" type="button">開始遊戲</button>
+    </section>
+  </main>
+
+  <div class="footer">D:\Codex\home_community_battle</div>
+
+  <script>
+    const seats = [
+      { name: "你 / P1", short: "P1" },
+      { name: "右手 / P2", short: "P2" },
+      { name: "左手 / P3", short: "P3" },
+      { name: "對家 / P4", short: "P4" },
+    ];
+    let playerCount = 1;
+
+    function seatRole(index) {
+      if (index >= playerCount) return "ai";
+      return document.querySelector(`input[name="seat${index}"]:checked`)?.value || "ai";
+    }
+
+    function currentRoles() {
+      return seats.map((_, index) => seatRole(index));
+    }
+
+    function updateSeatAvailability() {
+      document.querySelectorAll(".seat-card").forEach((card, index) => {
+        const inactive = index >= playerCount;
+        card.classList.toggle("inactive", inactive);
+        card.querySelectorAll("input").forEach((input) => {
+          input.disabled = inactive;
+        });
+        if (inactive) {
+          const aiInput = document.querySelector(`input[name="seat${index}"][value="ai"]`);
+          if (aiInput) aiInput.checked = true;
+        }
+      });
+
+      document.querySelectorAll("[data-player-count]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.playerCount) === playerCount);
+      });
+    }
+
+    function updatePreview() {
+      updateSeatAvailability();
+      const roles = currentRoles();
+      const activeRoles = roles.slice(0, playerCount);
+      const humanCount = activeRoles.filter((role) => role === "human").length;
+      const aiCount = roles.filter((role) => role === "ai").length;
+      const seatText = roles
+        .map((role, index) => `${seats[index].name}：${index < playerCount ? (role === "human" ? "真人" : "AI 代玩") : "AI 代玩"}`)
+        .join("｜");
+      document.getElementById("setupPreview").textContent =
+        `玩家數：${playerCount}｜真人 ${humanCount}｜AI 代玩 ${aiCount}｜勝敗：30 分鐘 + 玩家倒閉｜${seatText}`;
+    }
+
+    function setPlayerCount(count) {
+      playerCount = Math.max(1, Math.min(4, Number(count) || 1));
+      seats.forEach((_, index) => {
+        const value = index < playerCount ? "human" : "ai";
+        document.querySelector(`input[name="seat${index}"][value="${value}"]`).checked = true;
+      });
+      updatePreview();
+    }
+
+    document.querySelectorAll("[data-player-count]").forEach((button) => {
+      button.addEventListener("click", () => setPlayerCount(button.dataset.playerCount));
+    });
+
+    document.querySelectorAll('input[type="radio"]').forEach((input) => {
+      input.addEventListener("change", updatePreview);
+    });
+
+    document.getElementById("startGame").addEventListener("click", () => {
+      const params = new URLSearchParams({
+        seats: currentRoles().join(","),
+        playerCount: String(playerCount),
+        teacherSetup: "1",
+        mode: "touchscreen",
+        winCondition: "30min-bankruptcy",
+      });
+      window.location.href = `player_window/player-window.html?${params.toString()}`;
+    });
+
+    updatePreview();
+  </script>
+</body>
+</html>

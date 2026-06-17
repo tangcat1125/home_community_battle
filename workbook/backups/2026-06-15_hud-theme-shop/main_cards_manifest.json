@@ -1,0 +1,276 @@
+{
+  "category": "社區主線卡",
+  "version": 1,
+  "cards": [
+    {
+      "id": "community_main_01",
+      "name": "新竹米粉與貢丸",
+      "image": "images/01_hsinchu_rice_noodles_meatballs.png",
+      "communityType": "食品特產社區",
+      "mainTheme": "地方食物與伴手禮",
+      "scores": {
+        "income": 2,
+        "tourism": 0,
+        "culture": 1,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "只賣貨",
+        "低價競爭",
+        "退燒",
+        "說錯"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "故事地圖",
+        "展售",
+        "預算表"
+      ],
+      "fixedRisk": "連續兩回合只增收入時，文化 -1"
+    },
+    {
+      "id": "community_main_02",
+      "name": "高雄花枝丸觀光工廠",
+      "image": "images/02_kaohsiung_squid_ball_factory.png",
+      "communityType": "水產加工社區",
+      "mainTheme": "加工體驗與食農教育",
+      "scores": {
+        "income": 2,
+        "tourism": 1,
+        "culture": 1,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "故障",
+        "缺工",
+        "只賣貨",
+        "破財"
+      ],
+      "recommendedDeck": [
+        "安檢表",
+        "預算表",
+        "導覽",
+        "分類站"
+      ],
+      "fixedRisk": "體驗推廣時，需支付人力 1 或技術 1"
+    },
+    {
+      "id": "community_main_03",
+      "name": "彰化餅乾觀光工廠",
+      "image": "images/03_changhua_cookie_factory.png",
+      "communityType": "產業體驗社區",
+      "mainTheme": "親子體驗與工廠導覽",
+      "scores": {
+        "income": 2,
+        "tourism": 2,
+        "culture": 0,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "髒亂",
+        "缺工",
+        "破財",
+        "只賣貨"
+      ],
+      "recommendedDeck": [
+        "分類站",
+        "預算表",
+        "導覽",
+        "預約制"
+      ],
+      "fixedRisk": "收入暴增時，生態 -1 或 金錢 -1"
+    },
+    {
+      "id": "community_main_04",
+      "name": "南投茶葉與茶博活動",
+      "image": "images/04_nantou_tea_expo.png",
+      "communityType": "農產節慶社區",
+      "mainTheme": "茶產業與節慶活動",
+      "scores": {
+        "income": 0,
+        "tourism": 2,
+        "culture": 2,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "颱風",
+        "缺工",
+        "假表演",
+        "退燒"
+      ],
+      "recommendedDeck": [
+        "雨備",
+        "導覽",
+        "志工名單",
+        "預約制"
+      ],
+      "fixedRisk": "遇天氣事件時，收入 -2"
+    },
+    {
+      "id": "community_main_05",
+      "name": "雲林劍湖山與農產推廣",
+      "image": "images/05_yunlin_janfusun_farm_promo.png",
+      "communityType": "遊樂觀光社區",
+      "mainTheme": "大型觀光與地方農產連結",
+      "scores": {
+        "income": 2,
+        "tourism": 4,
+        "culture": 0,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "爆量",
+        "空拍照",
+        "過開發",
+        "說錯"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "分類站",
+        "澄清稿",
+        "故事地圖"
+      ],
+      "fixedRisk": "只衝觀光時，下一回合民心 -1"
+    },
+    {
+      "id": "community_main_06",
+      "name": "屏東原住民族文化園區",
+      "image": "images/06_pingtung_indigenous_culture_park.png",
+      "communityType": "族群文化社區",
+      "mainTheme": "文化展示與尊重理解",
+      "scores": {
+        "income": 0,
+        "tourism": 1,
+        "culture": 4,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "說錯",
+        "假表演",
+        "只賣貨",
+        "退燒"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "長輩審稿",
+        "資料夾",
+        "故事地圖"
+      ],
+      "fixedRisk": "文化誤用時，文化傷害 +1"
+    },
+    {
+      "id": "community_main_07",
+      "name": "嘉義布袋藍色玻璃鞋",
+      "image": "images/07_chiayi_budai_blue_glass_shoe.png",
+      "communityType": "地景藝術社區",
+      "mainTheme": "打卡景點與地方創意",
+      "scores": {
+        "income": 1,
+        "tourism": 3,
+        "culture": 0,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "爆量",
+        "空拍照",
+        "維修費",
+        "騷亂"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "分類站",
+        "澄清稿",
+        "故事地圖"
+      ],
+      "fixedRisk": "觀光暴增時，需支付維護費"
+    },
+    {
+      "id": "community_main_08",
+      "name": "花蓮玉里黑熊車站偶",
+      "image": "images/08_hualien_yuli_black_bear_station.png",
+      "communityType": "生態打卡社區",
+      "mainTheme": "生態意象與車站打卡",
+      "scores": {
+        "income": 0,
+        "tourism": 2,
+        "culture": 0,
+        "ecology": 1,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "玩壞",
+        "空拍照",
+        "過開發",
+        "說錯"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "生態解說",
+        "澄清稿",
+        "資料夾"
+      ],
+      "fixedRisk": "只衝觀光時，下一回合民心 -1"
+    },
+    {
+      "id": "community_main_09",
+      "name": "台南虱目魚頭人",
+      "image": "images/09_tainan_milkfish_head_mascot.png",
+      "communityType": "地方梗與水產社區",
+      "mainTheme": "地方梗轉成地方理解",
+      "scores": {
+        "income": 2,
+        "tourism": 2,
+        "culture": 0,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "玩壞",
+        "退燒",
+        "只賣貨",
+        "抗議"
+      ],
+      "recommendedDeck": [
+        "導覽",
+        "分類站",
+        "澄清稿",
+        "故事地圖"
+      ],
+      "fixedRisk": "公開宣傳時，抽文化或人潮攻擊"
+    },
+    {
+      "id": "community_main_10",
+      "name": "苗栗三義木雕老街",
+      "image": "images/10_miaoli_sanyi_woodcarving_street.png",
+      "communityType": "工藝保存社區",
+      "mainTheme": "木雕工藝與街區傳承",
+      "scores": {
+        "income": 0,
+        "tourism": 0,
+        "culture": 3,
+        "ecology": 0,
+        "publicSupport": 0
+      },
+      "weakAttacks": [
+        "缺工",
+        "失傳",
+        "只賣貨",
+        "退燒"
+      ],
+      "recommendedDeck": [
+        "長輩審稿",
+        "導覽",
+        "志工名單",
+        "故事地圖"
+      ],
+      "fixedRisk": "未投入人力或時間時，文化 -1"
+    }
+  ]
+}

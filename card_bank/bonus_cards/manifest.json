@@ -1,0 +1,109 @@
+{
+  "category": "bonus_cards",
+  "categoryLabel": "玩家加成卡",
+  "version": 2,
+  "cards": [
+    {
+      "id": "bonus_elder_help",
+      "name": "長輩幫忙",
+      "image": "images/01_elder_help.png",
+      "rarity": "普通",
+      "instant": { "culture": 1, "publicSupport": 1 },
+      "delayed": { "type": "cancel_next_culture_error" },
+      "note": "有長輩的智慧，故事就不容易說錯。"
+    },
+    {
+      "id": "bonus_temp_work_crew",
+      "name": "臨時工班",
+      "image": "images/02_temp_work_crew.png",
+      "rarity": "普通",
+      "instant": { "tech": 2 },
+      "delayed": { "type": "next_repair_discount", "value": 2 },
+      "note": "找到會修的人，很多麻煩就能先解掉。"
+    },
+    {
+      "id": "bonus_good_reputation",
+      "name": "好口碑",
+      "image": "images/03_good_reputation.png",
+      "rarity": "普通",
+      "instant": { "publicSupport": 1, "luck": 1 },
+      "delayed": { "type": "next_damage_reduce", "value": 1 },
+      "note": "留下好印象，做事就更順。"
+    },
+    {
+      "id": "bonus_social_share",
+      "name": "社群轉發",
+      "image": "images/04_social_share.png",
+      "rarity": "普通",
+      "instant": { "tourism": 2, "luck": 1 },
+      "delayed": { "type": "if_no_culture_gain_next_turn", "value": -1 },
+      "note": "流量很快，內容也要跟上。"
+    },
+    {
+      "id": "bonus_crowd_bonus",
+      "name": "人潮紅利",
+      "image": "images/05_crowd_bonus.png",
+      "rarity": "普通",
+      "instant": { "tourism": 2, "income": 1 },
+      "delayed": { "type": "if_tourism_high_draw_attack", "threshold": 6, "draw": 1, "attackTag": "人潮攻擊" },
+      "note": "遊客變多，熱鬧也會帶來壓力。"
+    },
+    {
+      "id": "bonus_local_spending",
+      "name": "在地消費",
+      "image": "images/06_local_spending.png",
+      "rarity": "普通",
+      "instant": { "money": 1, "income": 2 },
+      "delayed": { "type": "income_over_time", "turns": 2, "value": 1 },
+      "note": "願意消費，家鄉產業才走得更久。"
+    },
+    {
+      "id": "bonus_good_weather",
+      "name": "好天氣",
+      "image": "images/07_good_weather.png",
+      "rarity": "普通",
+      "instant": { "luck": 1, "tourism": 1 },
+      "delayed": { "type": "next_tourism_gain_bonus", "value": 1 },
+      "note": "天氣好，大家更想出門認識家鄉。"
+    },
+    {
+      "id": "bonus_volunteers_arrive",
+      "name": "志工來了",
+      "image": "images/08_volunteers_arrive.png",
+      "rarity": "普通",
+      "instant": { "population": 1, "manpower": 2 },
+      "delayed": { "type": "next_manpower_cost_reduce", "value": 1 },
+      "note": "大家一起幫忙，社區更有力量。"
+    },
+    {
+      "id": "bonus_small_luck",
+      "name": "小確幸",
+      "image": "images/09_small_luck.png",
+      "rarity": "普通",
+      "instant": { "luck": 2 },
+      "delayed": { "type": "reroll_next_bad_event", "times": 1 },
+      "note": "小小幸運，也能帶來大大幫助。"
+    },
+    {
+      "id": "bonus_grant_funding",
+      "name": "補助款",
+      "image": "images/10_grant_funding.png",
+      "rarity": "普通",
+      "instant": { "money": 3 },
+      "delayed": { "type": "none" },
+      "note": "善用資源，讓家鄉變得更美好。"
+    }
+  ],
+  "extraAssets": [
+    "images/11_bonus_extra_01.png",
+    "images/12_bonus_extra_02.png",
+    "images/13_bonus_extra_03.png",
+    "images/14_bonus_extra_04.png",
+    "images/15_bonus_extra_05.png",
+    "images/16_bonus_extra_06.png",
+    "images/17_bonus_extra_07.png",
+    "images/18_bonus_extra_08.png",
+    "images/19_bonus_extra_09.png",
+    "images/20_bonus_extra_10.png"
+  ]
+}

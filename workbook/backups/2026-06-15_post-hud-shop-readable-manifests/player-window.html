@@ -1,0 +1,2020 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Window</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: rgba(9, 15, 34, 0.84);
+      --panel-strong: rgba(16, 24, 48, 0.94);
+      --line: rgba(120, 160, 255, 0.18);
+      --text: #ecf3ff;
+      --muted: #8ea0c8;
+      --accent: #4fd1ff;
+      --accent-2: #7c5cff;
+      --danger: #ff6b8a;
+      --good: #67e8a5;
+      --card: rgba(20, 30, 56, 0.92);
+      --card-edge: rgba(118, 166, 255, 0.24);
+      --reel-rotation: 0deg;
+      --reel-user-rotation: 0deg;
+      --reel-scale: 1;
+      --seat-bottom: 22px;
+      --seat-side: 20px;
+      --radius: 22px;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(79, 209, 255, 0.14), transparent 26%),
+        radial-gradient(circle at 80% 10%, rgba(124, 92, 255, 0.16), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(103, 232, 165, 0.08), transparent 24%),
+        linear-gradient(145deg, #02040a 0%, #091225 42%, #040912 100%);
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    .left-toolbox {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(7, 12, 24, 0.88);
+      border: 1px solid rgba(120, 160, 255, 0.18);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    .tool-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+
+    .tool-row .mini-btn {
+      font-size: 12px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+
+    .title h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: 0.02em;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      min-width: 360px;
+    }
+
+    .button-row, .focus-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button, .chip {
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(56, 76, 116, 0.96), rgba(33, 44, 72, 0.96));
+      box-shadow: inset 0 0 0 1px rgba(159, 191, 255, 0.12);
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
+      font-weight: 700;
+    }
+
+    button:hover, .chip:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button.primary { background: linear-gradient(180deg, #30b6ff, #197ed9); }
+    button.danger { background: linear-gradient(180deg, #5e6a88, #34405c); }
+    button.ghost { background: linear-gradient(180deg, rgba(71, 84, 112, 0.9), rgba(44, 54, 76, 0.92)); }
+    button.active, .chip.active {
+      box-shadow: inset 0 0 0 1px rgba(79, 209, 255, 0.55), 0 0 0 1px rgba(79, 209, 255, 0.2);
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type="range"] {
+      width: 180px;
+      accent-color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      padding: 16px 18px 18px;
+      min-height: 0;
+    }
+
+    .layout.sidebar-hidden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .table-shell {
+      position: relative;
+      border-radius: 26px;
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      background:
+        radial-gradient(circle at center, rgba(79, 209, 255, 0.14), transparent 34%),
+        radial-gradient(circle at center, rgba(124, 92, 255, 0.10), transparent 52%),
+        rgba(3, 8, 22, 0.92);
+      overflow: hidden;
+      min-height: 0;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .table-shell.dragging { cursor: grabbing; }
+
+    .table-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, transparent 27%, rgba(79, 209, 255, 0.06) 28%, transparent 29%),
+        radial-gradient(circle at center, transparent 41%, rgba(124, 92, 255, 0.05) 42%, transparent 43%);
+      pointer-events: none;
+    }
+
+    .reel-stage {
+      position: absolute;
+      inset: 22px 18px 18px;
+      display: grid;
+      place-items: center;
+    }
+
+    .theme-slots {
+      position: absolute;
+      right: 26px;
+      top: 28px;
+      z-index: 48;
+      display: grid;
+      grid-template-columns: repeat(3, 122px);
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .theme-slot {
+      min-height: 188px;
+      border-radius: 18px;
+      padding: 10px;
+      background: linear-gradient(180deg, rgba(18, 30, 58, 0.92), rgba(7, 12, 28, 0.9));
+      border: 1px solid rgba(169, 207, 255, 0.2);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22), inset 0 0 0 1px rgba(79, 209, 255, 0.04);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, filter 0.16s ease;
+    }
+
+    .theme-slot:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.06);
+      border-color: rgba(79, 209, 255, 0.42);
+    }
+
+    .theme-slot.empty {
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 8px;
+      color: var(--muted);
+      border-style: dashed;
+    }
+
+    .theme-slot.ready {
+      border-color: rgba(103, 232, 165, 0.5);
+      box-shadow: 0 0 0 1px rgba(103, 232, 165, 0.12), 0 18px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .theme-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      background: rgba(79, 209, 255, 0.15);
+      border: 1px solid rgba(129, 171, 255, 0.22);
+      color: #dcf5ff;
+    }
+
+    .theme-card {
+      display: grid;
+      gap: 7px;
+    }
+
+    .theme-card img,
+    .hand-card-art,
+    .shop-card img {
+      width: 100%;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(4, 8, 18, 0.6);
+    }
+
+    .theme-card img {
+      height: 118px;
+      border-radius: 12px;
+    }
+
+    .theme-name {
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .theme-meta {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .shop-panel {
+      position: absolute;
+      right: 26px;
+      bottom: 18px;
+      z-index: 47;
+      width: 420px;
+      max-width: calc(100% - 920px);
+      min-width: 340px;
+      max-height: 258px;
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 20px;
+      background: rgba(9, 15, 32, 0.9);
+      border: 1px solid rgba(140, 175, 255, 0.18);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 22px 52px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+      overflow: hidden;
+    }
+
+    .shop-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .shop-title {
+      display: grid;
+      gap: 2px;
+    }
+
+    .shop-title strong {
+      font-size: 15px;
+    }
+
+    .shop-title span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .shop-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .shop-market {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .shop-card {
+      display: grid;
+      gap: 5px;
+      min-height: 148px;
+      padding: 7px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(25, 39, 69, 0.95), rgba(12, 20, 39, 0.95));
+      border: 1px solid rgba(140, 175, 255, 0.15);
+    }
+
+    .shop-card img {
+      height: 52px;
+      border-radius: 10px;
+    }
+
+    .shop-card .name {
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .shop-card .meta {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .reel-board {
+      position: relative;
+      width: min(100%, 860px);
+      height: min(100%, 620px);
+      border-radius: 50%;
+      transform: translateZ(0) scale(var(--reel-scale)) rotate(calc(var(--reel-rotation) + var(--reel-user-rotation)));
+      transition: transform 0.38s ease;
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.3));
+    }
+
+    .reel-ring {
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      border: 1px solid rgba(122, 164, 255, 0.14);
+      box-shadow:
+        inset 0 0 0 1px rgba(79, 209, 255, 0.08),
+        inset 0 0 80px rgba(79, 209, 255, 0.05);
+    }
+
+    .reel-core {
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(11, 19, 42, 0.98), rgba(6, 12, 26, 0.98) 62%, rgba(5, 10, 21, 1) 100%);
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      box-shadow:
+        inset 0 0 40px rgba(79, 209, 255, 0.05),
+        inset 0 0 100px rgba(124, 92, 255, 0.06);
+      transform: none;
+      transition: transform 0.38s ease;
+    }
+
+    .reel-hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transform: none;
+      transition: transform 0.38s ease;
+    }
+
+    .slot {
+      position: absolute;
+      display: grid;
+      gap: 8px;
+      width: 188px;
+      min-height: 110px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(11, 18, 36, 0.70);
+      border: 1px solid rgba(147, 181, 255, 0.16);
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 0 0 1px rgba(79, 209, 255, 0.05);
+      pointer-events: auto;
+    }
+
+    .slot .slot-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .slot .slot-body {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slot.slot-trap { top: 10%; left: 50%; transform: translateX(-50%); }
+    .slot.slot-boost { top: 18%; left: 50%; transform: translateX(-50%) translateX(220px); }
+    .slot.slot-attack-1 { top: 34%; left: 50%; transform: translateX(-50%) translateX(-232px); }
+    .slot.slot-attack-2 { top: 32%; left: 50%; transform: translateX(-50%); }
+    .slot.slot-attack-3 { top: 34%; left: 50%; transform: translateX(-50%) translateX(232px); }
+    .slot.slot-defense-1 { top: 60%; left: 50%; transform: translateX(-50%) translateX(-116px); }
+    .slot.slot-defense-2 { top: 60%; left: 50%; transform: translateX(-50%) translateX(116px); }
+
+    .card {
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(30, 44, 77, 0.98), rgba(17, 27, 49, 0.98));
+      border: 1px solid rgba(139, 177, 255, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .card.face-down {
+      background:
+        linear-gradient(135deg, rgba(18, 31, 58, 0.96), rgba(10, 16, 32, 0.96)),
+        repeating-linear-gradient(45deg, rgba(79, 209, 255, 0.08) 0 8px, rgba(124, 92, 255, 0.08) 8px 16px);
+    }
+
+    .card .name {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .card .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .card .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      color: #dbe8ff;
+      font-size: 11px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(78, 110, 168, 0.26);
+      border: 1px solid rgba(129, 171, 255, 0.16);
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 14px;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .sidebar.hidden {
+      display: none;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid rgba(138, 171, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-grid strong { color: var(--text); }
+
+    .seat-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .seat {
+      position: absolute;
+      width: 238px;
+      border-radius: 20px;
+      background: rgba(11, 16, 30, 0.72);
+      border: 1px solid rgba(140, 175, 255, 0.18);
+      padding: 12px;
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .seat:hover { transform: translateY(-2px); }
+    .seat.active {
+      border-color: rgba(79, 209, 255, 0.62);
+      box-shadow: 0 0 0 1px rgba(79, 209, 255, 0.2), 0 18px 42px rgba(0, 0, 0, 0.18);
+    }
+
+    .seat .seat-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .seat .seat-name { font-size: 17px; font-weight: 800; }
+    .seat .seat-meta { color: var(--muted); font-size: 12px; }
+    .seat .seat-lines { display: grid; gap: 4px; color: #c6d7fb; font-size: 13px; }
+
+    .seat.bottom {
+      left: 96px;
+      bottom: 30px;
+      transform: none;
+      width: min(800px, calc(100% - 580px));
+      max-height: none;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(17, 26, 49, 0.9), rgba(11, 18, 34, 0.9));
+      padding: 12px 14px 10px;
+      z-index: 50;
+    }
+
+    .self-summary {
+      display: grid;
+      gap: 4px;
+      padding-bottom: 2px;
+      border-bottom: 1px solid rgba(140, 175, 255, 0.12);
+    }
+
+    .self-cards {
+      display: grid;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .seat.bottom .board-wrap {
+      display: none;
+    }
+
+    .seat.right {
+      right: var(--seat-side);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .seat.left {
+      left: var(--seat-side);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .seat.top {
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .hand-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hand-wrap.collapsed {
+      gap: 4px;
+    }
+
+    .hand-wrap.collapsed .board-wrap {
+      display: none;
+    }
+
+    .hand-wrap.collapsed .hand-folder {
+      padding: 4px 6px;
+      min-height: 28px;
+    }
+
+    .hand-wrap.collapsed .folder-icon {
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+    }
+
+    .hand-wrap.collapsed .folder-title {
+      font-size: 11px;
+    }
+
+    .hand-wrap.collapsed .folder-meta,
+    .hand-wrap.collapsed .folder-preview {
+      font-size: 9px;
+    }
+
+    .hand-wrap.collapsed .folder-preview {
+      display: none;
+    }
+
+    .hand-wrap.collapsed {
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    .hand-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hand-folder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(12, 19, 36, 0.92);
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      min-height: 52px;
+    }
+
+    .folder-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(48, 182, 255, 0.18), rgba(25, 39, 69, 0.96));
+      border: 1px solid rgba(129, 171, 255, 0.18);
+      font-size: 17px;
+    }
+
+    .folder-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .folder-title {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .folder-meta, .folder-preview {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .hand-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hand-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .hand-card {
+      min-height: 158px;
+      border-radius: 14px;
+      padding: 8px;
+      background: linear-gradient(180deg, rgba(25, 39, 69, 0.98), rgba(15, 24, 42, 0.98));
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.16s ease, border-color 0.16s ease, filter 0.16s ease;
+    }
+
+    .hand-card:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    .hand-card.selected {
+      border-color: rgba(79, 209, 255, 0.58);
+      box-shadow: 0 0 0 1px rgba(79, 209, 255, 0.14);
+    }
+    .hand-card-art {
+      height: 58px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+    .hand-card .name { font-size: 13px; line-height: 1.2; }
+    .hand-card .meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      margin-top: 4px;
+    }
+    .hand-card .meta.desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      pointer-events: auto;
+      margin-top: auto;
+    }
+
+    .mini-btn {
+      border: 1px solid rgba(129, 171, 255, 0.18);
+      background: rgba(26, 39, 68, 0.96);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .mini-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .mini-btn.danger {
+      background: rgba(88, 45, 63, 0.96);
+      border-color: rgba(255, 130, 160, 0.22);
+    }
+
+    .stack-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mini {
+      width: 100%;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(12, 19, 36, 0.78);
+      border: 1px solid rgba(141, 177, 255, 0.12);
+      color: #dbe8ff;
+      font-size: 12px;
+      line-height: 1.4;
+      min-height: 60px;
+    }
+
+    .board-stack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .board-item {
+      border-radius: 14px;
+      padding: 8px 9px;
+      background: rgba(12, 19, 36, 0.82);
+      border: 1px solid rgba(141, 177, 255, 0.12);
+      display: grid;
+      gap: 6px;
+      min-height: 72px;
+    }
+
+    .board-item .title {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .board-item .meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .mini.hidden { opacity: 0.78; }
+    .mini strong { display: block; margin-bottom: 4px; }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .log-entry {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      background: rgba(5, 10, 22, 0.72);
+      color: #d8e5ff;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .zoom-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 1100px) {
+      body { overflow: auto; }
+      .app { height: auto; min-height: 100%; }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .toolbar {
+        min-width: 0;
+        justify-items: start;
+      }
+      .seat.bottom { left: 20px; bottom: 24px; width: calc(100% - 40px); max-height: none; }
+      .theme-slots, .shop-panel { position: relative; inset: auto; width: auto; max-width: none; min-width: 0; margin: 10px; }
+      .theme-slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .seat.left, .seat.right, .seat.top { position: relative; inset: auto; transform: none; width: auto; margin: 10px; }
+      .seat-grid { position: static; display: grid; grid-template-columns: 1fr; gap: 12px; padding: 12px; }
+      .reel-board { width: 100%; height: 560px; }
+      .slot { width: 156px; }
+      .slot.slot-boost { transform: translateX(-50%) translateX(170px); }
+      .slot.slot-attack-1 { transform: translateX(-50%) translateX(-176px); }
+      .slot.slot-attack-3 { transform: translateX(-50%) translateX(176px); }
+      .slot.slot-defense-1 { transform: translateX(-50%) translateX(-90px); }
+      .slot.slot-defense-2 { transform: translateX(-50%) translateX(90px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="left-toolbox">
+      <div class="tool-row">
+        <button class="primary" id="btnZoomIn" aria-label="放大">+</button>
+        <button class="ghost" id="btnZoomOut" aria-label="縮小">-</button>
+        <button class="ghost" id="btnResetView" aria-label="回到玩家視角">r</button>
+      </div>
+      <div class="tool-row">
+        <button class="ghost" id="btnToggleSidebar">面板</button>
+        <button class="danger" id="btnAutoAI">AI</button>
+      </div>
+    </div>
+
+    <main class="layout sidebar-hidden">
+      <section class="table-shell">
+        <div class="reel-stage">
+          <div class="reel-board" id="reelBoard">
+            <div class="reel-ring"></div>
+            <div class="reel-core"></div>
+            <div class="reel-hud" id="reelHud"></div>
+          </div>
+        </div>
+        <div class="seat-grid" id="seatGrid"></div>
+        <div class="theme-slots" id="themeSlots" aria-label="地方主題放置區"></div>
+        <div class="shop-panel" id="shopPanel" aria-label="卡牌商店"></div>
+      </section>
+
+      <aside class="sidebar hidden">
+        <section class="panel">
+          <h2>玩家概況</h2>
+          <div class="status-grid" id="playerStatus"></div>
+        </section>
+
+        <section class="panel">
+          <h2>對局資訊</h2>
+          <div class="status-grid" id="matchStatus"></div>
+        </section>
+
+        <section class="panel">
+          <h2>事件紀錄</h2>
+          <div class="log" id="log"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="../sample-cards.js"></script>
+  <script src="reel.js"></script>
+  <script>
+    const reel = new TableReelSystem();
+    const seatOrder = ["self", "right", "left", "top"];
+    const tableShell = document.querySelector(".table-shell");
+    const reelHud = document.getElementById("reelHud");
+    const seatGrid = document.getElementById("seatGrid");
+    const themeSlots = document.getElementById("themeSlots");
+    const shopPanel = document.getElementById("shopPanel");
+    const playerStatus = document.getElementById("playerStatus");
+    const matchStatus = document.getElementById("matchStatus");
+    const logEl = document.getElementById("log");
+    const layout = document.querySelector(".layout");
+    const sidebar = document.querySelector(".sidebar");
+
+    const extendedCards = [...(window.sampleCards || [])];
+    const scoreLabels = {
+      income: "收入",
+      tourism: "觀光",
+      culture: "文化",
+      ecology: "生態",
+      publicSupport: "民心",
+    };
+    const resourceLabels = {
+      money: "錢",
+      luck: "幸運",
+      population: "人口",
+      manpower: "人力",
+      time: "時間",
+      tech: "技術",
+    };
+
+    let focusSeatIndex = 0;
+    let round = 1;
+    let turnSeatIndex = 0;
+    let selectedCardIndex = null;
+    let handCollapsed = false;
+    let turnCounter = 1;
+    let userRotation = 0;
+    let zoomScale = 1;
+    let shopMarket = [];
+    const activePointers = new Map();
+    const dragState = {
+      mode: null,
+      pointerId: null,
+      startX: 0,
+      baseRotation: 0,
+      baseScale: 1,
+      baseDistance: 0,
+    };
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    const state = seatOrder.map((seatKey, seatIndex) => createPlayer(seatKey, seatIndex));
+
+    function createDeck() {
+      const deck = [];
+      extendedCards.forEach((card, idx) => {
+        const copyCount = card.type === "MainTheme" ? 1 : card.type === "Attack" ? 3 : card.type === "Defense" ? 3 : 2;
+        for (let i = 0; i < copyCount; i += 1) {
+          deck.push(cloneCard(card, `${idx}_${i}`));
+        }
+      });
+      return shuffle(deck);
+    }
+
+    function createEmptyBoard() {
+      return {
+        trap: [null],
+        boost: [null],
+        attack: [null, null, null],
+        defense: [null, null],
+        theme: [null, null, null],
+      };
+    }
+
+    function createPlayer(seatKey, seatIndex) {
+      return {
+        seatKey,
+        seatIndex,
+        id: seatKey,
+        name: reel.getSeatLabel(seatIndex),
+        hp: 100,
+        maxHp: 100,
+        armor: 0,
+        energy: 3,
+        maxEnergy: 3,
+        points: 5,
+        cashflow: 0,
+        money: 5,
+        luck: 0,
+        population: 3,
+        manpower: 3,
+        time: 3,
+        tech: 2,
+        scores: {
+          income: 0,
+          tourism: 0,
+          culture: 0,
+          ecology: 0,
+          publicSupport: 0,
+        },
+        deck: createDeck(),
+        hand: [],
+        discardPile: [],
+        graveyard: [],
+        board: createEmptyBoard(),
+        history: [],
+      };
+    }
+
+    function cloneCard(card, suffix = "copy") {
+      return {
+        ...card,
+        effect: card.effect ? { ...card.effect } : undefined,
+        scores: card.scores ? { ...card.scores } : undefined,
+        instanceId: `${card.id}_${suffix}_${Math.random().toString(36).slice(2, 8)}`,
+      };
+    }
+
+    function isMainTheme(card) {
+      return card?.type === "MainTheme";
+    }
+
+    function themePointValue(card) {
+      return Object.values(card?.scores || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+    }
+
+    function themeCashflowValue(card) {
+      const scores = card?.scores || {};
+      const income = Number(scores.income || 0);
+      const tourism = Number(scores.tourism || 0);
+      return Math.max(1, income + Math.floor(tourism / 2));
+    }
+
+    function applyScores(player, scores = {}, direction = 1) {
+      Object.keys(scoreLabels).forEach((key) => {
+        player.scores[key] += Number(scores[key] || 0) * direction;
+      });
+    }
+
+    function applyResourceEffect(player, effect = {}) {
+      Object.keys(resourceLabels).forEach((key) => {
+        if (effect[key]) {
+          player[key] += Number(effect[key]);
+        }
+      });
+
+      const scoreEffect = {};
+      Object.keys(scoreLabels).forEach((key) => {
+        if (effect[key]) scoreEffect[key] = effect[key];
+      });
+      applyScores(player, scoreEffect, 1);
+
+      player.energy = Math.min(player.maxEnergy + 2, player.energy + (effect.energy || 0));
+      player.hp = Math.min(player.maxHp, player.hp + (effect.heal || 0));
+    }
+
+    function shuffle(items) {
+      const array = [...items];
+      for (let i = array.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function dealToFive(player) {
+      while (player.hand.length < 5 && player.deck.length > 0) {
+        player.hand.push(player.deck.pop());
+      }
+    }
+
+    function ensureOpeningThemeCard(player) {
+      if (player.hand.some(isMainTheme)) return;
+      const deckIndex = player.deck.findIndex(isMainTheme);
+      if (deckIndex < 0) return;
+      const [themeCard] = player.deck.splice(deckIndex, 1);
+      const replaceIndex = player.hand.findIndex((card) => !isMainTheme(card));
+      if (replaceIndex >= 0) {
+        player.deck.unshift(player.hand[replaceIndex]);
+        player.hand[replaceIndex] = themeCard;
+      } else if (player.hand.length < 5) {
+        player.hand.push(themeCard);
+      }
+    }
+
+    function buildShopMarket() {
+      const pool = extendedCards.filter((card) => card.type !== "Attack");
+      shopMarket = shuffle(pool).slice(0, 4).map((card, index) => cloneCard(card, `shop_${turnCounter}_${index}`));
+    }
+
+    function buyShopCard(index) {
+      const self = state[0];
+      const card = shopMarket[index];
+      if (!card) return;
+
+      const cost = card.shopCost || Math.max(2, (card.cost || 0) + 2);
+      if (self.points < cost) {
+        pushLog(`點數不足，無法購買 ${card.name}。`);
+        render();
+        return;
+      }
+
+      self.points -= cost;
+      const bought = cloneCard(card, `bought_${Date.now()}`);
+      if (self.hand.length < 5) {
+        self.hand.push(bought);
+        pushLog(`${self.name} 用 ${cost} 點購買 ${card.name}，加入手牌。`);
+      } else {
+        self.discardPile.unshift(bought);
+        pushLog(`${self.name} 用 ${cost} 點購買 ${card.name}，手牌已滿，先放入棄牌堆。`);
+      }
+      render();
+    }
+
+    function collectCashflow() {
+      const self = state[0];
+      if (self.cashflow <= 0) {
+        pushLog("目前沒有現金流，先把地方主題放進 S1-S3。");
+        render();
+        return;
+      }
+      self.points += self.cashflow;
+      pushLog(`${self.name} 收取現金流 +${self.cashflow} 點。`);
+      render();
+    }
+
+    function refreshShopMarket() {
+      const self = state[0];
+      if (self.points <= 0) {
+        pushLog("點數不足，無法刷新商店。");
+        render();
+        return;
+      }
+      self.points -= 1;
+      buildShopMarket();
+      pushLog(`${self.name} 花 1 點刷新卡牌商店。`);
+      render();
+    }
+
+    function pushGraveyard(player, card, source) {
+      if (!card) return;
+      player.graveyard.unshift({
+        card,
+        source,
+        round,
+        ts: Date.now(),
+      });
+      if (player.graveyard.length > 20) {
+        player.graveyard.length = 20;
+      }
+    }
+
+    function discardHandCard(player, cardIndex) {
+      const turn = currentTurnPlayer();
+      if (!turn || turn.id !== player.id) {
+        pushLog(`${player.name} cannot discard right now.`);
+        return;
+      }
+
+      const card = player.hand[cardIndex];
+      if (!card) return;
+
+      player.hand.splice(cardIndex, 1);
+      player.discardPile.unshift(card);
+      if (player.discardPile.length > 20) {
+        player.discardPile.length = 20;
+      }
+      pushGraveyard(player, card, "hand");
+      player.history.unshift(`${card.name} discarded from hand`);
+      if (player.history.length > 6) player.history.length = 6;
+
+      dealToFive(player);
+      ensureOpeningThemeCard(player);
+      pushLog(`${player.name} discarded ${card.name} from hand.`);
+      render();
+    }
+
+    function discardBoardCard(player, lane) {
+      const turn = currentTurnPlayer();
+      if (!turn || turn.id !== player.id) {
+        pushLog(`${player.name} cannot discard board cards right now.`);
+        return;
+      }
+
+      let slotValue = null;
+      let targetList = null;
+      let slotIndex = -1;
+      let label = lane.label;
+
+      if (lane.slot === "attack") {
+        targetList = player.board.attack;
+        slotIndex = lane.slotIndex;
+        slotValue = targetList[slotIndex];
+      } else if (lane.slot === "defense") {
+        targetList = player.board.defense;
+        slotIndex = lane.slotIndex;
+        slotValue = targetList[slotIndex];
+      } else if (lane.key === "trap") {
+        targetList = player.board.trap;
+        slotIndex = 0;
+        slotValue = targetList[0];
+      } else if (lane.key === "boost") {
+        targetList = player.board.boost;
+        slotIndex = 0;
+        slotValue = targetList[0];
+      } else if (lane.slot === "theme") {
+        targetList = player.board.theme;
+        slotIndex = lane.slotIndex;
+        slotValue = targetList[slotIndex];
+      }
+
+      if (!slotValue) return;
+
+      const card = slotValue.card;
+      if (lane.slot === "defense") {
+        player.armor = Math.max(0, player.armor - (card.effect?.block || 5));
+      } else if (lane.slot === "theme") {
+        player.cashflow = Math.max(0, player.cashflow - themeCashflowValue(card));
+        applyScores(player, card.scores, -1);
+      }
+
+      targetList[slotIndex] = null;
+      pushGraveyard(player, card, `board:${lane.key}`);
+      player.history.unshift(`${card.name} removed from board`);
+      if (player.history.length > 6) player.history.length = 6;
+      pushLog(`${player.name} removed ${card.name} from ${label}.`);
+      render();
+    }
+
+    function resetMatch() {
+      round = 1;
+      turnSeatIndex = 0;
+      selectedCardIndex = null;
+      handCollapsed = false;
+      focusSeatIndex = 0;
+      userRotation = 0;
+      zoomScale = 1;
+
+      state.forEach((player, index) => {
+        state[index] = createPlayer(player.seatKey, index);
+        dealToFive(state[index]);
+        ensureOpeningThemeCard(state[index]);
+        state[index].history.push("Player state reset.");
+      });
+
+      buildShopMarket();
+      pushLog("Match started with 4 players.");
+      pushLog("Player view reset.");
+      render();
+    }
+
+    function pushLog(message) {
+      const entry = {
+        round,
+        turnSeatIndex,
+        message,
+        ts: Date.now(),
+      };
+      const player = state[turnSeatIndex];
+      player.history.unshift(message);
+      if (player.history.length > 6) player.history.length = 6;
+      if (!window._log) window._log = [];
+      window._log.unshift(entry);
+      window._log.length = Math.min(window._log.length, 12);
+    }
+
+    function currentFocusPlayer() {
+      return state[focusSeatIndex];
+    }
+
+    function currentTurnPlayer() {
+      return state[turnSeatIndex];
+    }
+
+    function placeThemeCard(player, cardIndex, explicitSlotIndex = null) {
+      const card = player.hand[cardIndex];
+      if (!isMainTheme(card)) return false;
+
+      const slotIndex = explicitSlotIndex ?? player.board.theme.findIndex((slot) => !slot);
+      if (slotIndex < 0 || slotIndex >= player.board.theme.length || player.board.theme[slotIndex]) {
+        pushLog("S1-S3 已滿，請先棄置或調整地方主題卡。");
+        render();
+        return false;
+      }
+
+      const pointGain = themePointValue(card);
+      const cashflowGain = themeCashflowValue(card);
+      player.board.theme[slotIndex] = {
+        card,
+        faceDown: false,
+        triggered: true,
+        note: `S${slotIndex + 1}`,
+        pointGain,
+        cashflowGain,
+      };
+      applyScores(player, card.scores, 1);
+      player.points += pointGain;
+      player.cashflow += cashflowGain;
+      player.hand.splice(cardIndex, 1);
+      player.history.unshift(`${card.name} placed in S${slotIndex + 1}`);
+      if (player.history.length > 6) player.history.length = 6;
+      dealToFive(player);
+      ensureOpeningThemeCard(player);
+      pushLog(`${player.name} 放置 ${card.name} 到 S${slotIndex + 1}，點數 +${pointGain}，現金流 +${cashflowGain}。`);
+      handCollapsed = true;
+      selectedCardIndex = null;
+      render();
+      return true;
+    }
+
+    function placeCard(player, cardIndex, targetSeatIndex = focusSeatIndex) {
+      const card = player.hand[cardIndex];
+      if (!card) return;
+
+      if (isMainTheme(card)) {
+        placeThemeCard(player, cardIndex);
+        return;
+      }
+
+      const lane = reel.getCardLane(card.type);
+      const target = state[targetSeatIndex];
+      let result = `${player.name} played ${card.name} on ${target.name}.`;
+
+      if (lane === "attack") {
+        const slotIndex = target.board.attack.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          target.board.attack[slotIndex] = {
+            card,
+            faceDown: false,
+            triggered: true,
+            note: "Attack slot",
+          };
+        }
+        result = resolveAttack(target, card, player);
+      } else if (lane === "defense") {
+        const slotIndex = player.board.defense.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.defense[slotIndex] = {
+            card,
+            faceDown: true,
+            triggered: false,
+            note: "Defense slot",
+          };
+          player.armor += card.effect?.block || 5;
+        }
+        result = `${player.name} placed defense ${card.name}.`;
+      } else if (lane === "trap") {
+        const slotIndex = player.board.trap.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.trap[slotIndex] = {
+            card,
+            faceDown: true,
+            triggered: false,
+            note: "Trap slot",
+          };
+        }
+        result = `${player.name} placed trap ${card.name}.`;
+      } else {
+        const slotIndex = player.board.boost.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.boost[slotIndex] = {
+            card,
+            faceDown: false,
+            triggered: true,
+            note: "Boost slot",
+          };
+        }
+        applyResourceEffect(player, card.effect || { energy: 1 });
+        result = `${player.name} placed boost ${card.name}.`;
+      }
+
+      player.hand.splice(cardIndex, 1);
+      player.history.unshift(`${card.name} moved to the board`);
+      if (player.history.length > 6) player.history.length = 6;
+
+      dealToFive(player);
+      ensureOpeningThemeCard(player);
+      pushLog(result);
+      handCollapsed = true;
+      selectedCardIndex = null;
+      render();
+    }
+
+    function placeSelectedHandCardAtDesk() {
+      const self = state[0];
+      if (selectedCardIndex === null) return false;
+      if (selectedCardIndex < 0 || selectedCardIndex >= self.hand.length) {
+        selectedCardIndex = null;
+        return false;
+      }
+
+      const card = self.hand[selectedCardIndex];
+      if (!card) return false;
+
+      if (isMainTheme(card)) {
+        return placeThemeCard(self, selectedCardIndex);
+      }
+
+      const lane = reel.getCardLane(card.type);
+      if (lane === "attack") {
+        placeCard(self, selectedCardIndex, focusSeatIndex === 0 ? 1 : focusSeatIndex);
+      } else {
+        placeCard(self, selectedCardIndex, 0);
+      }
+      handCollapsed = true;
+      selectedCardIndex = null;
+      return true;
+    }
+
+    function resolveAttack(target, card, source) {
+      const damage = card.effect?.damage || 0;
+      const trapSlot = target.board.trap[0];
+      const defenseSlotIndex = target.board.defense.findIndex((slot) => slot && slot.faceDown);
+      let blocked = 0;
+      let notes = [];
+
+      if (trapSlot && !trapSlot.triggered) {
+        trapSlot.triggered = true;
+        trapSlot.faceDown = false;
+        notes.push(`${target.name}'s trap triggered.`);
+        source.hp = Math.max(0, source.hp - (trapSlot.card.effect?.trapDamage || 3));
+      }
+
+      if (defenseSlotIndex >= 0) {
+        const defenseSlot = target.board.defense[defenseSlotIndex];
+        defenseSlot.faceDown = false;
+        defenseSlot.triggered = true;
+        blocked = defenseSlot.card.effect?.block || 5;
+        notes.push(`${target.name}'s defense blocked damage.`);
+      }
+
+      const finalDamage = Math.max(0, damage - blocked);
+      target.hp = Math.max(0, target.hp - finalDamage);
+      target.history.unshift(`${card.name} dealt ${finalDamage} damage`);
+      if (target.history.length > 6) target.history.length = 6;
+
+      return `${source.name} attacked ${target.name} for ${damage} damage${blocked ? `, blocked ${blocked}` : ""}${notes.length ? ` (${notes.join(", ")})` : ""}.`;
+    }
+
+    function autoAIPlay() {
+      const aiPlayers = state.filter((_, index) => index !== 0);
+      aiPlayers.forEach((player) => {
+        const cardIndex = player.hand.findIndex((card) => reel.getCardLane(card.type) !== "attack");
+        const attackIndex = cardIndex >= 0 ? cardIndex : 0;
+        const lane = reel.getCardLane(player.hand[attackIndex]?.type);
+        placeCard(player, attackIndex, lane === "attack" ? 0 : player.seatIndex);
+      });
+      pushLog("AI played its cards.");
+      render();
+    }
+
+    function seatClasses(seatKey) {
+      return `seat ${seatKey} ${focusSeatIndex === seatOrder.indexOf(seatKey) ? "active" : ""}`;
+    }
+
+    function renderReel() {
+      const focusRotation = reel.getRotation(focusSeatIndex);
+      document.documentElement.style.setProperty("--reel-rotation", focusRotation);
+      document.documentElement.style.setProperty("--reel-user-rotation", `${userRotation}deg`);
+      document.documentElement.style.setProperty("--reel-scale", `${zoomScale}`);
+
+      reelHud.innerHTML = "";
+      const groups = reel.getLaneGroups();
+      const viewerSeatIndex = focusSeatIndex;
+      [...groups.front, ...groups.main].forEach((lane) => {
+        const slot = document.createElement("div");
+        slot.className = `slot slot-${lane.key}`;
+        slot.innerHTML = `
+          <div class="slot-head">
+            <span>${lane.label}</span>
+            <span>${lane.slotType}</span>
+          </div>
+          <div class="slot-body">${renderLaneCards(focusSeatIndex, lane)}</div>
+        `;
+        const discardButton = slot.querySelector('[data-discard-board="1"]');
+        if (discardButton) {
+          discardButton.onclick = (event) => {
+            event.stopPropagation();
+            discardBoardCard(state[viewerSeatIndex], lane);
+          };
+        }
+        reelHud.appendChild(slot);
+      });
+    }
+
+    function renderLaneCards(seatIndex, lane) {
+      const player = state[seatIndex];
+      let slotValue = null;
+      if (lane.slot === "attack") {
+        slotValue = player.board.attack[lane.slotIndex];
+      } else if (lane.slot === "defense") {
+        slotValue = player.board.defense[lane.slotIndex];
+      } else if (lane.key === "trap") {
+        slotValue = player.board.trap[0];
+      } else if (lane.key === "boost") {
+        slotValue = player.board.boost[0];
+      }
+
+      if (!slotValue) {
+        return `<div class="mini empty">等待放牌</div>`;
+      }
+
+      const faceDown = slotValue.faceDown && !slotValue.triggered;
+      const card = slotValue.card;
+      const tagText = faceDown ? "覆蓋" : `${card.type} / Cost ${card.cost}`;
+      return `
+        <div class="card ${faceDown ? "face-down" : ""}">
+          <div class="name">${faceDown ? "覆蓋牌" : card.name}</div>
+          <div class="meta">${faceDown ? "尚未觸發" : card.desc}</div>
+          <div class="tag-row">
+            <span class="tag">${tagText}</span>
+            <span class="tag">${slotValue.note || lane.label}</span>
+          </div>
+          ${seatIndex === 0 && (lane.key === "trap" || lane.key === "boost" || lane.slot === "defense") ? `
+            <div class="card-actions">
+              <button class="mini-btn danger" data-discard-board="1">棄置</button>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function renderSeats() {
+      const mapping = [
+        { key: "self", cls: "bottom" },
+        { key: "right", cls: "right" },
+        { key: "left", cls: "left" },
+        { key: "top", cls: "top" },
+      ];
+
+      seatGrid.innerHTML = "";
+      mapping.forEach(({ key, cls }) => {
+        const index = seatOrder.indexOf(key);
+        const player = state[index];
+        const seat = document.createElement("div");
+        seat.className = `seat ${cls} ${focusSeatIndex === index ? "active" : ""}`;
+        seat.onclick = () => {
+          focusSeatIndex = index;
+          render();
+        };
+
+        if (key === "self") {
+          seat.innerHTML = `
+            <div class="seat-top">
+              <div>
+                <div class="seat-name">${player.name}</div>
+                <div class="seat-meta">玩家本人</div>
+              </div>
+              <div class="seat-meta">HP ${player.hp}/${player.maxHp}</div>
+            </div>
+            <div class="self-summary">
+              <div class="seat-lines">
+                <div>護甲 ${player.armor} | 能量 ${player.energy}/${player.maxEnergy} | 點數 ${player.points}</div>
+                <div>現金流 +${player.cashflow} | 錢 ${player.money} | 幸運 ${player.luck}</div>
+                <div>手牌 ${player.hand.length} | 牌庫 ${player.deck.length}</div>
+                <div>收入 ${player.scores.income} | 觀光 ${player.scores.tourism} | 文化 ${player.scores.culture} | 生態 ${player.scores.ecology} | 民心 ${player.scores.publicSupport}</div>
+                <div>桌面 ${countSlots(player.board)}</div>
+              </div>
+            </div>
+            <div class="self-cards"></div>
+          `;
+        } else {
+          seat.innerHTML = `
+            <div class="seat-top">
+              <div>
+                <div class="seat-name">${player.name}</div>
+                <div class="seat-meta">對手視窗</div>
+              </div>
+              <div class="seat-meta">HP ${player.hp}/${player.maxHp}</div>
+            </div>
+            <div class="seat-lines">
+              <div>護甲 ${player.armor} | 能量 ${player.energy}/${player.maxEnergy}</div>
+              <div>點數 ${player.points} | 現金流 +${player.cashflow}</div>
+              <div>手牌 ${player.hand.length} | 牌庫 ${player.deck.length}</div>
+              <div>桌面 ${countSlots(player.board)}</div>
+            </div>
+          `;
+        }
+        seatGrid.appendChild(seat);
+      });
+    }
+
+    function countSlots(board) {
+      const total = [...board.trap, ...board.boost, ...board.attack, ...board.defense, ...board.theme].filter(Boolean).length;
+      return `${total}/10`;
+    }
+
+    function renderFocusChips() {
+      focusChips.innerHTML = "";
+      seatOrder.forEach((seatKey, index) => {
+        const chip = document.createElement("button");
+        chip.className = `chip ${focusSeatIndex === index ? "active" : ""}`;
+        chip.textContent = reel.getSeatLabel(index);
+        chip.onclick = () => {
+          focusSeatIndex = index;
+          render();
+        };
+        focusChips.appendChild(chip);
+      });
+    }
+
+    function renderStatus() {
+      const self = state[0];
+      const focus = currentFocusPlayer();
+      const turn = currentTurnPlayer();
+      playerStatus.innerHTML = `
+        <div>你的位置：<strong>${self.name}</strong></div>
+        <div>目前觀察：<strong>${focus.name}</strong></div>
+        <div>輪到：<strong>${turn.name}</strong></div>
+        <div>生命值：<strong>${self.hp}/${self.maxHp}</strong></div>
+        <div>點數：<strong>${self.points}</strong></div>
+        <div>現金流：<strong>+${self.cashflow}</strong></div>
+        <div>手牌：<strong>${self.hand.length}</strong> 張</div>
+        <div>棄牌堆：<strong>${self.discardPile.length}</strong> 張</div>
+        <div>卡牌墳場：<strong>${self.graveyard.length}</strong> 張</div>
+        <div>桌面效果：<strong>reel rotation</strong></div>
+      `;
+
+      matchStatus.innerHTML = `
+        <div>目前回合：<strong>${round}</strong></div>
+        <div>目前輪次：<strong>${turnCounter}</strong></div>
+        <div>視角旋轉：<strong>${reel.getRotation(focusSeatIndex)}</strong></div>
+        <div>桌面縮放：<strong>${Math.round(zoomScale * 100)}%</strong></div>
+        <div class="zoom-note">可用左側工具與滑鼠 / 觸控板調整視角。</div>
+      `;
+    }
+
+    function scoreSummary(scores = {}) {
+      return Object.entries(scoreLabels)
+        .map(([key, label]) => `${label} ${Number(scores[key] || 0) >= 0 ? "+" : ""}${Number(scores[key] || 0)}`)
+        .join(" / ");
+    }
+
+    function renderThemeSlots() {
+      const viewer = currentFocusPlayer();
+      const selected = selectedCardIndex !== null ? state[0].hand[selectedCardIndex] : null;
+      const canPlaceTheme = focusSeatIndex === 0 && isMainTheme(selected);
+      themeSlots.innerHTML = "";
+
+      viewer.board.theme.forEach((slotValue, index) => {
+        const slot = document.createElement("div");
+        slot.className = `theme-slot ${slotValue ? "" : "empty"} ${!slotValue && canPlaceTheme ? "ready" : ""}`;
+        slot.onclick = (event) => {
+          event.stopPropagation();
+          if (!slotValue && canPlaceTheme) {
+            placeThemeCard(state[0], selectedCardIndex, index);
+          }
+        };
+
+        if (!slotValue) {
+          slot.innerHTML = `
+            <div class="theme-code">S${index + 1}</div>
+            <div class="theme-name">地方主題放置區</div>
+            <div class="theme-meta">${canPlaceTheme ? "點擊放置選中的主線卡" : "從手牌選主線卡"}</div>
+          `;
+        } else {
+          const card = slotValue.card;
+          slot.innerHTML = `
+            <div class="theme-card">
+              ${card.image ? `<img src="${card.image}" alt="${card.name}">` : ""}
+              <div class="theme-code">S${index + 1}</div>
+              <div class="theme-name">${card.name}</div>
+              <div class="theme-meta">${card.communityType || "社區主線"} · 現金流 +${slotValue.cashflowGain}</div>
+              <div class="theme-meta">${scoreSummary(card.scores)}</div>
+              ${viewer.seatIndex === 0 ? `
+                <div class="card-actions">
+                  <button class="mini-btn danger" data-discard-theme="${index}">棄置</button>
+                </div>
+              ` : ""}
+            </div>
+          `;
+          const discard = slot.querySelector(`[data-discard-theme="${index}"]`);
+          if (discard) {
+            discard.onclick = (event) => {
+              event.stopPropagation();
+              discardBoardCard(viewer, { key: `theme-${index + 1}`, slot: "theme", slotIndex: index, label: `S${index + 1}` });
+            };
+          }
+        }
+
+        themeSlots.appendChild(slot);
+      });
+    }
+
+    function renderShop() {
+      const self = state[0];
+      if (!shopMarket.length) buildShopMarket();
+      shopPanel.innerHTML = `
+        <div class="shop-header">
+          <div class="shop-title">
+            <strong>卡牌商店</strong>
+            <span>點數 ${self.points} · 現金流 +${self.cashflow}</span>
+          </div>
+          <div class="shop-actions">
+            <button class="mini-btn" data-collect-cashflow="1">收成</button>
+            <button class="mini-btn" data-refresh-shop="1">刷新 1</button>
+          </div>
+        </div>
+        <div class="shop-market"></div>
+      `;
+
+      shopPanel.querySelector('[data-collect-cashflow="1"]').onclick = (event) => {
+        event.stopPropagation();
+        collectCashflow();
+      };
+      shopPanel.querySelector('[data-refresh-shop="1"]').onclick = (event) => {
+        event.stopPropagation();
+        refreshShopMarket();
+      };
+
+      const market = shopPanel.querySelector(".shop-market");
+      shopMarket.forEach((card, index) => {
+        const cost = card.shopCost || Math.max(2, (card.cost || 0) + 2);
+        const item = document.createElement("div");
+        item.className = "shop-card";
+        item.innerHTML = `
+          ${card.image ? `<img src="${card.image}" alt="${card.name}">` : ""}
+          <div class="name">${card.name}</div>
+          <div class="meta">${card.rarity || "卡牌"} · ${card.type}</div>
+          <div class="meta">價格 ${cost} 點</div>
+          <button class="mini-btn" data-buy-card="${index}">購買</button>
+        `;
+        item.querySelector(`[data-buy-card="${index}"]`).onclick = (event) => {
+          event.stopPropagation();
+          buyShopCard(index);
+        };
+        market.appendChild(item);
+      });
+    }
+
+    function renderHand() {
+      const self = state[0];
+      const handWrap = document.createElement("div");
+      handWrap.className = "hand-wrap";
+      if (handCollapsed) {
+        const preview = selectedCardIndex !== null ? self.hand[selectedCardIndex] : self.hand[0];
+        handWrap.classList.add("collapsed");
+        handWrap.innerHTML = `
+          <div class="hand-head">
+            <span>手牌夾</span>
+            <button class="mini-btn" data-expand-hand="1">展開</button>
+          </div>
+          <div class="hand-folder">
+            <div class="folder-icon">手</div>
+            <div class="folder-copy">
+              <div class="folder-title">手牌區</div>
+              <div class="folder-meta">共 ${self.hand.length} 張</div>
+              ${preview ? `<div class="folder-preview">${preview.name}</div>` : `<div class="folder-preview">空</div>`}
+            </div>
+          </div>
+        `;
+        handWrap.querySelector('[data-expand-hand="1"]').onclick = (event) => {
+          event.stopPropagation();
+          handCollapsed = false;
+          render();
+        };
+      } else {
+        handWrap.innerHTML = `
+          <div class="hand-head">
+            <span>你的手牌（最多 5 張）</span>
+            <span>點牌即可出牌</span>
+          </div>
+        `;
+
+        const handGrid = document.createElement("div");
+        handGrid.className = "hand-grid";
+        self.hand.slice(0, 5).forEach((card, index) => {
+          const cardEl = document.createElement("div");
+          cardEl.className = `hand-card ${selectedCardIndex === index ? "selected" : ""}`;
+          cardEl.onclick = () => {
+            selectedCardIndex = index;
+            handCollapsed = false;
+            render();
+          };
+          const laneLabel = isMainTheme(card) ? "S1-S3" : reel.getCardLane(card.type);
+          cardEl.innerHTML = `
+            ${card.image ? `<img class="hand-card-art" src="${card.image}" alt="${card.name}">` : ""}
+            <div class="name">${card.name}</div>
+            <div class="meta">${card.type} / Cost ${card.cost}</div>
+            <div class="meta desc">${card.desc}</div>
+            <div class="stack-row">
+              <span class="tag">${card.rarity}</span>
+              <span class="tag">${laneLabel}</span>
+            </div>
+            <div class="card-actions">
+              <button class="mini-btn" data-play-hand="1">${isMainTheme(card) ? "放到 S 區" : "出牌"}</button>
+              <button class="mini-btn danger" data-discard-hand="1">棄牌</button>
+            </div>
+          `;
+          cardEl.querySelector('[data-play-hand="1"]').onclick = (event) => {
+            event.stopPropagation();
+            selectedCardIndex = index;
+            handCollapsed = false;
+            placeSelectedHandCardAtDesk();
+          };
+          cardEl.querySelector('[data-discard-hand="1"]').onclick = (event) => {
+            event.stopPropagation();
+            discardHandCard(self, index);
+          };
+          handGrid.appendChild(cardEl);
+        });
+
+        while (handGrid.children.length < 5) {
+          const empty = document.createElement("div");
+          empty.className = "hand-card";
+          empty.innerHTML = `<div class="empty">空位</div>`;
+          handGrid.appendChild(empty);
+        }
+
+        handWrap.appendChild(handGrid);
+      }
+
+      const boardWrap = document.createElement("div");
+      boardWrap.className = "board-wrap";
+      boardWrap.innerHTML = `
+        <div class="hand-head">
+          <span>桌上卡牌區（陷阱 / 加成 / 防禦）</span>
+          <span>送入墳場不補牌</span>
+        </div>
+      `;
+
+      const boardStack = document.createElement("div");
+      boardStack.className = "board-stack";
+      const boardItems = [
+        { key: "trap", label: "陷阱牌", value: self.board.trap[0] },
+        { key: "boost", label: "加成牌", value: self.board.boost[0] },
+        { key: "defense-1", label: "防禦牌 1", value: self.board.defense[0] },
+        { key: "defense-2", label: "防禦牌 2", value: self.board.defense[1] },
+      ];
+
+      boardItems.forEach((item) => {
+        const panel = document.createElement("div");
+        panel.className = "board-item";
+        if (!item.value) {
+          panel.innerHTML = `<div class="title">${item.label}</div><div class="meta">空位</div>`;
+        } else {
+          panel.innerHTML = `
+            <div class="title">${item.label}: ${item.value.card.name}</div>
+            <div class="meta">${item.value.card.type} / Cost ${item.value.card.cost}</div>
+            <div class="meta">${item.value.faceDown && !item.value.triggered ? "覆蓋，觸發後翻開" : "已翻開"}</div>
+            <div class="card-actions">
+              <button class="mini-btn danger" data-board-discard="${item.key}">棄置</button>
+            </div>
+          `;
+          const btn = panel.querySelector(`[data-board-discard="${item.key}"]`);
+          btn.onclick = (event) => {
+            event.stopPropagation();
+            discardBoardCard(self, item.key === "defense-1" ? { key: "defense-1", slot: "defense", slotIndex: 0, label: "防禦 1" }
+              : item.key === "defense-2" ? { key: "defense-2", slot: "defense", slotIndex: 1, label: "防禦 2" }
+              : { key: item.key, slot: "front", label: item.label });
+          };
+        }
+        boardStack.appendChild(panel);
+      });
+
+      boardWrap.appendChild(boardStack);
+      handWrap.appendChild(boardWrap);
+      return handWrap;
+    }
+
+    function renderLog() {
+      logEl.innerHTML = "";
+      const entries = (window._log || []).slice(0, 12);
+      if (!entries.length) {
+        logEl.innerHTML = `<div class="log-entry">目前還沒有事件。</div>`;
+        return;
+      }
+      entries.forEach((entry) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        div.textContent = `[R${entry.round}] ${entry.message}`;
+        logEl.appendChild(div);
+      });
+    }
+
+    function renderBoardControls() {
+      const bottomSlot = seatGrid.querySelector(".seat.bottom .self-cards");
+      if (!bottomSlot) return;
+      const existing = bottomSlot.querySelector(".hand-wrap");
+      if (existing) existing.remove();
+      bottomSlot.appendChild(renderHand());
+    }
+
+    function render() {
+      renderReel();
+      renderSeats();
+      renderBoardControls();
+      renderThemeSlots();
+      renderShop();
+      renderStatus();
+      renderLog();
+    }
+
+    document.getElementById("btnZoomIn").addEventListener("click", () => updateZoomScale(zoomScale + 0.08));
+    document.getElementById("btnZoomOut").addEventListener("click", () => updateZoomScale(zoomScale - 0.08));
+    document.getElementById("btnResetView").addEventListener("click", () => {
+      focusSeatIndex = 0;
+      userRotation = 0;
+      updateZoomScale(1);
+    });
+    document.getElementById("btnToggleSidebar").addEventListener("click", () => {
+      const hidden = sidebar.classList.toggle("hidden");
+      layout.classList.toggle("sidebar-hidden", hidden);
+    });
+    document.getElementById("btnAutoAI").addEventListener("click", autoAIPlay);
+
+    function updateZoomScale(nextScale) {
+      const clamped = clamp(nextScale, 0.9, 1.4);
+      zoomScale = clamped;
+      render();
+    }
+
+    function getDistance(a, b) {
+      return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    }
+
+    tableShell.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button") || event.target.closest(".seat") || event.target.closest(".sidebar") || event.target.closest(".theme-slots") || event.target.closest(".shop-panel")) {
+        return;
+      }
+
+      if (selectedCardIndex !== null && !event.target.closest(".slot") && !event.target.closest(".hand-wrap")) {
+        const placed = placeSelectedHandCardAtDesk();
+        if (placed) {
+          event.preventDefault();
+          return;
+        }
+      }
+
+      tableShell.classList.add("dragging");
+      tableShell.setPointerCapture(event.pointerId);
+      activePointers.set(event.pointerId, event);
+
+      if (activePointers.size === 1) {
+        dragState.mode = "rotate";
+        dragState.pointerId = event.pointerId;
+        dragState.startX = event.clientX;
+        dragState.baseRotation = userRotation;
+      } else if (activePointers.size === 2) {
+        const [first, second] = [...activePointers.values()];
+        dragState.mode = "pinch";
+        dragState.baseScale = zoomScale;
+        dragState.baseDistance = getDistance(first, second);
+      }
+
+      event.preventDefault();
+    });
+
+    tableShell.addEventListener("pointermove", (event) => {
+      if (!activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, event);
+
+      if (dragState.mode === "rotate" && dragState.pointerId === event.pointerId) {
+        const deltaX = event.clientX - dragState.startX;
+        userRotation = dragState.baseRotation + deltaX * 0.25;
+        render();
+      } else if (dragState.mode === "pinch" && activePointers.size >= 2) {
+        const [first, second] = [...activePointers.values()];
+        const distance = getDistance(first, second);
+        if (dragState.baseDistance > 0) {
+          updateZoomScale(dragState.baseScale * (distance / dragState.baseDistance));
+        }
+      }
+
+      event.preventDefault();
+    });
+
+    function endPointer(event) {
+      activePointers.delete(event.pointerId);
+      if (activePointers.size === 0) {
+        dragState.mode = null;
+        dragState.pointerId = null;
+        tableShell.classList.remove("dragging");
+      } else if (activePointers.size === 1) {
+        const [remaining] = [...activePointers.values()];
+        dragState.mode = "rotate";
+        dragState.pointerId = remaining.pointerId;
+        dragState.startX = remaining.clientX;
+        dragState.baseRotation = userRotation;
+      }
+    }
+
+    tableShell.addEventListener("pointerup", endPointer);
+    tableShell.addEventListener("pointercancel", endPointer);
+    tableShell.addEventListener("lostpointercapture", endPointer);
+
+    tableShell.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const direction = Math.sign(event.deltaY);
+      const step = event.deltaMode === 1 ? 0.05 : 0.025;
+      updateZoomScale(zoomScale - direction * step);
+    }, { passive: false });
+
+    resetMatch();
+  </script>
+</body>
+</html>
+

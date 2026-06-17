@@ -1,0 +1,1532 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Window</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: rgba(9, 15, 34, 0.84);
+      --panel-strong: rgba(16, 24, 48, 0.94);
+      --line: rgba(120, 160, 255, 0.18);
+      --text: #ecf3ff;
+      --muted: #8ea0c8;
+      --accent: #4fd1ff;
+      --accent-2: #7c5cff;
+      --danger: #ff6b8a;
+      --good: #67e8a5;
+      --card: rgba(20, 30, 56, 0.92);
+      --card-edge: rgba(118, 166, 255, 0.24);
+      --reel-rotation: 0deg;
+      --reel-user-rotation: 0deg;
+      --reel-scale: 1;
+      --seat-bottom: 22px;
+      --seat-side: 20px;
+      --radius: 22px;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(79, 209, 255, 0.14), transparent 26%),
+        radial-gradient(circle at 80% 10%, rgba(124, 92, 255, 0.16), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(103, 232, 165, 0.08), transparent 24%),
+        linear-gradient(145deg, #02040a 0%, #091225 42%, #040912 100%);
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    .left-toolbox {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(7, 12, 24, 0.88);
+      border: 1px solid rgba(120, 160, 255, 0.18);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    .tool-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+
+    .tool-row .mini-btn {
+      font-size: 12px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+
+    .title h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: 0.02em;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+      min-width: 360px;
+    }
+
+    .button-row, .focus-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button, .chip {
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(56, 76, 116, 0.96), rgba(33, 44, 72, 0.96));
+      box-shadow: inset 0 0 0 1px rgba(159, 191, 255, 0.12);
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
+      font-weight: 700;
+    }
+
+    button:hover, .chip:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button.primary { background: linear-gradient(180deg, #30b6ff, #197ed9); }
+    button.danger { background: linear-gradient(180deg, #5e6a88, #34405c); }
+    button.ghost { background: linear-gradient(180deg, rgba(71, 84, 112, 0.9), rgba(44, 54, 76, 0.92)); }
+    button.active, .chip.active {
+      box-shadow: inset 0 0 0 1px rgba(79, 209, 255, 0.55), 0 0 0 1px rgba(79, 209, 255, 0.2);
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type="range"] {
+      width: 180px;
+      accent-color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      padding: 16px 18px 18px;
+      min-height: 0;
+    }
+
+    .layout.sidebar-hidden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .table-shell {
+      position: relative;
+      border-radius: 26px;
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      background:
+        radial-gradient(circle at center, rgba(79, 209, 255, 0.14), transparent 34%),
+        radial-gradient(circle at center, rgba(124, 92, 255, 0.10), transparent 52%),
+        rgba(3, 8, 22, 0.92);
+      overflow: hidden;
+      min-height: 0;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .table-shell.dragging { cursor: grabbing; }
+
+    .table-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, transparent 27%, rgba(79, 209, 255, 0.06) 28%, transparent 29%),
+        radial-gradient(circle at center, transparent 41%, rgba(124, 92, 255, 0.05) 42%, transparent 43%);
+      pointer-events: none;
+    }
+
+    .reel-stage {
+      position: absolute;
+      inset: 22px 18px 18px;
+      display: grid;
+      place-items: center;
+    }
+
+    .reel-board {
+      position: relative;
+      width: min(100%, 860px);
+      height: min(100%, 620px);
+      border-radius: 50%;
+      transform: translateZ(0) scale(var(--reel-scale)) rotate(calc(var(--reel-rotation) + var(--reel-user-rotation)));
+      transition: transform 0.38s ease;
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.3));
+    }
+
+    .reel-ring {
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      border: 1px solid rgba(122, 164, 255, 0.14);
+      box-shadow:
+        inset 0 0 0 1px rgba(79, 209, 255, 0.08),
+        inset 0 0 80px rgba(79, 209, 255, 0.05);
+    }
+
+    .reel-core {
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(11, 19, 42, 0.98), rgba(6, 12, 26, 0.98) 62%, rgba(5, 10, 21, 1) 100%);
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      box-shadow:
+        inset 0 0 40px rgba(79, 209, 255, 0.05),
+        inset 0 0 100px rgba(124, 92, 255, 0.06);
+      transform: none;
+      transition: transform 0.38s ease;
+    }
+
+    .reel-hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transform: none;
+      transition: transform 0.38s ease;
+    }
+
+    .slot {
+      position: absolute;
+      display: grid;
+      gap: 8px;
+      width: 188px;
+      min-height: 110px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(11, 18, 36, 0.70);
+      border: 1px solid rgba(147, 181, 255, 0.16);
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 0 0 1px rgba(79, 209, 255, 0.05);
+      pointer-events: auto;
+    }
+
+    .slot .slot-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .slot .slot-body {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slot.slot-trap { top: 10%; left: 50%; transform: translateX(-50%); }
+    .slot.slot-boost { top: 18%; left: 50%; transform: translateX(-50%) translateX(220px); }
+    .slot.slot-attack-1 { top: 34%; left: 50%; transform: translateX(-50%) translateX(-232px); }
+    .slot.slot-attack-2 { top: 32%; left: 50%; transform: translateX(-50%); }
+    .slot.slot-attack-3 { top: 34%; left: 50%; transform: translateX(-50%) translateX(232px); }
+    .slot.slot-defense-1 { top: 60%; left: 50%; transform: translateX(-50%) translateX(-116px); }
+    .slot.slot-defense-2 { top: 60%; left: 50%; transform: translateX(-50%) translateX(116px); }
+
+    .card {
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(30, 44, 77, 0.98), rgba(17, 27, 49, 0.98));
+      border: 1px solid rgba(139, 177, 255, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .card.face-down {
+      background:
+        linear-gradient(135deg, rgba(18, 31, 58, 0.96), rgba(10, 16, 32, 0.96)),
+        repeating-linear-gradient(45deg, rgba(79, 209, 255, 0.08) 0 8px, rgba(124, 92, 255, 0.08) 8px 16px);
+    }
+
+    .card .name {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .card .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .card .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      color: #dbe8ff;
+      font-size: 11px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(78, 110, 168, 0.26);
+      border: 1px solid rgba(129, 171, 255, 0.16);
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 14px;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .sidebar.hidden {
+      display: none;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid rgba(138, 171, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-grid strong { color: var(--text); }
+
+    .seat-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .seat {
+      position: absolute;
+      width: 238px;
+      border-radius: 20px;
+      background: rgba(11, 16, 30, 0.72);
+      border: 1px solid rgba(140, 175, 255, 0.18);
+      padding: 12px;
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .seat:hover { transform: translateY(-2px); }
+    .seat.active {
+      border-color: rgba(79, 209, 255, 0.62);
+      box-shadow: 0 0 0 1px rgba(79, 209, 255, 0.2), 0 18px 42px rgba(0, 0, 0, 0.18);
+    }
+
+    .seat .seat-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .seat .seat-name { font-size: 17px; font-weight: 800; }
+    .seat .seat-meta { color: var(--muted); font-size: 12px; }
+    .seat .seat-lines { display: grid; gap: 4px; color: #c6d7fb; font-size: 13px; }
+
+    .seat.bottom {
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      width: min(560px, calc(100% - 120px));
+      max-height: 28vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: linear-gradient(180deg, rgba(17, 26, 49, 0.9), rgba(11, 18, 34, 0.9));
+      padding: 10px 12px 8px;
+    }
+
+    .self-summary {
+      display: grid;
+      gap: 4px;
+      padding-bottom: 2px;
+      border-bottom: 1px solid rgba(140, 175, 255, 0.12);
+    }
+
+    .self-cards {
+      display: grid;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .seat.right {
+      right: var(--seat-side);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .seat.left {
+      left: var(--seat-side);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .seat.top {
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .hand-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hand-wrap.collapsed {
+      gap: 4px;
+    }
+
+    .hand-wrap.collapsed .board-wrap {
+      display: none;
+    }
+
+    .hand-wrap.collapsed .hand-folder {
+      padding: 4px 6px;
+      min-height: 28px;
+    }
+
+    .hand-wrap.collapsed .folder-icon {
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+    }
+
+    .hand-wrap.collapsed .folder-title {
+      font-size: 11px;
+    }
+
+    .hand-wrap.collapsed .folder-meta,
+    .hand-wrap.collapsed .folder-preview {
+      font-size: 9px;
+    }
+
+    .hand-wrap.collapsed .folder-preview {
+      display: none;
+    }
+
+    .hand-wrap.collapsed {
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    .hand-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hand-folder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(12, 19, 36, 0.92);
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      min-height: 52px;
+    }
+
+    .folder-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(48, 182, 255, 0.18), rgba(25, 39, 69, 0.96));
+      border: 1px solid rgba(129, 171, 255, 0.18);
+      font-size: 17px;
+    }
+
+    .folder-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .folder-title {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .folder-meta, .folder-preview {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .hand-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hand-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .hand-card {
+      min-height: 88px;
+      border-radius: 14px;
+      padding: 8px 9px;
+      background: linear-gradient(180deg, rgba(25, 39, 69, 0.98), rgba(15, 24, 42, 0.98));
+      border: 1px solid rgba(140, 175, 255, 0.16);
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, filter 0.16s ease;
+    }
+
+    .hand-card:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    .hand-card .name { font-size: 13px; line-height: 1.2; }
+    .hand-card .meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      margin-top: 4px;
+    }
+    .hand-card .meta.desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      pointer-events: auto;
+    }
+
+    .mini-btn {
+      border: 1px solid rgba(129, 171, 255, 0.18);
+      background: rgba(26, 39, 68, 0.96);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .mini-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .mini-btn.danger {
+      background: rgba(88, 45, 63, 0.96);
+      border-color: rgba(255, 130, 160, 0.22);
+    }
+
+    .stack-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mini {
+      width: 100%;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(12, 19, 36, 0.78);
+      border: 1px solid rgba(141, 177, 255, 0.12);
+      color: #dbe8ff;
+      font-size: 12px;
+      line-height: 1.4;
+      min-height: 60px;
+    }
+
+    .board-stack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .board-item {
+      border-radius: 14px;
+      padding: 8px 9px;
+      background: rgba(12, 19, 36, 0.82);
+      border: 1px solid rgba(141, 177, 255, 0.12);
+      display: grid;
+      gap: 6px;
+      min-height: 72px;
+    }
+
+    .board-item .title {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .board-item .meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .mini.hidden { opacity: 0.78; }
+    .mini strong { display: block; margin-bottom: 4px; }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .log-entry {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      background: rgba(5, 10, 22, 0.72);
+      color: #d8e5ff;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .zoom-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    @media (max-width: 1280px) {
+      body { overflow: auto; }
+      .app { height: auto; min-height: 100%; }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .toolbar {
+        min-width: 0;
+        justify-items: start;
+      }
+      .seat.bottom { width: calc(100% - 40px); }
+      .seat.left, .seat.right, .seat.top { position: relative; inset: auto; transform: none; width: auto; margin: 10px; }
+      .seat-grid { position: static; display: grid; grid-template-columns: 1fr; gap: 12px; padding: 12px; }
+      .reel-board { width: 100%; height: 560px; }
+      .slot { width: 156px; }
+      .slot.slot-boost { transform: translateX(-50%) translateX(170px); }
+      .slot.slot-attack-1 { transform: translateX(-50%) translateX(-176px); }
+      .slot.slot-attack-3 { transform: translateX(-50%) translateX(176px); }
+      .slot.slot-defense-1 { transform: translateX(-50%) translateX(-90px); }
+      .slot.slot-defense-2 { transform: translateX(-50%) translateX(90px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="left-toolbox">
+      <div class="tool-row">
+        <button class="primary" id="btnZoomIn" aria-label="放大">+</button>
+        <button class="ghost" id="btnZoomOut" aria-label="縮小">-</button>
+        <button class="ghost" id="btnResetView" aria-label="回到玩家視角">r</button>
+      </div>
+      <div class="tool-row">
+        <button class="ghost" id="btnToggleSidebar">面板</button>
+        <button class="danger" id="btnAutoAI">AI</button>
+      </div>
+    </div>
+
+    <main class="layout sidebar-hidden">
+      <section class="table-shell">
+        <div class="reel-stage">
+          <div class="reel-board" id="reelBoard">
+            <div class="reel-ring"></div>
+            <div class="reel-core"></div>
+            <div class="reel-hud" id="reelHud"></div>
+          </div>
+        </div>
+        <div class="seat-grid" id="seatGrid"></div>
+      </section>
+
+      <aside class="sidebar hidden">
+        <section class="panel">
+          <h2>玩家概況</h2>
+          <div class="status-grid" id="playerStatus"></div>
+        </section>
+
+        <section class="panel">
+          <h2>對局資訊</h2>
+          <div class="status-grid" id="matchStatus"></div>
+        </section>
+
+        <section class="panel">
+          <h2>事件紀錄</h2>
+          <div class="log" id="log"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="../sample-cards.js"></script>
+  <script src="reel.js"></script>
+  <script>
+    const reel = new TableReelSystem();
+    const seatOrder = ["self", "right", "left", "top"];
+    const tableShell = document.querySelector(".table-shell");
+    const reelHud = document.getElementById("reelHud");
+    const seatGrid = document.getElementById("seatGrid");
+    const playerStatus = document.getElementById("playerStatus");
+    const matchStatus = document.getElementById("matchStatus");
+    const logEl = document.getElementById("log");
+    const layout = document.querySelector(".layout");
+    const sidebar = document.querySelector(".sidebar");
+
+    const extendedCards = [
+      ...(window.sampleCards || []),
+      {
+        id: "snare_trap",
+        name: "Snare Trap",
+        cost: 1,
+        type: "Trap",
+        rarity: "Rare",
+        desc: "Set a trap that punishes the next attacker.",
+        effect: { trapDamage: 3 },
+      },
+      {
+        id: "power_surge",
+        name: "Power Surge",
+        cost: 0,
+        type: "Utility",
+        rarity: "Epic",
+        desc: "Gain 1 energy and draw 1 card.",
+        effect: { energy: 1, draw: 1 },
+      },
+    ];
+
+    let focusSeatIndex = 0;
+    let round = 1;
+    let turnSeatIndex = 0;
+    let selectedCardIndex = null;
+    let handCollapsed = false;
+    let turnCounter = 1;
+    let userRotation = 0;
+    let zoomScale = 1;
+    const activePointers = new Map();
+    const dragState = {
+      mode: null,
+      pointerId: null,
+      startX: 0,
+      baseRotation: 0,
+      baseScale: 1,
+      baseDistance: 0,
+    };
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    const state = seatOrder.map((seatKey, seatIndex) => createPlayer(seatKey, seatIndex));
+
+    function createDeck() {
+      const deck = [];
+      extendedCards.forEach((card, idx) => {
+        const copyCount = card.type === "Attack" ? 3 : card.type === "Defense" ? 3 : 2;
+        for (let i = 0; i < copyCount; i += 1) {
+          deck.push({
+            ...card,
+            instanceId: `${card.id}_${idx}_${i}_${Math.random().toString(36).slice(2, 8)}`,
+          });
+        }
+      });
+      return shuffle(deck);
+    }
+
+    function createEmptyBoard() {
+      return {
+        trap: [null],
+        boost: [null],
+        attack: [null, null, null],
+        defense: [null, null],
+      };
+    }
+
+    function createPlayer(seatKey, seatIndex) {
+      return {
+        seatKey,
+        seatIndex,
+        id: seatKey,
+        name: reel.getSeatLabel(seatIndex),
+        hp: 30,
+        armor: 0,
+        energy: 3,
+        maxEnergy: 3,
+        deck: createDeck(),
+        hand: [],
+        discardPile: [],
+        graveyard: [],
+        board: createEmptyBoard(),
+        history: [],
+      };
+    }
+
+    function shuffle(items) {
+      const array = [...items];
+      for (let i = array.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function dealToFive(player) {
+      while (player.hand.length < 5 && player.deck.length > 0) {
+        player.hand.push(player.deck.pop());
+      }
+    }
+
+    function pushGraveyard(player, card, source) {
+      if (!card) return;
+      player.graveyard.unshift({
+        card,
+        source,
+        round,
+        ts: Date.now(),
+      });
+      if (player.graveyard.length > 20) {
+        player.graveyard.length = 20;
+      }
+    }
+
+    function discardHandCard(player, cardIndex) {
+      const turn = currentTurnPlayer();
+      if (!turn || turn.id !== player.id) {
+        pushLog(`${player.name} cannot discard right now.`);
+        return;
+      }
+
+      const card = player.hand[cardIndex];
+      if (!card) return;
+
+      player.hand.splice(cardIndex, 1);
+      player.discardPile.unshift(card);
+      if (player.discardPile.length > 20) {
+        player.discardPile.length = 20;
+      }
+      pushGraveyard(player, card, "hand");
+      player.history.unshift(`${card.name} discarded from hand`);
+      if (player.history.length > 6) player.history.length = 6;
+
+      dealToFive(player);
+      pushLog(`${player.name} discarded ${card.name} from hand.`);
+      render();
+    }
+
+    function discardBoardCard(player, lane) {
+      const turn = currentTurnPlayer();
+      if (!turn || turn.id !== player.id) {
+        pushLog(`${player.name} cannot discard board cards right now.`);
+        return;
+      }
+
+      let slotValue = null;
+      let targetList = null;
+      let slotIndex = -1;
+      let label = lane.label;
+
+      if (lane.slot === "attack") {
+        targetList = player.board.attack;
+        slotIndex = lane.slotIndex;
+        slotValue = targetList[slotIndex];
+      } else if (lane.slot === "defense") {
+        targetList = player.board.defense;
+        slotIndex = lane.slotIndex;
+        slotValue = targetList[slotIndex];
+      } else if (lane.key === "trap") {
+        targetList = player.board.trap;
+        slotIndex = 0;
+        slotValue = targetList[0];
+      } else if (lane.key === "boost") {
+        targetList = player.board.boost;
+        slotIndex = 0;
+        slotValue = targetList[0];
+      }
+
+      if (!slotValue) return;
+
+      const card = slotValue.card;
+      if (lane.slot === "defense") {
+        player.armor = Math.max(0, player.armor - (card.effect?.block || 5));
+      }
+
+      targetList[slotIndex] = null;
+      pushGraveyard(player, card, `board:${lane.key}`);
+      player.history.unshift(`${card.name} removed from board`);
+      if (player.history.length > 6) player.history.length = 6;
+      pushLog(`${player.name} removed ${card.name} from ${label}.`);
+      render();
+    }
+
+    function resetMatch() {
+      round = 1;
+      turnSeatIndex = 0;
+      selectedCardIndex = null;
+      handCollapsed = false;
+      focusSeatIndex = 0;
+      userRotation = 0;
+      zoomScale = 1;
+
+      state.forEach((player, index) => {
+        state[index] = createPlayer(player.seatKey, index);
+        dealToFive(state[index]);
+        state[index].history.push("Player state reset.");
+      });
+
+      pushLog("Match started with 4 players.");
+      pushLog("Player view reset.");
+      render();
+    }
+
+    function pushLog(message) {
+      const entry = {
+        round,
+        turnSeatIndex,
+        message,
+        ts: Date.now(),
+      };
+      const player = state[turnSeatIndex];
+      player.history.unshift(message);
+      if (player.history.length > 6) player.history.length = 6;
+      if (!window._log) window._log = [];
+      window._log.unshift(entry);
+      window._log.length = Math.min(window._log.length, 12);
+    }
+
+    function currentFocusPlayer() {
+      return state[focusSeatIndex];
+    }
+
+    function currentTurnPlayer() {
+      return state[turnSeatIndex];
+    }
+
+    function placeCard(player, cardIndex, targetSeatIndex = focusSeatIndex) {
+      const card = player.hand[cardIndex];
+      if (!card) return;
+
+      const lane = reel.getCardLane(card.type);
+      const target = state[targetSeatIndex];
+      let result = `${player.name} played ${card.name} on ${target.name}.`;
+
+      if (lane === "attack") {
+        const slotIndex = target.board.attack.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          target.board.attack[slotIndex] = {
+            card,
+            faceDown: false,
+            triggered: true,
+            note: "Attack slot",
+          };
+        }
+        result = resolveAttack(target, card, player);
+      } else if (lane === "defense") {
+        const slotIndex = player.board.defense.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.defense[slotIndex] = {
+            card,
+            faceDown: true,
+            triggered: false,
+            note: "Defense slot",
+          };
+          player.armor += card.effect?.block || 5;
+        }
+        result = `${player.name} placed defense ${card.name}.`;
+      } else if (lane === "trap") {
+        const slotIndex = player.board.trap.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.trap[slotIndex] = {
+            card,
+            faceDown: true,
+            triggered: false,
+            note: "Trap slot",
+          };
+        }
+        result = `${player.name} placed trap ${card.name}.`;
+      } else {
+        const slotIndex = player.board.boost.findIndex((slot) => !slot);
+        if (slotIndex >= 0) {
+          player.board.boost[slotIndex] = {
+            card,
+            faceDown: false,
+            triggered: true,
+            note: "Boost slot",
+          };
+        }
+        player.energy = Math.min(player.maxEnergy + 2, player.energy + (card.effect?.energy || 1));
+        player.hp = Math.min(30, player.hp + (card.effect?.heal || 0));
+        result = `${player.name} placed boost ${card.name}.`;
+      }
+
+      player.hand.splice(cardIndex, 1);
+      player.history.unshift(`${card.name} moved to the board`);
+      if (player.history.length > 6) player.history.length = 6;
+
+      dealToFive(player);
+      pushLog(result);
+      handCollapsed = true;
+      selectedCardIndex = null;
+      render();
+    }
+
+    function placeSelectedHandCardAtDesk() {
+      const self = state[0];
+      if (selectedCardIndex === null) return false;
+      if (selectedCardIndex < 0 || selectedCardIndex >= self.hand.length) {
+        selectedCardIndex = null;
+        return false;
+      }
+
+      const card = self.hand[selectedCardIndex];
+      if (!card) return false;
+
+      const lane = reel.getCardLane(card.type);
+      if (lane === "attack") {
+        placeCard(self, selectedCardIndex, focusSeatIndex === 0 ? 1 : focusSeatIndex);
+      } else {
+        placeCard(self, selectedCardIndex, 0);
+      }
+      handCollapsed = true;
+      selectedCardIndex = null;
+      return true;
+    }
+
+    function resolveAttack(target, card, source) {
+      const damage = card.effect?.damage || 0;
+      const trapSlot = target.board.trap[0];
+      const defenseSlotIndex = target.board.defense.findIndex((slot) => slot && slot.faceDown);
+      let blocked = 0;
+      let notes = [];
+
+      if (trapSlot && !trapSlot.triggered) {
+        trapSlot.triggered = true;
+        trapSlot.faceDown = false;
+        notes.push(`${target.name}'s trap triggered.`);
+        source.hp = Math.max(0, source.hp - (trapSlot.card.effect?.trapDamage || 3));
+      }
+
+      if (defenseSlotIndex >= 0) {
+        const defenseSlot = target.board.defense[defenseSlotIndex];
+        defenseSlot.faceDown = false;
+        defenseSlot.triggered = true;
+        blocked = defenseSlot.card.effect?.block || 5;
+        notes.push(`${target.name}'s defense blocked damage.`);
+      }
+
+      const finalDamage = Math.max(0, damage - blocked);
+      target.hp = Math.max(0, target.hp - finalDamage);
+      target.history.unshift(`${card.name} dealt ${finalDamage} damage`);
+      if (target.history.length > 6) target.history.length = 6;
+
+      return `${source.name} attacked ${target.name} for ${damage} damage${blocked ? `, blocked ${blocked}` : ""}${notes.length ? ` (${notes.join(", ")})` : ""}.`;
+    }
+
+    function autoAIPlay() {
+      const aiPlayers = state.filter((_, index) => index !== 0);
+      aiPlayers.forEach((player) => {
+        const cardIndex = player.hand.findIndex((card) => reel.getCardLane(card.type) !== "attack");
+        const attackIndex = cardIndex >= 0 ? cardIndex : 0;
+        const lane = reel.getCardLane(player.hand[attackIndex]?.type);
+        placeCard(player, attackIndex, lane === "attack" ? 0 : player.seatIndex);
+      });
+      pushLog("AI played its cards.");
+      render();
+    }
+
+    function seatClasses(seatKey) {
+      return `seat ${seatKey} ${focusSeatIndex === seatOrder.indexOf(seatKey) ? "active" : ""}`;
+    }
+
+    function renderReel() {
+      const focusRotation = reel.getRotation(focusSeatIndex);
+      document.documentElement.style.setProperty("--reel-rotation", focusRotation);
+      document.documentElement.style.setProperty("--reel-user-rotation", `${userRotation}deg`);
+      document.documentElement.style.setProperty("--reel-scale", `${zoomScale}`);
+
+      reelHud.innerHTML = "";
+      const groups = reel.getLaneGroups();
+      const viewerSeatIndex = focusSeatIndex;
+      [...groups.front, ...groups.main].forEach((lane) => {
+        const slot = document.createElement("div");
+        slot.className = `slot slot-${lane.key}`;
+        slot.innerHTML = `
+          <div class="slot-head">
+            <span>${lane.label}</span>
+            <span>${lane.slotType}</span>
+          </div>
+          <div class="slot-body">${renderLaneCards(focusSeatIndex, lane)}</div>
+        `;
+        const discardButton = slot.querySelector('[data-discard-board="1"]');
+        if (discardButton) {
+          discardButton.onclick = (event) => {
+            event.stopPropagation();
+            discardBoardCard(state[viewerSeatIndex], lane);
+          };
+        }
+        reelHud.appendChild(slot);
+      });
+    }
+
+    function renderLaneCards(seatIndex, lane) {
+      const player = state[seatIndex];
+      let slotValue = null;
+      if (lane.slot === "attack") {
+        slotValue = player.board.attack[lane.slotIndex];
+      } else if (lane.slot === "defense") {
+        slotValue = player.board.defense[lane.slotIndex];
+      } else if (lane.key === "trap") {
+        slotValue = player.board.trap[0];
+      } else if (lane.key === "boost") {
+        slotValue = player.board.boost[0];
+      }
+
+      if (!slotValue) {
+        return `<div class="mini empty">Empty slot</div>`;
+      }
+
+      const faceDown = slotValue.faceDown && !slotValue.triggered;
+      const card = slotValue.card;
+      const tagText = faceDown ? "Hidden" : `${card.type} / Cost ${card.cost}`;
+      return `
+        <div class="card ${faceDown ? "face-down" : ""}">
+          <div class="name">${faceDown ? "Card Back" : card.name}</div>
+          <div class="meta">${faceDown ? "Hidden card" : card.desc}</div>
+          <div class="tag-row">
+            <span class="tag">${tagText}</span>
+            <span class="tag">${slotValue.note || lane.label}</span>
+          </div>
+          ${seatIndex === 0 && (lane.key === "trap" || lane.key === "boost" || lane.slot === "defense") ? `
+            <div class="card-actions">
+              <button class="mini-btn danger" data-discard-board="1">Discard</button>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function renderSeats() {
+      const mapping = [
+        { key: "self", cls: "bottom" },
+        { key: "right", cls: "right" },
+        { key: "left", cls: "left" },
+        { key: "top", cls: "top" },
+      ];
+
+      seatGrid.innerHTML = "";
+      mapping.forEach(({ key, cls }) => {
+        const index = seatOrder.indexOf(key);
+        const player = state[index];
+        const seat = document.createElement("div");
+        seat.className = `seat ${cls} ${focusSeatIndex === index ? "active" : ""}`;
+        seat.onclick = () => {
+          focusSeatIndex = index;
+          render();
+        };
+
+        if (key === "self") {
+          seat.innerHTML = `
+            <div class="seat-top">
+              <div>
+                <div class="seat-name">${player.name}</div>
+                <div class="seat-meta">玩家本人</div>
+              </div>
+              <div class="seat-meta">HP ${player.hp}/30</div>
+            </div>
+            <div class="self-summary">
+              <div class="seat-lines">
+                <div>護甲 ${player.armor} | 能量 ${player.energy}/${player.maxEnergy}</div>
+                <div>手牌 ${player.hand.length} | 牌庫 ${player.deck.length}</div>
+                <div>桌面 ${countSlots(player.board)}</div>
+              </div>
+            </div>
+            <div class="self-cards"></div>
+          `;
+        } else {
+          seat.innerHTML = `
+            <div class="seat-top">
+              <div>
+                <div class="seat-name">${player.name}</div>
+                <div class="seat-meta">對手視窗</div>
+              </div>
+              <div class="seat-meta">HP ${player.hp}/30</div>
+            </div>
+            <div class="seat-lines">
+              <div>護甲 ${player.armor} | 能量 ${player.energy}/${player.maxEnergy}</div>
+              <div>手牌 ${player.hand.length} | 牌庫 ${player.deck.length}</div>
+              <div>桌面 ${countSlots(player.board)}</div>
+            </div>
+          `;
+        }
+        seatGrid.appendChild(seat);
+      });
+    }
+
+    function countSlots(board) {
+      const total = [...board.trap, ...board.boost, ...board.attack, ...board.defense].filter(Boolean).length;
+      return `${total}/7`;
+    }
+
+    function renderFocusChips() {
+      focusChips.innerHTML = "";
+      seatOrder.forEach((seatKey, index) => {
+        const chip = document.createElement("button");
+        chip.className = `chip ${focusSeatIndex === index ? "active" : ""}`;
+        chip.textContent = reel.getSeatLabel(index);
+        chip.onclick = () => {
+          focusSeatIndex = index;
+          render();
+        };
+        focusChips.appendChild(chip);
+      });
+    }
+
+    function renderStatus() {
+      const self = state[0];
+      const focus = currentFocusPlayer();
+      const turn = currentTurnPlayer();
+      playerStatus.innerHTML = `
+        <div>你的位置：<strong>${self.name}</strong></div>
+        <div>目前觀察：<strong>${focus.name}</strong></div>
+        <div>輪到：<strong>${turn.name}</strong></div>
+        <div>手牌：<strong>${self.hand.length}</strong> 張</div>
+        <div>棄牌堆：<strong>${self.discardPile.length}</strong> 張</div>
+        <div>卡牌墳場：<strong>${self.graveyard.length}</strong> 張</div>
+        <div>桌面效果：<strong>reel rotation</strong></div>
+      `;
+
+      matchStatus.innerHTML = `
+        <div>目前回合：<strong>${round}</strong></div>
+        <div>目前輪次：<strong>${turnCounter}</strong></div>
+        <div>視角旋轉：<strong>${reel.getRotation(focusSeatIndex)}</strong></div>
+        <div>桌面縮放：<strong>${Math.round(zoomScale * 100)}%</strong></div>
+        <div class="zoom-note">可用左側工具與滑鼠 / 觸控板調整視角。</div>
+      `;
+    }
+
+    function renderHand() {
+      const self = state[0];
+      const handWrap = document.createElement("div");
+      handWrap.className = "hand-wrap";
+      if (handCollapsed) {
+        const preview = selectedCardIndex !== null ? self.hand[selectedCardIndex] : self.hand[0];
+        handWrap.classList.add("collapsed");
+        handWrap.innerHTML = `
+          <div class="hand-head">
+            <span>手牌夾</span>
+            <button class="mini-btn" data-expand-hand="1">展開</button>
+          </div>
+          <div class="hand-folder">
+            <div class="folder-icon">手</div>
+            <div class="folder-copy">
+              <div class="folder-title">手牌區</div>
+              <div class="folder-meta">共 ${self.hand.length} 張</div>
+              ${preview ? `<div class="folder-preview">${preview.name}</div>` : `<div class="folder-preview">空</div>`}
+            </div>
+          </div>
+        `;
+        handWrap.querySelector('[data-expand-hand="1"]').onclick = (event) => {
+          event.stopPropagation();
+          handCollapsed = false;
+          render();
+        };
+      } else {
+        handWrap.innerHTML = `
+          <div class="hand-head">
+            <span>你的手牌（最多 5 張）</span>
+            <span>點牌即可出牌</span>
+          </div>
+        `;
+
+        const handGrid = document.createElement("div");
+        handGrid.className = "hand-grid";
+        self.hand.slice(0, 5).forEach((card, index) => {
+          const cardEl = document.createElement("div");
+          cardEl.className = `hand-card ${selectedCardIndex === index ? "selected" : ""}`;
+          cardEl.onclick = () => {
+            selectedCardIndex = index;
+            handCollapsed = false;
+            render();
+          };
+          cardEl.innerHTML = `
+            <div class="name">${card.name}</div>
+            <div class="meta">${card.type} / Cost ${card.cost}</div>
+            <div class="meta desc">${card.desc}</div>
+            <div class="stack-row">
+              <span class="tag">${card.rarity}</span>
+              <span class="tag">${reel.getCardLane(card.type)}</span>
+            </div>
+            <div class="card-actions">
+              <button class="mini-btn" data-play-hand="1">出牌</button>
+              <button class="mini-btn danger" data-discard-hand="1">棄牌</button>
+            </div>
+          `;
+          cardEl.querySelector('[data-play-hand="1"]').onclick = (event) => {
+            event.stopPropagation();
+            selectedCardIndex = index;
+            handCollapsed = false;
+            placeSelectedHandCardAtDesk();
+          };
+          cardEl.querySelector('[data-discard-hand="1"]').onclick = (event) => {
+            event.stopPropagation();
+            discardHandCard(self, index);
+          };
+          handGrid.appendChild(cardEl);
+        });
+
+        while (handGrid.children.length < 5) {
+          const empty = document.createElement("div");
+          empty.className = "hand-card";
+          empty.innerHTML = `<div class="empty">空位</div>`;
+          handGrid.appendChild(empty);
+        }
+
+        handWrap.appendChild(handGrid);
+      }
+
+      const boardWrap = document.createElement("div");
+      boardWrap.className = "board-wrap";
+      boardWrap.innerHTML = `
+        <div class="hand-head">
+          <span>桌上卡牌區（陷阱 / 加成 / 防禦）</span>
+          <span>送入墳場不補牌</span>
+        </div>
+      `;
+
+      const boardStack = document.createElement("div");
+      boardStack.className = "board-stack";
+      const boardItems = [
+        { key: "trap", label: "Trap", value: self.board.trap[0] },
+        { key: "boost", label: "Boost", value: self.board.boost[0] },
+        { key: "defense-1", label: "Defense 1", value: self.board.defense[0] },
+        { key: "defense-2", label: "Defense 2", value: self.board.defense[1] },
+      ];
+
+      boardItems.forEach((item) => {
+        const panel = document.createElement("div");
+        panel.className = "board-item";
+        if (!item.value) {
+          panel.innerHTML = `<div class="title">${item.label}</div><div class="meta">Empty</div>`;
+        } else {
+          panel.innerHTML = `
+            <div class="title">${item.label}: ${item.value.card.name}</div>
+            <div class="meta">${item.value.card.type} / Cost ${item.value.card.cost}</div>
+            <div class="meta">${item.value.faceDown && !item.value.triggered ? "Hidden until triggered" : "Open"}</div>
+            <div class="card-actions">
+              <button class="mini-btn danger" data-board-discard="${item.key}">Discard</button>
+            </div>
+          `;
+          const btn = panel.querySelector(`[data-board-discard="${item.key}"]`);
+          btn.onclick = (event) => {
+            event.stopPropagation();
+            discardBoardCard(self, item.key === "defense-1" ? { key: "defense-1", slot: "defense", slotIndex: 0, label: "防禦 1" }
+              : item.key === "defense-2" ? { key: "defense-2", slot: "defense", slotIndex: 1, label: "防禦 2" }
+              : { key: item.key, slot: "front", label: item.label });
+          };
+        }
+        boardStack.appendChild(panel);
+      });
+
+      boardWrap.appendChild(boardStack);
+      handWrap.appendChild(boardWrap);
+      return handWrap;
+    }
+
+    function renderLog() {
+      logEl.innerHTML = "";
+      const entries = (window._log || []).slice(0, 12);
+      if (!entries.length) {
+        logEl.innerHTML = `<div class="log-entry">目前還沒有事件。</div>`;
+        return;
+      }
+      entries.forEach((entry) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        div.textContent = `[R${entry.round}] ${entry.message}`;
+        logEl.appendChild(div);
+      });
+    }
+
+    function renderBoardControls() {
+      const bottomSlot = seatGrid.querySelector(".seat.bottom .self-cards");
+      if (!bottomSlot) return;
+      const existing = bottomSlot.querySelector(".hand-wrap");
+      if (existing) existing.remove();
+      bottomSlot.appendChild(renderHand());
+    }
+
+    function render() {
+      renderReel();
+      renderSeats();
+      renderBoardControls();
+      renderStatus();
+      renderLog();
+    }
+
+    document.getElementById("btnZoomIn").addEventListener("click", () => updateZoomScale(zoomScale + 0.08));
+    document.getElementById("btnZoomOut").addEventListener("click", () => updateZoomScale(zoomScale - 0.08));
+    document.getElementById("btnResetView").addEventListener("click", () => {
+      focusSeatIndex = 0;
+      userRotation = 0;
+      updateZoomScale(1);
+    });
+    document.getElementById("btnToggleSidebar").addEventListener("click", () => {
+      const hidden = sidebar.classList.toggle("hidden");
+      layout.classList.toggle("sidebar-hidden", hidden);
+    });
+    document.getElementById("btnAutoAI").addEventListener("click", autoAIPlay);
+
+    function updateZoomScale(nextScale) {
+      const clamped = clamp(nextScale, 0.9, 1.4);
+      zoomScale = clamped;
+      render();
+    }
+
+    function getDistance(a, b) {
+      return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    }
+
+    tableShell.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button") || event.target.closest(".seat") || event.target.closest(".sidebar")) {
+        return;
+      }
+
+      if (selectedCardIndex !== null && !event.target.closest(".slot") && !event.target.closest(".hand-wrap")) {
+        const placed = placeSelectedHandCardAtDesk();
+        if (placed) {
+          event.preventDefault();
+          return;
+        }
+      }
+
+      tableShell.classList.add("dragging");
+      tableShell.setPointerCapture(event.pointerId);
+      activePointers.set(event.pointerId, event);
+
+      if (activePointers.size === 1) {
+        dragState.mode = "rotate";
+        dragState.pointerId = event.pointerId;
+        dragState.startX = event.clientX;
+        dragState.baseRotation = userRotation;
+      } else if (activePointers.size === 2) {
+        const [first, second] = [...activePointers.values()];
+        dragState.mode = "pinch";
+        dragState.baseScale = zoomScale;
+        dragState.baseDistance = getDistance(first, second);
+      }
+
+      event.preventDefault();
+    });
+
+    tableShell.addEventListener("pointermove", (event) => {
+      if (!activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, event);
+
+      if (dragState.mode === "rotate" && dragState.pointerId === event.pointerId) {
+        const deltaX = event.clientX - dragState.startX;
+        userRotation = dragState.baseRotation + deltaX * 0.25;
+        render();
+      } else if (dragState.mode === "pinch" && activePointers.size >= 2) {
+        const [first, second] = [...activePointers.values()];
+        const distance = getDistance(first, second);
+        if (dragState.baseDistance > 0) {
+          updateZoomScale(dragState.baseScale * (distance / dragState.baseDistance));
+        }
+      }
+
+      event.preventDefault();
+    });
+
+    function endPointer(event) {
+      activePointers.delete(event.pointerId);
+      if (activePointers.size === 0) {
+        dragState.mode = null;
+        dragState.pointerId = null;
+        tableShell.classList.remove("dragging");
+      } else if (activePointers.size === 1) {
+        const [remaining] = [...activePointers.values()];
+        dragState.mode = "rotate";
+        dragState.pointerId = remaining.pointerId;
+        dragState.startX = remaining.clientX;
+        dragState.baseRotation = userRotation;
+      }
+    }
+
+    tableShell.addEventListener("pointerup", endPointer);
+    tableShell.addEventListener("pointercancel", endPointer);
+    tableShell.addEventListener("lostpointercapture", endPointer);
+
+    tableShell.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const direction = Math.sign(event.deltaY);
+      const step = event.deltaMode === 1 ? 0.05 : 0.025;
+      updateZoomScale(zoomScale - direction * step);
+    }, { passive: false });
+
+    resetMatch();
+  </script>
+</body>
+</html>
+

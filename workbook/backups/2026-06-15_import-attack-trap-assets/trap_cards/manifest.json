@@ -1,0 +1,87 @@
+{
+  "category": "trap_cards",
+  "categoryLabel": "陷阱卡",
+  "version": 1,
+  "cards": [
+    {
+      "id": "trap_crowd_flow_map",
+      "name": "分流圖",
+      "image": "images/01_crowd_flow_map.png",
+      "setupCost": { "time": 1, "tech": 1 },
+      "triggers": ["爆量", "塞爆", "搶車位", "改路線", "朝聖塞車"],
+      "success": { "efficiency": 1 }
+    },
+    {
+      "id": "trap_reservation_site",
+      "name": "預約網",
+      "image": "images/02_reservation_site.png",
+      "setupCost": { "tech": 2 },
+      "triggers": ["爆量", "過度行銷", "看不到"],
+      "success": { "efficiency": 1, "ecology": 1 }
+    },
+    {
+      "id": "trap_rain_plan",
+      "name": "雨備",
+      "image": "images/03_rain_plan.png",
+      "setupCost": { "time": 1 },
+      "triggers": ["颱風", "風太大"],
+      "success": { "publicSupport": 1 }
+    },
+    {
+      "id": "trap_documentation_folder",
+      "name": "資料夾",
+      "image": "images/04_documentation_folder.png",
+      "setupCost": { "time": 1 },
+      "triggers": ["說錯", "文化誤讀", "假消息"],
+      "success": { "culture": 1 }
+    },
+    {
+      "id": "trap_clarification_draft",
+      "name": "澄清稿",
+      "image": "images/05_clarification_draft.png",
+      "setupCost": { "time": 1, "tech": 1 },
+      "triggers": ["玩壞", "空拍照", "假消息", "抗議"],
+      "success": { "culture": 1 }
+    },
+    {
+      "id": "trap_emergency_fund",
+      "name": "基金",
+      "image": "images/06_emergency_fund.png",
+      "setupCost": { "money": 1 },
+      "triggers": ["破財", "維修費", "古蹟漏水"],
+      "success": { "money": 2 }
+    },
+    {
+      "id": "trap_safety_checklist",
+      "name": "安檢表",
+      "image": "images/07_safety_checklist.png",
+      "setupCost": { "time": 1, "tech": 1 },
+      "triggers": ["故障", "安全事故", "維修費"],
+      "success": { "efficiency": 1 }
+    },
+    {
+      "id": "trap_buffer_zone",
+      "name": "緩衝區",
+      "image": "images/08_buffer_zone.png",
+      "setupCost": { "time": 1 },
+      "triggers": ["棲地危機", "過開發", "環境衝突"],
+      "success": { "ecology": 1 }
+    },
+    {
+      "id": "trap_records",
+      "name": "紀錄",
+      "image": "images/09_records.png",
+      "setupCost": { "time": 1 },
+      "triggers": ["施壓", "抗議", "搶攤位", "走後門"],
+      "success": { "publicSupport": 1 }
+    },
+    {
+      "id": "trap_volunteer_roster",
+      "name": "志工名單",
+      "image": "images/10_volunteer_roster.png",
+      "setupCost": { "time": 1 },
+      "triggers": ["缺工", "人手不足", "失傳"],
+      "success": { "manpower": 1 }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+﻿.DS_Store
+Thumbs.db
+*.inspect.ndjson
+node_modules/

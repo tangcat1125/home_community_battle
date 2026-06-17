@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Card Battle Table</title>
+  <style>
+    :root {
+      --bg-0: #050816;
+      --bg-1: #0f172a;
+      --bg-2: #111827;
+      --line: rgba(148, 163, 184, 0.22);
+      --line-strong: rgba(96, 165, 250, 0.45);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #f59e0b;
+      --danger: #ef4444;
+      --good: #22c55e;
+      --panel: rgba(15, 23, 42, 0.78);
+      --panel-strong: rgba(15, 23, 42, 0.96);
+      --card: rgba(12, 18, 32, 0.9);
+      --card-hint: rgba(56, 189, 248, 0.16);
+      --zoom: 1;
+      --table-spin: 0deg;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 28%),
+        radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.10), transparent 18%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .table-backdrop {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(2, 6, 23, 0.05), rgba(2, 6, 23, 0.75) 75%),
+        radial-gradient(circle at center, rgba(56, 189, 248, 0.12), transparent 35%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(30, 41, 59, 0.15));
+      pointer-events: none;
+    }
+
+    .table-core {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: min(70vw, 900px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(var(--zoom)) rotate(var(--table-spin));
+      transform-origin: center center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(5, 8, 22, 0.18) 0%, rgba(11, 18, 32, 0.92) 62%, rgba(2, 6, 23, 1) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 40px 120px rgba(0, 0, 0, 0.35),
+        0 0 90px rgba(56, 189, 248, 0.15);
+      overflow: hidden;
+    }
+
+    .table-core::before {
+      content: "";
+      position: absolute;
+      inset: 12%;
+      border-radius: 50%;
+      border: 1px dashed rgba(148, 163, 184, 0.18);
+    }
+
+    .table-core::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.08) 72%, transparent 74%);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.12) inset;
+    }
+
+    .hud {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .hud .panel {
+      pointer-events: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
+    }
+
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .title-block {
+      padding: 18px 20px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+      max-width: 62ch;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 18px 20px;
+    }
+
+    .toolbar button, .toolbar input[type="range"] {
+      pointer-events: auto;
+    }
+
+    .toolbar button {
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: white;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 1), rgba(14, 165, 233, 1));
+      box-shadow: 0 12px 22px rgba(14, 165, 233, 0.25);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .toolbar button.secondary {
+      background: linear-gradient(180deg, rgba(71, 85, 105, 1), rgba(51, 65, 85, 1));
+    }
+
+    .toolbar label {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar input[type="range"] {
+      width: 150px;
+    }
+
+    .monitor {
+      grid-column: 2;
+      grid-row: 2 / span 2;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 16px;
+      min-height: 0;
+    }
+
+    .monitor-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .monitor-title {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .monitor-body {
+      overflow: auto;
+      min-height: 0;
+      padding-right: 4px;
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #dbeafe;
+    }
+
+    .log-entry {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .board {
+      position: absolute;
+      inset: 0;
+      transform: scale(var(--zoom));
+      transform-origin: center center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .seat {
+      position: absolute;
+      width: clamp(220px, 24vw, 300px);
+      display: grid;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .seat-panel {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.92));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .seat.active .seat-panel {
+      border-color: var(--line-strong);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.30) inset, 0 16px 32px rgba(0, 0, 0, 0.24);
+    }
+
+    .seat-name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .seat-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .board-lanes {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .lane {
+      display: grid;
+      gap: 6px;
+    }
+
+    .lane-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .slot-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 40px;
+    }
+
+    .slot-card {
+      position: relative;
+      min-width: 78px;
+      max-width: 100px;
+      border-radius: 12px;
+      padding: 8px 9px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: linear-gradient(180deg, rgba(12, 18, 32, 0.96), rgba(20, 26, 44, 0.88));
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .slot-card.attack { box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.16) inset; }
+    .slot-card.defense { box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16) inset; }
+    .slot-card.trap { box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.18) inset; }
+    .slot-card.revealed { box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2) inset; }
+    .slot-card.history { opacity: 0.65; }
+
+    .slot-card small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .slot-card.back {
+      background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 12, 24, 0.95)),
+        repeating-linear-gradient(45deg, rgba(56, 189, 248, 0.12) 0 7px, transparent 7px 14px);
+      color: #dbeafe;
+    }
+
+    .slot-card.back::after {
+      content: "FACE DOWN";
+      display: block;
+      margin-top: 6px;
+      font-size: 10px;
+      color: rgba(147, 197, 253, 0.95);
+      letter-spacing: 0.12em;
+    }
+
+    .hand {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 74px;
+    }
+
+    .hand-card {
+      min-width: 120px;
+      border-radius: 14px;
+      padding: 10px 11px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: linear-gradient(180deg, rgba(9, 15, 28, 0.96), rgba(17, 24, 39, 0.92));
+      color: white;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+
+    .hand-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.45);
+      background: linear-gradient(180deg, rgba(14, 22, 39, 0.98), rgba(17, 24, 39, 0.94));
+    }
+
+    .hand-card small {
+      display: block;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.38;
+    }
+
+    .hand-card.pending {
+      outline: 2px solid rgba(245, 158, 11, 0.75);
+    }
+
+    .seat.bottom { left: 50%; bottom: 18px; transform: translateX(-50%); }
+    .seat.top { left: 50%; top: 18px; transform: translateX(-50%); }
+    .seat.left { left: 18px; top: 50%; transform: translateY(-50%); }
+    .seat.right { right: 18px; top: 50%; transform: translateY(-50%); }
+
+    .seat.bottom .seat-panel, .seat.top .seat-panel { width: 100%; }
+
+    .seat.top .hand,
+    .seat.left .hand,
+    .seat.right .hand {
+      display: none;
+    }
+
+    .seat.bottom .seat-panel {
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.16), rgba(15, 23, 42, 0.96));
+    }
+
+    .seat.left .seat-panel,
+    .seat.right .seat-panel,
+    .seat.top .seat-panel {
+      opacity: 0.96;
+    }
+
+    .play-area {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .center-orb {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(var(--zoom));
+      width: 34%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(56, 189, 248, 0.08), rgba(15, 23, 42, 0.02) 45%, transparent 72%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .inspector {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 6;
+      pointer-events: auto;
+      width: min(92vw, 560px);
+      background: rgba(2, 6, 23, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+      display: none;
+    }
+
+    .inspector.open {
+      display: block;
+    }
+
+    .inspector-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .inspector-title {
+      font-weight: 800;
+      font-size: 17px;
+    }
+
+    .inspector-close {
+      border: 0;
+      background: rgba(71, 85, 105, 0.85);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .inspector-body {
+      color: #dbeafe;
+      line-height: 1.45;
+      display: grid;
+      gap: 8px;
+    }
+
+    .target-hint {
+      color: rgba(245, 158, 11, 0.95);
+      font-size: 12px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .seat.targetable .seat-panel {
+      outline: 2px solid rgba(245, 158, 11, 0.55);
+      cursor: pointer;
+    }
+
+    .seat.targetable .target-hint {
+      display: block;
+    }
+
+    .seat.current-turn .seat-name::after {
+      content: "TURN";
+      color: #0f172a;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 1), rgba(251, 191, 36, 1));
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 8px 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 920px) {
+      html, body { overflow: auto; }
+      .app { height: auto; min-height: 100vh; }
+      .scene { position: relative; min-height: 100vh; transform: none !important; }
+      .hud { position: relative; inset: auto; grid-template-columns: 1fr; grid-template-rows: auto auto auto; padding: 12px; }
+      .monitor { grid-column: 1; grid-row: auto; min-height: 260px; }
+      .table-core { width: 90vw; top: 56%; }
+      .seat.bottom, .seat.top, .seat.left, .seat.right {
+        width: min(92vw, 420px);
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .seat.top { top: 0; }
+      .seat.left { top: auto; bottom: 48vh; }
+      .seat.right { top: auto; bottom: 34vh; }
+      .inspector { width: calc(100vw - 24px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="scene" id="scene">
+      <div class="table-backdrop"></div>
+      <div class="table-core"></div>
+      <div class="center-orb"></div>
+
+      <div class="board" id="board"></div>
+
+      <div class="hud">
+        <div class="panel title-block">
+          <h1>Battle Table Command Deck</h1>
+          <div class="subtitle">
+            四角座位的卡牌戰情室。桌台是第一層，HUD 是第二層，卡牌放置在玩家席位周圍，並跟隨當前視角轉動。
+          </div>
+        </div>
+
+        <div class="panel toolbar">
+          <button id="btnStart">重新開局</button>
+          <button id="btnEndTurn" class="secondary">結束回合</button>
+          <button id="btnToggleZoom" class="secondary">重置視角</button>
+          <label>
+            視角縮放
+            <input id="zoomSlider" type="range" min="0.78" max="1.36" step="0.01" value="1" />
+          </label>
+        </div>
+
+        <div class="panel monitor">
+          <div class="monitor-head">
+            <div>
+              <div class="monitor-title">戰情監控</div>
+              <div id="statusText" style="color:var(--muted); font-size:13px; margin-top:4px;"></div>
+            </div>
+            <div style="text-align:right; color:var(--muted); font-size:12px;">
+              <div id="roundText">Round 1</div>
+              <div id="turnText">Turn -</div>
+            </div>
+          </div>
+          <div class="monitor-body">
+            <div class="log" id="log"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inspector" id="inspector">
+        <div class="inspector-head">
+          <div>
+            <div class="inspector-title" id="inspectorTitle">Card</div>
+            <div id="inspectorMeta" style="color:var(--muted); font-size:12px; margin-top:4px;"></div>
+          </div>
+          <button class="inspector-close" id="btnCloseInspector">關閉</button>
+        </div>
+        <div class="inspector-body" id="inspectorBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../card_bank/cards-data.js"></script>
+  <script src="./sample-cards.js"></script>
+  <script src="./table-battle-engine.js"></script>
+  <script src="./peer.js"></script>
+  <script>
+    const game = new TableBattleEngine(sampleCards, {
+      handLimit: 7,
+      drawPerTurn: 2,
+      maxPlayers: 4,
+    });
+
+    game.addPlayer({ name: "你", isAI: false, seat: 0 });
+    game.addPlayer({ name: "AI-1", isAI: true, seat: 1 });
+    game.addPlayer({ name: "AI-2", isAI: true, seat: 2 });
+    game.addPlayer({ name: "AI-3", isAI: true, seat: 3 });
+
+    const monitor = createBattlePeerHub(game);
+
+    const scene = document.getElementById("scene");
+    const board = document.getElementById("board");
+    const logEl = document.getElementById("log");
+    const statusText = document.getElementById("statusText");
+    const roundText = document.getElementById("roundText");
+    const turnText = document.getElementById("turnText");
+    const zoomSlider = document.getElementById("zoomSlider");
+    const btnStart = document.getElementById("btnStart");
+    const btnEndTurn = document.getElementById("btnEndTurn");
+    const btnToggleZoom = document.getElementById("btnToggleZoom");
+    const inspector = document.getElementById("inspector");
+    const inspectorTitle = document.getElementById("inspectorTitle");
+    const inspectorMeta = document.getElementById("inspectorMeta");
+    const inspectorBody = document.getElementById("inspectorBody");
+    const btnCloseInspector = document.getElementById("btnCloseInspector");
+
+    const seatPositionMap = ["bottom", "left", "top", "right"];
+    let pendingAttack = null;
+    let selectedCardInfo = null;
+    let currentSnapshot = null;
+    let cameraSeat = 0;
+
+    function formatCardMeta(card) {
+      const parts = [card.type, `Cost ${card.cost}`, card.rarity || "Common"];
+      return parts.join(" · ");
+    }
+
+    function openInspector(card, extra = {}) {
+      selectedCardInfo = card;
+      inspector.classList.add("open");
+      inspectorTitle.textContent = card.name || "Card";
+      inspectorMeta.textContent = formatCardMeta(card);
+      const effectLines = [];
+      if (card.desc) effectLines.push(card.desc);
+      if (extra.note) effectLines.push(extra.note);
+      if (card.effect) {
+        const effectSummary = Object.entries(card.effect)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ");
+        effectLines.push(`效果：${effectSummary}`);
+      }
+      inspectorBody.innerHTML = effectLines.map((line) => `<div>${line}</div>`).join("");
+    }
+
+    function closeInspector() {
+      selectedCardInfo = null;
+      inspector.classList.remove("open");
+    }
+
+    function getViewSeat() {
+      if (!currentSnapshot) return 0;
+      return currentSnapshot.currentPlayerId
+        ? currentSnapshot.players.find((player) => player.id === currentSnapshot.currentPlayerId)?.seat ?? 0
+        : 0;
+    }
+
+    function relativeSeatClass(seat) {
+      const diff = ((seat - cameraSeat) + 4) % 4;
+      return seatPositionMap[diff];
+    }
+
+    function renderSeat(player, currentPlayer, snapshotPlayer) {
+      const seatEl = document.createElement("div");
+      const slotClass = relativeSeatClass(player.seat);
+      const isCurrent = currentPlayer && currentPlayer.id === player.id;
+      const isHuman = !player.isAI;
+      seatEl.className = `seat ${slotClass} ${isCurrent ? "active current-turn" : ""} ${pendingAttack && pendingAttack.ownerId !== player.id && player.id !== pendingAttack.ownerId ? "targetable" : ""}`;
+      if (!isHuman && pendingAttack && pendingAttack.ownerId === currentPlayer?.id && currentPlayer?.id !== player.id) {
+        seatEl.classList.add("targetable");
+      }
+      seatEl.dataset.playerId = player.id;
+
+      const visibleBoard = snapshotPlayer.board;
+      const boardHtml = [
+        ["attack", visibleBoard.attack, false],
+        ["defense", visibleBoard.defense, false],
+        ["trap", visibleBoard.traps, true],
+        ["revealed", visibleBoard.revealed, false],
+        ["history", visibleBoard.history, false],
+      ].map(([laneName, cards, faceDown]) => `
+        <div class="lane">
+          <div class="lane-label">
+            <span>${laneName}</span>
+            <span>${cards.length}</span>
+          </div>
+          <div class="slot-row">
+            ${cards.map((card) => `
+              <button class="slot-card ${laneName} ${faceDown ? "back" : ""}" data-lane="${laneName}" data-card='${encodeURIComponent(JSON.stringify(card))}'>
+                ${faceDown ? "???" : card.name}
+                <small>${faceDown ? "Covered trap" : formatCardMeta(card)}</small>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      const handHtml = isHuman
+        ? `
+          <div class="lane">
+            <div class="lane-label">
+              <span>hand</span>
+              <span>${player.hand.length}</span>
+            </div>
+            <div class="hand">
+              ${player.hand.map((card, index) => `
+                <button class="hand-card ${pendingAttack && pendingAttack.handIndex === index ? "pending" : ""}" data-hand-index="${index}">
+                  ${card.name}
+                  <small>${formatCardMeta(card)}<br>${card.desc || ""}</small>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        `
+        : `
+          <div class="lane">
+            <div class="lane-label">
+              <span>hand</span>
+              <span>${player.hand.length} cards</span>
+            </div>
+            <div class="seat-meta">
+              <span>hidden hand</span>
+              <span>watch lanes to inspect</span>
+            </div>
+          </div>
+        `;
+
+      seatEl.innerHTML = `
+        <div class="seat-panel">
+          <div class="seat-name">
+            <span>${player.name}${player.isAI ? " (AI)" : ""}</span>
+          </div>
+          <div class="mini-stats">
+            <div>HP ${player.hp}/${player.maxHp}</div>
+            <div>Armor ${player.armor}</div>
+            <div>Energy ${player.energy}</div>
+            <div>Poison ${player.statuses.poison}</div>
+            <div>Vulnerable ${player.statuses.vulnerable}</div>
+            <div>Shields ${player.statuses.shieldNext}</div>
+          </div>
+          <div class="target-hint">${pendingAttack && pendingAttack.ownerId === currentPlayer?.id && player.id !== currentPlayer?.id ? "點擊這個牌桌作為目標" : ""}</div>
+          <div class="board-lanes">
+            ${boardHtml}
+            ${handHtml}
+          </div>
+        </div>
+      `;
+
+      seatEl.querySelectorAll("[data-hand-index]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (!currentPlayer || currentPlayer.id !== player.id || player.isAI || game.matchOver) return;
+          const handIndex = Number(button.dataset.handIndex);
+          const card = player.hand[handIndex];
+          if (!card) return;
+
+          if (card.type === "Attack" || card.type === "Debuff") {
+            pendingAttack = {
+              ownerId: player.id,
+              handIndex,
+              cardId: card.id,
+            };
+            render();
+            return;
+          }
+
+          game.playCard(player.id, handIndex, player.id);
+          pendingAttack = null;
+          monitor.refresh("play-card");
+          render();
+        });
+      });
+
+      seatEl.querySelectorAll("[data-lane]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const cardJson = JSON.parse(decodeURIComponent(button.dataset.card));
+          openInspector(cardJson, {
+            note: `${player.name} 的 ${button.dataset.lane} 區域`,
+          });
+        });
+      });
+
+      seatEl.addEventListener("click", (event) => {
+        if (!pendingAttack || !currentPlayer || pendingAttack.ownerId !== currentPlayer.id) return;
+        if (player.id === currentPlayer.id) return;
+        if (player.hp <= 0) return;
+        if (event.target.closest(".hand-card") || event.target.closest(".slot-card")) return;
+
+        const handIndex = pendingAttack.handIndex;
+        const activeCard = currentPlayer.hand[handIndex];
+        if (!activeCard) return;
+
+        game.playCard(currentPlayer.id, handIndex, player.id);
+        pendingAttack = null;
+        monitor.refresh("target-play");
+        render();
+      });
+
+      return seatEl;
+    }
+
+    function render() {
+      currentSnapshot = monitor.snapshot();
+      const currentPlayer = game.getCurrentPlayer();
+      cameraSeat = getViewSeat();
+
+      scene.style.setProperty("--zoom", zoomSlider.value);
+      scene.style.setProperty("--table-spin", `${cameraSeat * 90}deg`);
+
+      const playersBySeat = [...game.players].sort((a, b) => a.seat - b.seat);
+      board.innerHTML = "";
+      playersBySeat.forEach((player) => {
+        const snapPlayer = currentSnapshot.players.find((entry) => entry.id === player.id);
+        if (!snapPlayer) return;
+        board.appendChild(renderSeat(player, currentPlayer, snapPlayer));
+      });
+
+      statusText.textContent = currentSnapshot.matchOver
+        ? "對局結束"
+        : `現在輪到 ${currentPlayer ? currentPlayer.name : "無"}，可視角為 ${currentPlayer ? `P${currentPlayer.seat + 1}` : "-"}`;
+      roundText.textContent = `Round ${currentSnapshot.round}`;
+      turnText.textContent = currentSnapshot.matchOver
+        ? "Finished"
+        : `Turn: ${currentPlayer ? currentPlayer.name : "-"}`;
+      logEl.innerHTML = currentSnapshot.log
+        .slice(-18)
+        .map((entry) => `<div class="log-entry">[R${entry.round}] ${entry.message}</div>`)
+        .join("");
+
+      const human = game.players[0];
+      if (pendingAttack && human && pendingAttack.ownerId !== human.id) {
+        pendingAttack = null;
+      }
+
+      currentSnapshot.players.forEach((entry) => {
+        const seatEl = board.querySelector(`.seat[data-player-id="${entry.id}"]`);
+        if (!seatEl) return;
+        if (pendingAttack && currentPlayer && pendingAttack.ownerId === currentPlayer.id && entry.id !== currentPlayer.id) {
+          seatEl.classList.add("targetable");
+        }
+      });
+    }
+
+    function startGame() {
+      pendingAttack = null;
+      closeInspector();
+      game.startMatch();
+      monitor.refresh("start-match");
+      game.startTurn();
+      monitor.refresh("start-turn");
+      render();
+    }
+
+    btnStart.addEventListener("click", startGame);
+    btnEndTurn.addEventListener("click", () => {
+      if (game.matchOver) return;
+      pendingAttack = null;
+      game.endTurn();
+      monitor.refresh("end-turn");
+      render();
+    });
+
+    btnToggleZoom.addEventListener("click", () => {
+      zoomSlider.value = "1";
+      render();
+    });
+
+    zoomSlider.addEventListener("input", render);
+    btnCloseInspector.addEventListener("click", closeInspector);
+
+    monitor.subscribe(() => {
+      // Monitor exists so later we can plug in a peer transport without changing rendering logic.
+    });
+
+    startGame();
+  </script>
+</body>
+</html>

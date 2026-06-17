@@ -1,0 +1,167 @@
+{
+  "category": "attack_cards",
+  "categoryLabel": "攻擊卡",
+  "version": 1,
+  "cards": [
+    {
+      "id": "attack_crowd_surge",
+      "name": "爆量",
+      "image": "images/01_crowd_surge.png",
+      "attackType": "人潮攻擊",
+      "effects": { "tourism": 1, "publicSupport": -2, "efficiency": -1 },
+      "counterCards": ["動線", "接駁", "預約制"]
+    },
+    {
+      "id": "attack_delay",
+      "name": "拖延",
+      "image": "images/02_delay.png",
+      "attackType": "成本攻擊",
+      "effects": { "time": -2, "efficiency": -1 },
+      "counterCards": ["預算表", "志工站"]
+    },
+    {
+      "id": "attack_overcrowding",
+      "name": "塞爆",
+      "image": "images/03_overcrowding.png",
+      "attackType": "人潮攻擊",
+      "effects": { "efficiency": -2, "publicSupport": -1 },
+      "counterCards": ["接駁", "動線"]
+    },
+    {
+      "id": "attack_parking_scramble",
+      "name": "搶車位",
+      "image": "images/04_parking_scramble.png",
+      "attackType": "人潮攻擊",
+      "effects": { "publicSupport": -2 },
+      "counterCards": ["動線", "接駁", "說明會"]
+    },
+    {
+      "id": "attack_drone_photo",
+      "name": "空拍照",
+      "image": "images/05_drone_photo.png",
+      "attackType": "人潮攻擊",
+      "effects": { "tourism": 1, "income": -2, "culture": -1 },
+      "counterCards": ["拍照規範", "澄清稿"]
+    },
+    {
+      "id": "attack_hype_cooldown",
+      "name": "退燒",
+      "image": "images/06_hype_cooldown.png",
+      "attackType": "人潮攻擊",
+      "effects": { "tourism": -3 },
+      "counterCards": ["導覽", "故事地圖", "體驗課"]
+    },
+    {
+      "id": "attack_labor_shortage",
+      "name": "缺工",
+      "image": "images/07_labor_shortage.png",
+      "attackType": "成本攻擊",
+      "effects": { "manpower": -2, "time": -1 },
+      "counterCards": ["志工名單", "志工站", "說明會"]
+    },
+    {
+      "id": "attack_budget_loss",
+      "name": "破財",
+      "image": "images/08_budget_loss.png",
+      "attackType": "成本攻擊",
+      "effects": { "money": -3 },
+      "counterCards": ["預算表"]
+    },
+    {
+      "id": "attack_equipment_failure",
+      "name": "故障",
+      "image": "images/09_equipment_failure.png",
+      "attackType": "成本攻擊",
+      "effects": { "tech": -2, "efficiency": -1 },
+      "counterCards": ["安檢表", "預算表"]
+    },
+    {
+      "id": "attack_maintenance_fee",
+      "name": "維修費",
+      "image": "images/10_maintenance_fee.png",
+      "attackType": "成本攻擊",
+      "effects": { "money": -2 },
+      "counterCards": ["預算表", "古蹟修繕"]
+    },
+    {
+      "id": "attack_cultural_misstatement",
+      "name": "說錯",
+      "image": "images/11_cultural_misstatement.png",
+      "attackType": "文化攻擊",
+      "effects": { "culture": -2, "publicSupport": -1 },
+      "counterCards": ["導覽", "禮俗解說", "資料夾"]
+    },
+    {
+      "id": "attack_commodity_only",
+      "name": "只賣貨",
+      "image": "images/12_commodity_only.png",
+      "attackType": "文化攻擊",
+      "effects": { "culture": -2, "income": 1 },
+      "counterCards": ["故事地圖", "導覽", "小展館"]
+    },
+    {
+      "id": "attack_fake_performance",
+      "name": "假表演",
+      "image": "images/13_fake_performance.png",
+      "attackType": "文化攻擊",
+      "effects": { "culture": -3, "income": 1 },
+      "counterCards": ["禮俗解說", "長輩審稿"]
+    },
+    {
+      "id": "attack_lost_tradition",
+      "name": "失傳",
+      "image": "images/14_lost_tradition.png",
+      "attackType": "文化攻擊",
+      "effects": { "culture": -2, "manpower": -1 },
+      "counterCards": ["長輩審稿", "志工名單", "故事牆"]
+    },
+    {
+      "id": "attack_misused_meme",
+      "name": "玩壞",
+      "image": "images/15_misused_meme.png",
+      "attackType": "文化攻擊",
+      "effects": { "tourism": -1, "culture": -2 },
+      "counterCards": ["導覽", "拍照規範", "澄清稿"]
+    },
+    {
+      "id": "attack_litter_mess",
+      "name": "髒亂",
+      "image": "images/16_litter_mess.png",
+      "attackType": "生態攻擊",
+      "effects": { "ecology": -2, "publicSupport": -1 },
+      "counterCards": ["分類站", "志工站"]
+    },
+    {
+      "id": "attack_overdevelopment",
+      "name": "過開發",
+      "image": "images/17_overdevelopment.png",
+      "attackType": "生態攻擊",
+      "effects": { "income": 2, "ecology": -4 },
+      "counterCards": ["友善農法", "說明會"]
+    },
+    {
+      "id": "attack_habitat_crisis",
+      "name": "棲地危機",
+      "image": "images/18_habitat_crisis.png",
+      "attackType": "生態攻擊",
+      "effects": { "ecology": -3, "publicSupport": -1 },
+      "counterCards": ["友善農法", "緩衝區"]
+    },
+    {
+      "id": "attack_water_shortage",
+      "name": "缺水",
+      "image": "images/19_water_shortage.png",
+      "attackType": "生態攻擊",
+      "effects": { "income": -1, "ecology": -2 },
+      "counterCards": ["友善農法", "預算表"]
+    },
+    {
+      "id": "attack_light_pollution",
+      "name": "光害",
+      "image": "images/20_light_pollution.png",
+      "attackType": "生態攻擊",
+      "effects": { "ecology": -1, "publicSupport": -1 },
+      "counterCards": ["說明會", "動線"]
+    }
+  ]
+}
