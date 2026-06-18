@@ -2767,6 +2767,13 @@
       render();
     }
 
+    window.addEventListener("message", (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === "homeCommunityBattle:endGame") {
+        endGame(event.data.reason || "老師手動結束遊戲");
+      }
+    });
+
     function checkGameEnd() {
       if (gameEnded) return true;
       if (Date.now() - gameStartAt >= GAME_DURATION_MS) {
@@ -4416,7 +4423,7 @@
               <div class="hand-manage-sub">點卡牌可以放大閱讀；自己的回合可以棄牌換牌，避免被攻擊壓住後完全動不了。</div>
             </div>
             <div class="hand-manage-actions">
-              <button class="mini-btn" data-close-hand-manager="1">回到桌面</button>
+              <button class="mini-btn" data-close-hand-manager="1">關閉整理</button>
               <button class="mini-btn danger" data-collapse-from-manager="1">收成手牌夾</button>
             </div>
           </div>
@@ -4516,7 +4523,7 @@
               <div class="hand-manage-sub">放大檢視攻擊、防禦與加成。自己的回合可以把桌牌送進墳場並補回手牌，讓策略重新流動。</div>
             </div>
             <div class="hand-manage-actions">
-              <button class="mini-btn" data-close-table-zone="1">回到桌面</button>
+              <button class="mini-btn" data-close-table-zone="1">關閉整理</button>
             </div>
           </div>
           ${isTurn ? "" : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}

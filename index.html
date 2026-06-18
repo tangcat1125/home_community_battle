@@ -817,9 +817,11 @@
     document.getElementById("openGuide").addEventListener("click", openGuide);
     document.getElementById("closeGuide").addEventListener("click", closeGuide);
     document.getElementById("returnSetup").addEventListener("click", () => {
-      document.getElementById("gameShell").classList.remove("open");
-      document.body.classList.remove("game-active");
-      document.getElementById("gameFrame").src = "about:blank";
+      const frame = document.getElementById("gameFrame");
+      frame.contentWindow?.postMessage({
+        type: "homeCommunityBattle:endGame",
+        reason: "老師手動結束遊戲",
+      }, window.location.origin);
     });
 
     updatePreview();
