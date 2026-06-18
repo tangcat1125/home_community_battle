@@ -380,105 +380,6 @@
       line-height: 1.25;
     }
 
-    .metric-bars {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(148, 163, 184, 0.18);
-    }
-
-    .metric-bar {
-      display: grid;
-      grid-template-columns: 72px 1fr auto;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-    }
-
-    .metric-label {
-      color: #dbeafe;
-      font-weight: 900;
-    }
-
-    .metric-track {
-      position: relative;
-      height: 12px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.32);
-    }
-
-    .metric-fill {
-      width: var(--metric-width, 0%);
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #38bdf8, #67e8f9);
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
-      transition: width 0.48s ease;
-    }
-
-    .metric-bar.good .metric-fill {
-      background: linear-gradient(90deg, #22c55e, #a3e635);
-      box-shadow: 0 0 14px rgba(34, 197, 94, 0.35);
-    }
-
-    .metric-bar.warn .metric-fill {
-      background: linear-gradient(90deg, #f97316, #facc15);
-      box-shadow: 0 0 14px rgba(249, 115, 22, 0.35);
-    }
-
-    .metric-bar.danger .metric-fill {
-      background: linear-gradient(90deg, #ef4444, #fb7185);
-      box-shadow: 0 0 18px rgba(239, 68, 68, 0.5);
-    }
-
-    .metric-value {
-      min-width: 62px;
-      text-align: right;
-      color: #e0f2fe;
-      font-weight: 900;
-    }
-
-    .metric-delta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      margin-left: 4px;
-      padding: 2px 5px;
-      border-radius: 999px;
-      color: #bbf7d0;
-      background: rgba(22, 163, 74, 0.2);
-      border: 1px solid rgba(74, 222, 128, 0.28);
-      font-size: 11px;
-    }
-
-    .metric-delta.negative {
-      color: #fecdd3;
-      background: rgba(190, 18, 60, 0.26);
-      border-color: rgba(251, 113, 133, 0.42);
-      animation: warningPulse 1.2s ease-in-out infinite;
-    }
-
-    .metric-alert {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      color: #fecdd3;
-      background: rgba(127, 29, 29, 0.36);
-      border: 1px solid rgba(251, 113, 133, 0.36);
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    @keyframes warningPulse {
-      0%, 100% { filter: brightness(1); transform: translateY(0); }
-      50% { filter: brightness(1.32); transform: translateY(-1px); }
-    }
-
     .operation-themes {
       display: grid;
       gap: 7px;
@@ -715,10 +616,6 @@
       animation: crowdGather 1.15s ease-in-out infinite;
     }
 
-    .crowd-piece.departing {
-      animation: crowdDepart 1.65s cubic-bezier(0.16, 0.9, 0.24, 1) both, crowdWalk 4.8s ease-in-out 1.65s infinite;
-    }
-
     .meeple {
       width: 16px;
       height: 22px;
@@ -822,25 +719,6 @@
       }
       50% {
         transform: translate(-50%, -50%) translate(var(--walk-x, 8px), var(--walk-y, -5px)) rotate(var(--tilt, 0deg)) scale(1.08);
-      }
-    }
-
-    @keyframes crowdDepart {
-      0% {
-        left: var(--from-x, 50%);
-        top: var(--from-y, 50%);
-        opacity: 0.55;
-        transform: translate(-50%, -50%) scale(0.72) rotate(var(--tilt, 0deg));
-      }
-      58% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.12) rotate(var(--tilt, 0deg));
-      }
-      100% {
-        left: var(--x);
-        top: var(--y);
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1) rotate(var(--tilt, 0deg));
       }
     }
 
@@ -2543,8 +2421,6 @@
     let aiTurnRunning = false;
     let turnCounter = 1;
     let crowdCenterUntil = 0;
-    let crowdTravelUntil = 0;
-    let crowdReleaseTimer = null;
     let userRotation = 0;
     let zoomScale = 1;
     let bgmEnabled = false;
@@ -2988,7 +2864,6 @@
         cashflow: 0,
         visitorFlow: 0,
         monthlyVisitors: 120,
-        metricBaseline: null,
         money: 5,
         luck: 0,
         population: 3,
@@ -3061,37 +2936,6 @@
 
     function currentMonthlyVisitors(player) {
       return Math.max(0, player.monthlyVisitors + player.visitorFlow + player.scores.tourism * 60);
-    }
-
-    function satisfactionValue(player) {
-      const stormPenalty = hasActiveStorm(player) ? 14 : 0;
-      return clamp(58 + player.scores.publicSupport * 11 + player.scores.ecology * 5 - stormPenalty, 0, 100);
-    }
-
-    function happinessValue(player) {
-      const hpFactor = Math.round((player.hp / Math.max(1, player.maxHp)) * 22);
-      return clamp(42 + hpFactor + player.scores.culture * 6 + player.scores.publicSupport * 8 + player.scores.ecology * 4, 0, 100);
-    }
-
-    function metricSnapshot(player) {
-      return {
-        cashflow: Number(player.cashflow || 0),
-        money: Number(player.points || 0),
-        visitors: currentMonthlyVisitors(player),
-        satisfaction: satisfactionValue(player),
-        happiness: happinessValue(player),
-      };
-    }
-
-    function ensureMetricBaseline(player) {
-      if (!player.metricBaseline) {
-        player.metricBaseline = metricSnapshot(player);
-      }
-      return player.metricBaseline;
-    }
-
-    function resetMetricBaseline(player) {
-      player.metricBaseline = metricSnapshot(player);
     }
 
     function hasActiveStorm(player) {
@@ -3656,7 +3500,6 @@
       const player = state[seatIndex];
       turnSeatIndex = seatIndex;
       focusSeatIndex = seatIndex;
-      resetMetricBaseline(player);
       player.stats.turnsTaken += 1;
       player.exchangesThisTurn = 0;
       player.energy = player.maxEnergy;
@@ -3664,12 +3507,9 @@
       player.manpower += player.population > 5 ? 2 : 1;
       player.time += 1;
       player.tech += 1;
-      const stormPenalty = hasActiveStorm(player) ? 120 : 0;
-      const visitorDelta = Math.round(player.visitorFlow * 0.12 + player.scores.tourism * 18 + player.scores.publicSupport * 8 - stormPenalty);
-      player.monthlyVisitors = Math.max(0, player.monthlyVisitors + visitorDelta);
       dealToFive(player);
       ensureOpeningThemeCard(player);
-      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}${visitorDelta ? `，人潮 ${visitorDelta > 0 ? "+" : ""}${visitorDelta}` : ""}。`);
+      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}。`);
     }
 
     function nextAliveSeatIndex(fromIndex) {
@@ -4184,25 +4024,11 @@
     }
 
     function sendCrowdToCenter() {
-      crowdCenterUntil = Date.now() + 1050;
-      crowdTravelUntil = 0;
-      if (crowdReleaseTimer) {
-        clearTimeout(crowdReleaseTimer);
-      }
-      crowdReleaseTimer = setTimeout(() => {
-        crowdCenterUntil = 0;
-        crowdTravelUntil = Date.now() + 1750;
-        render();
-      }, 1080);
+      crowdCenterUntil = Date.now() + 950;
     }
 
     function releaseCrowdFromCenter() {
       crowdCenterUntil = 0;
-      crowdTravelUntil = Date.now() + 1550;
-      if (crowdReleaseTimer) {
-        clearTimeout(crowdReleaseTimer);
-        crowdReleaseTimer = null;
-      }
     }
 
     function seededUnit(seed) {
@@ -4215,7 +4041,6 @@
       crowdLayer.innerHTML = "";
       const zones = getPlayerTrafficZones();
       const returningHome = Date.now() < crowdCenterUntil;
-      const departing = !returningHome && Date.now() < crowdTravelUntil;
       const colors = ["#ff6b8a", "#ffd86b", "#67e8a5", "#4fd1ff", "#a78bfa", "#fb923c", "#f472b6", "#34d399"];
       const vehicleColors = ["#f97316", "#38bdf8", "#22c55e", "#facc15"];
       state.forEach((player, seatIndex) => {
@@ -4227,13 +4052,11 @@
         for (let index = 0; index < meepleCount; index += 1) {
           const seed = (turnCounter + 3) * 100 + seatIndex * 29 + index;
           const piece = document.createElement("span");
-          piece.className = `crowd-piece meeple ${returningHome ? "returning-home" : departing ? "departing" : ""}`;
+          piece.className = `crowd-piece meeple ${returningHome ? "returning-home" : ""}`;
           const x = returningHome ? 50 + (seededUnit(seed) - 0.5) * 6 : zone.x + (seededUnit(seed) - 0.5) * zone.spreadX;
           const y = returningHome ? 50 + (seededUnit(seed + 0.37) - 0.5) * 5 : zone.y + (seededUnit(seed + 0.37) - 0.5) * zone.spreadY;
           piece.style.setProperty("--x", `${x}%`);
           piece.style.setProperty("--y", `${y}%`);
-          piece.style.setProperty("--from-x", `${50 + (seededUnit(seed) - 0.5) * 5}%`);
-          piece.style.setProperty("--from-y", `${50 + (seededUnit(seed + 0.37) - 0.5) * 4}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.73) - 0.5) * 28}deg`);
           piece.style.setProperty("--color", colors[(seatIndex * 3 + index) % colors.length]);
           piece.style.setProperty("--delay", `${(seededUnit(seed + 1.11) * -2).toFixed(2)}s`);
@@ -4246,12 +4069,10 @@
           const seed = (turnCounter + 7) * 77 + seatIndex * 31 + index;
           const piece = document.createElement("span");
           const vehicleType = ["bus", "train", "car"][(seatIndex + index) % 3];
-          piece.className = `crowd-piece vehicle ${vehicleType} ${returningHome ? "returning-home" : departing ? "departing" : ""}`;
+          piece.className = `crowd-piece vehicle ${vehicleType} ${returningHome ? "returning-home" : ""}`;
           const offset = (index - 1) * 7;
           piece.style.setProperty("--x", `${returningHome ? 50 + (seededUnit(seed) - 0.5) * 7 : zone.x + (zone.spreadX > zone.spreadY ? offset : 0) + (seededUnit(seed) - 0.5) * 8}%`);
           piece.style.setProperty("--y", `${returningHome ? 50 + (seededUnit(seed + 0.41) - 0.5) * 6 : zone.y + (zone.spreadY >= zone.spreadX ? offset : 0) + (seededUnit(seed + 0.41) - 0.5) * 8}%`);
-          piece.style.setProperty("--from-x", `${50 + (seededUnit(seed) - 0.5) * 6}%`);
-          piece.style.setProperty("--from-y", `${50 + (seededUnit(seed + 0.41) - 0.5) * 5}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.82) - 0.5) * 16}deg`);
           piece.style.setProperty("--color", vehicleColors[(seatIndex + index) % vehicleColors.length]);
           piece.style.setProperty("--delay", `${(seededUnit(seed + 1.23) * -2).toFixed(2)}s`);
@@ -4438,33 +4259,6 @@
 
     function renderPlayerHud() {
       const self = currentControlPlayer();
-      const baseline = ensureMetricBaseline(self);
-      const metrics = metricSnapshot(self);
-      const metricRows = [
-        { key: "cashflow", label: "金流", value: metrics.cashflow, max: 12 },
-        { key: "money", label: "資金", value: metrics.money, max: 40 },
-        { key: "visitors", label: "人潮", value: metrics.visitors, max: 2400 },
-        { key: "satisfaction", label: "滿意度", value: metrics.satisfaction, max: 100 },
-        { key: "happiness", label: "幸福度", value: metrics.happiness, max: 100 },
-      ];
-      const metricHtml = metricRows.map((metric) => {
-        const delta = Math.round(metric.value - Number(baseline[metric.key] || 0));
-        const width = clamp(Math.round((Math.max(0, metric.value) / metric.max) * 100), 3, 100);
-        const mood = delta < 0 || metric.value < metric.max * 0.32 ? "danger" : metric.value < metric.max * 0.55 ? "warn" : "good";
-        const formattedValue = metric.key === "visitors" ? `${Math.round(metric.value).toLocaleString()}人` : Math.round(metric.value).toLocaleString();
-        const deltaText = delta === 0 ? "±0" : `${delta > 0 ? "+" : ""}${delta.toLocaleString()}`;
-        return `
-          <div class="metric-bar ${mood}">
-            <span class="metric-label">${metric.label}</span>
-            <span class="metric-track"><span class="metric-fill" style="--metric-width:${width}%"></span></span>
-            <span class="metric-value">${formattedValue}<span class="metric-delta ${delta < 0 ? "negative" : ""}">${deltaText}</span></span>
-          </div>
-        `;
-      }).join("");
-      const warningHtml = metricRows
-        .filter((metric) => metric.value - Number(baseline[metric.key] || 0) < 0)
-        .map((metric) => metric.label)
-        .join("、");
       const operatingThemes = self.board.theme
         .map((slotValue, index) => ({ slotValue, index }))
         .filter(({ slotValue }) => slotValue);
@@ -4507,8 +4301,6 @@
           <div><span class="clock-pill">剩餘 ${formatRemainingTime()}</span></div>
           <div>本月觀光人潮 ${currentMonthlyVisitors(self).toLocaleString()} 人</div>
         </div>
-        <div class="metric-bars">${metricHtml}</div>
-        ${warningHtml ? `<div class="metric-alert">紅色警示：${warningHtml} 本回合下降，請考慮防禦、陷阱或調整營運。</div>` : ""}
       `;
     }
 
