@@ -349,24 +349,32 @@
     .guide-teacher {
       position: relative;
       min-height: 260px;
+      display: grid;
+      grid-template-columns: minmax(150px, 0.82fr) minmax(150px, 1fr);
+      align-items: end;
+      gap: 6px;
       border-radius: 26px;
-      overflow: hidden;
+      overflow: visible;
       background: linear-gradient(180deg, #fff7ed, #e0f2fe);
       border: 1px solid rgba(19, 120, 184, 0.12);
     }
 
     .guide-teacher img {
-      position: absolute;
-      right: -20px;
-      bottom: -16px;
-      width: min(280px, 82%);
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      height: 270px;
+      object-fit: contain;
+      object-position: center bottom;
+      align-self: end;
+      justify-self: center;
       animation: xiaomiFloat 3.2s ease-in-out infinite;
     }
 
     .guide-teacher-copy {
       position: relative;
       z-index: 1;
-      max-width: 230px;
       padding: 22px;
     }
 
