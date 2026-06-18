@@ -9,8 +9,6 @@ class TableReelSystem {
       { key: "defense-2", label: "防禦 2", slot: "defense", slotIndex: 1, slotType: "DEFENSE", kind: "defense", faceDown: true },
       { key: "boost-1", label: "加成 1", slot: "boost", slotIndex: 0, slotType: "BOOST", kind: "boost", faceDown: false },
       { key: "boost-2", label: "加成 2", slot: "boost", slotIndex: 1, slotType: "BOOST", kind: "boost", faceDown: false },
-      { key: "trap-1", label: "陷阱 1", slot: "trap", slotIndex: 0, slotType: "TRAP", kind: "trap", faceDown: true },
-      { key: "trap-2", label: "陷阱 2", slot: "trap", slotIndex: 1, slotType: "TRAP", kind: "trap", faceDown: true },
     ];
   }
 
@@ -39,7 +37,7 @@ class TableReelSystem {
 
   getLaneGroups() {
     return {
-      front: this.lanes.slice(5, 9),
+      front: this.lanes.slice(5, 7),
       main: this.lanes.slice(0, 5),
     };
   }
@@ -49,7 +47,6 @@ class TableReelSystem {
       case "MainTheme":
         return "theme";
       case "Trap":
-        return "trap";
       case "Utility":
       case "Bonus":
       case "Heal":

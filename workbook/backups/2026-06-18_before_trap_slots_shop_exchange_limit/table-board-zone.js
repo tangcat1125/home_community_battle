@@ -38,8 +38,8 @@ class TableBoardZoneSystem {
     if (lane.slot === "attack") return player.board.attack[lane.slotIndex] || null;
     if (lane.slot === "defense") return player.board.defense[lane.slotIndex] || null;
     if (lane.slot === "boost") return player.board.boost[lane.slotIndex] || null;
-    if (lane.slot === "trap") return player.board.trap[lane.slotIndex] || null;
     if (lane.slot === "theme") return player.board.theme[lane.slotIndex] || null;
+    if (lane.key === "trap") return player.board.trap[0] || null;
     return null;
   }
 

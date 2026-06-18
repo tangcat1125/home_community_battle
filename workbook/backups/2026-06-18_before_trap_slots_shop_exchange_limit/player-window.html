@@ -732,11 +732,11 @@
 
     .seat-board {
       position: absolute;
-      width: 570px;
-      height: 250px;
+      width: 430px;
+      height: 230px;
       display: grid;
-      grid-template-columns: repeat(9, 1fr);
-      grid-template-rows: 26px 96px 96px;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: 26px 86px 86px;
       gap: 5px;
       padding: 9px;
       border-radius: 18px;
@@ -1354,7 +1354,7 @@
     }
 
     .table-board-card {
-      width: min(1240px, 96vw);
+      width: min(1080px, 94vw);
       max-height: 90vh;
       overflow: auto;
       border-radius: 30px;
@@ -1369,7 +1369,7 @@
 
     .table-board-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
       gap: 14px;
     }
 
@@ -2171,9 +2171,9 @@
       .seat-grid { position: static; display: grid; grid-template-columns: 1fr; gap: 12px; padding: 12px; }
       .reel-board { width: 100vw; height: 100vh; }
       .seat-board {
-        width: 430px;
-        height: 210px;
-        grid-template-columns: repeat(9, 1fr);
+        width: 360px;
+        height: 184px;
+        grid-template-columns: repeat(8, 1fr);
         grid-template-rows: 24px 70px 70px;
         gap: 4px;
         padding: 7px;
@@ -2405,7 +2405,6 @@
       },
     };
     const aiProfileOrder = ["prankster", "operator", "slowLearner"];
-    const MAX_EXCHANGES_PER_TURN = 3;
 
     let focusSeatIndex = 0;
     let round = 1;
@@ -2831,7 +2830,7 @@
 
     function createEmptyBoard() {
       return {
-        trap: [null, null],
+        trap: [null],
         boost: [null, null],
         attack: [null, null, null],
         defense: [null, null],
@@ -2881,7 +2880,6 @@
         hand: [],
         discardPile: [],
         graveyard: [],
-        exchangesThisTurn: 0,
         board: createEmptyBoard(),
         stats: {
           turnsTaken: 0,
@@ -3003,7 +3001,7 @@
       });
       player.board.attack = [null, null, null];
       player.board.defense = [null, null];
-      player.board.trap = [null, null];
+      player.board.trap = [null];
       player.board.boost = [null, null];
       player.board.theme = [null, null, null, null];
       player.armor = 0;
@@ -3116,21 +3114,6 @@
       }
     }
 
-    function refillHandIfEmpty(player) {
-      if (!player || player.hand.length > 0) return false;
-      dealToFive(player);
-      ensureOpeningThemeCard(player);
-      return player.hand.length > 0;
-    }
-
-    function canExchangeThisTurn(player) {
-      return (player.exchangesThisTurn || 0) < MAX_EXCHANGES_PER_TURN;
-    }
-
-    function registerExchange(player) {
-      player.exchangesThisTurn = (player.exchangesThisTurn || 0) + 1;
-    }
-
     function ensureOpeningThemeCard(player) {
       if (player.stats.openingThemeGranted) return;
       if (player.hand.some(isMainTheme) || player.board.theme.some((slot) => slot?.card)) return;
@@ -3149,12 +3132,11 @@
     function buildShopMarket() {
       const rareThemeChance = Math.random() < 0.06;
       const rareTheme = rareThemeChance ? shuffle(mainThemeCards.filter((card) => card.image)).slice(0, 1) : [];
-      const trapAndDefenseCards = shuffle(extendedCards.filter((card) => (card.type === "Trap" || card.type === "Defense") && card.image)).slice(0, 2);
-      const supportCards = shuffle(extendedCards.filter((card) => card.type !== "Attack" && card.type !== "Trap" && card.type !== "Defense" && !isMainTheme(card) && card.image)).slice(0, 2);
+      const supportCards = shuffle(extendedCards.filter((card) => card.type !== "Attack" && !isMainTheme(card) && card.image)).slice(0, 3);
       const attackCards = shuffle(extendedCards.filter((card) => card.type === "Attack" && card.image)).slice(0, 1);
-      const fallback = shuffle(extendedCards.filter((card) => !isMainTheme(card) && card.image)).slice(0, Math.max(0, 5 - rareTheme.length - trapAndDefenseCards.length - supportCards.length - attackCards.length));
-      shopMarket = shuffle([...rareTheme, ...trapAndDefenseCards, ...supportCards, ...attackCards, ...fallback])
-        .slice(0, 5)
+      const fallback = shuffle(extendedCards.filter((card) => !isMainTheme(card) && card.image)).slice(0, Math.max(0, 4 - rareTheme.length - supportCards.length - attackCards.length));
+      shopMarket = shuffle([...rareTheme, ...supportCards, ...attackCards, ...fallback])
+        .slice(0, 4)
         .map((card, index) => cloneCard(card, `shop_${turnCounter}_${index}`));
     }
 
@@ -3230,11 +3212,6 @@
         renderHandManageOverlay();
         return false;
       }
-      if (!canExchangeThisTurn(player)) {
-        pushLog(`${player.name} 本回合已經換過 ${MAX_EXCHANGES_PER_TURN} 張牌，不能再換了。`);
-        renderHandManageOverlay();
-        return false;
-      }
 
       const card = player.hand[cardIndex];
       if (!card) return false;
@@ -3248,10 +3225,10 @@
       player.history.unshift(`${card.name} discarded from hand`);
       if (player.history.length > 6) player.history.length = 6;
 
-      registerExchange(player);
-      const refilled = refillHandIfEmpty(player);
+      dealToFive(player);
+      ensureOpeningThemeCard(player);
       selectedCardIndex = null;
-      pushLog(`${player.name} 棄掉 ${card.name}（本回合換牌 ${player.exchangesThisTurn}/${MAX_EXCHANGES_PER_TURN}）${refilled ? "，手牌打空後補滿。" : "，暫不補牌。"}`);
+      pushLog(`${player.name} 棄掉 ${card.name}，並補回手牌。`);
       render();
       return true;
     }
@@ -3260,11 +3237,6 @@
       const turn = currentTurnPlayer();
       if (!turn || turn.id !== player.id) {
         pushLog(`${player.name} cannot discard board cards right now.`);
-        renderTableBoardOverlay();
-        return false;
-      }
-      if (!canExchangeThisTurn(player)) {
-        pushLog(`${player.name} 本回合已經換過 ${MAX_EXCHANGES_PER_TURN} 張牌，不能再整理換牌。`);
         renderTableBoardOverlay();
         return false;
       }
@@ -3282,10 +3254,10 @@
         targetList = player.board.defense;
         slotIndex = lane.slotIndex;
         slotValue = targetList[slotIndex];
-      } else if (lane.slot === "trap") {
+      } else if (lane.key === "trap") {
         targetList = player.board.trap;
-        slotIndex = lane.slotIndex;
-        slotValue = targetList[slotIndex];
+        slotIndex = 0;
+        slotValue = targetList[0];
       } else if (lane.slot === "boost") {
         targetList = player.board.boost;
         slotIndex = lane.slotIndex;
@@ -3311,11 +3283,11 @@
       pushGraveyard(player, card, `board:${lane.key}`);
       player.history.unshift(`${card.name} removed from board`);
       if (player.history.length > 6) player.history.length = 6;
-      registerExchange(player);
       pushLog(`${player.name} removed ${card.name} from ${label}.`);
       if (options.drawReplacement) {
-        const refilled = refillHandIfEmpty(player);
-        pushLog(`${player.name} 從桌牌區換下 ${card.name}（本回合換牌 ${player.exchangesThisTurn}/${MAX_EXCHANGES_PER_TURN}）${refilled ? "，手牌打空後補滿。" : "，暫不補牌。"}`);
+        dealToFive(player);
+        ensureOpeningThemeCard(player);
+        pushLog(`${player.name} 從桌牌區換下 ${card.name}，補回手牌。`);
       }
       render();
       return true;
@@ -3501,7 +3473,6 @@
       turnSeatIndex = seatIndex;
       focusSeatIndex = seatIndex;
       player.stats.turnsTaken += 1;
-      player.exchangesThisTurn = 0;
       player.energy = player.maxEnergy;
       player.points += player.cashflow;
       player.manpower += player.population > 5 ? 2 : 1;
@@ -3890,8 +3861,7 @@
 
     function resolveAttack(target, card, source) {
       const damage = card.effect?.damage || 0;
-      const trapSlotIndex = target.board.trap.findIndex((slot) => slot && !slot.triggered);
-      const trapSlot = trapSlotIndex >= 0 ? target.board.trap[trapSlotIndex] : null;
+      const trapSlot = target.board.trap[0];
       const defenseSlotIndex = target.board.defense.findIndex((slot) => slot && slot.faceDown);
       let blocked = 0;
       let notes = [];
@@ -3904,9 +3874,6 @@
         source.hp = Math.max(0, source.hp - trapDamage);
         source.stats.damageTaken += trapDamage;
         target.stats.trapsTriggered += 1;
-        target.board.trap[trapSlotIndex] = null;
-        pushGraveyard(target, trapSlot.card, "triggered-trap");
-        blocked = Math.max(blocked, trapSlot.card.effect?.block || damage);
       }
 
       if (defenseSlotIndex >= 0) {
@@ -4115,7 +4082,7 @@
       if (!player || !lane) return null;
       if (lane.slot === "attack") return player.board.attack[lane.slotIndex];
       if (lane.slot === "defense") return player.board.defense[lane.slotIndex];
-      if (lane.slot === "trap") return player.board.trap[lane.slotIndex];
+      if (lane.key === "trap") return player.board.trap[0];
       if (lane.slot === "boost") return player.board.boost[lane.slotIndex];
       return null;
     }
@@ -4140,7 +4107,7 @@
             <span class="tag">${tagText}</span>
             <span class="tag">${slotValue.note || lane.label}</span>
           </div>
-          ${seatIndex === 0 && (lane.slot === "boost" || lane.slot === "defense" || lane.slot === "trap") ? `
+          ${seatIndex === 0 && (lane.slot === "boost" || lane.slot === "defense") ? `
             <div class="card-actions">
               <button class="mini-btn danger" data-discard-board="1">棄置</button>
             </div>
@@ -4449,7 +4416,6 @@
       }
 
       const isTurn = currentTurnPlayer()?.id === self.id && !self.isAI && !gameEnded;
-      const exchangeLeft = Math.max(0, MAX_EXCHANGES_PER_TURN - (self.exchangesThisTurn || 0));
       const cards = self.hand.slice(0, 5);
       const cardHtml = cards.length ? cards.map((card, index) => `
         <article class="hand-manage-item">
@@ -4464,7 +4430,7 @@
             </div>
             <div class="card-actions">
               <button class="mini-btn" data-read-hand-card="${index}">放大閱讀</button>
-              <button class="mini-btn danger" data-exchange-hand-card="${index}" ${isTurn && exchangeLeft > 0 ? "" : "disabled"}>棄牌換牌</button>
+              <button class="mini-btn danger" data-exchange-hand-card="${index}" ${isTurn ? "" : "disabled"}>棄牌換牌</button>
             </div>
           </div>
         </article>
@@ -4476,14 +4442,14 @@
           <div class="hand-manage-head">
             <div>
               <div class="hand-manage-title">手牌整理區</div>
-              <div class="hand-manage-sub">點卡牌可以放大閱讀；自己的回合最多換 ${MAX_EXCHANGES_PER_TURN} 張，本回合還可換 ${exchangeLeft} 張。棄牌不會立刻補牌，手牌打空或下回合開始才會補滿。</div>
+              <div class="hand-manage-sub">點卡牌可以放大閱讀；自己的回合可以棄牌換牌，避免被攻擊壓住後完全動不了。</div>
             </div>
             <div class="hand-manage-actions">
               <button class="mini-btn" data-close-hand-manager="1">關閉整理</button>
               <button class="mini-btn danger" data-collapse-from-manager="1">收成手牌夾</button>
             </div>
           </div>
-          ${isTurn ? (exchangeLeft > 0 ? "" : `<div class="turn-warning">本回合換牌次數已用完，請先出牌或結束回合。</div>`) : `<div class="turn-warning">現在不是你的行動回合，先查看手牌；輪到你時才能棄牌換牌。</div>`}
+          ${isTurn ? "" : `<div class="turn-warning">現在不是你的行動回合，先查看手牌；輪到你時才能棄牌換牌。</div>`}
           <div class="hand-manage-grid">${cardHtml}</div>
         </article>
       `;
@@ -4540,7 +4506,6 @@
 
       const player = state[tableBoardFocusSeatIndex] || currentControlPlayer();
       const isTurn = currentTurnPlayer()?.id === player.id && !player.isAI && !gameEnded;
-      const exchangeLeft = Math.max(0, MAX_EXCHANGES_PER_TURN - (player.exchangesThisTurn || 0));
       const items = tableBoardZone.getManageItems(player);
       const itemHtml = items.map(({ lane, value }) => {
         const card = value?.card;
@@ -4565,7 +4530,7 @@
             </div>
             <div class="card-actions">
               ${covered ? "" : `<button class="mini-btn" data-read-table-card="${escapeHtml(lane.key)}">放大閱讀</button>`}
-              <button class="mini-btn danger" data-exchange-table-card="${escapeHtml(lane.key)}" ${isTurn && exchangeLeft > 0 ? "" : "disabled"}>棄置換牌</button>
+              <button class="mini-btn danger" data-exchange-table-card="${escapeHtml(lane.key)}" ${isTurn ? "" : "disabled"}>棄置換牌</button>
             </div>
           </article>
         `;
@@ -4577,13 +4542,13 @@
           <div class="hand-manage-head">
             <div>
               <div class="hand-manage-title">${tableBoardZone.getTitle()}｜${escapeHtml(tableBoardZone.getSeatLabel(tableBoardFocusSeatIndex))}</div>
-              <div class="hand-manage-sub">放大檢視攻擊、防禦、陷阱與加成。自己的回合最多整理換牌 ${MAX_EXCHANGES_PER_TURN} 張，本回合還可換 ${exchangeLeft} 張；棄置後進墳場，不會立刻補牌。</div>
+              <div class="hand-manage-sub">放大檢視攻擊、防禦與加成。自己的回合可以把桌牌送進墳場並補回手牌，讓策略重新流動。</div>
             </div>
             <div class="hand-manage-actions">
               <button class="mini-btn" data-close-table-zone="1">關閉整理</button>
             </div>
           </div>
-          ${isTurn ? (exchangeLeft > 0 ? "" : `<div class="turn-warning">本回合換牌次數已用完。</div>`) : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}
+          ${isTurn ? "" : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}
           <div class="table-board-grid">${itemHtml}</div>
         </article>
       `;
