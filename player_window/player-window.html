@@ -1733,6 +1733,13 @@
       font-size: 0.78em;
     }
 
+    .credits-name-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 6px 14px;
+      font-size: 0.82em;
+    }
+
     .credits-end {
       margin-top: 28px;
       font-size: clamp(28px, 4.6vw, 58px);
@@ -2565,6 +2572,13 @@
       const playerLines = state.map((player) => `
         <div>${player.name}｜${player.isAI ? "AI 代玩" : "真人玩家"}｜本月人潮 ${currentMonthlyVisitors(player).toLocaleString()} 人</div>
       `).join("");
+      const sponsorNames = [
+        "林慶泓", "陳連域", "Bobo Chen", "Tsai Kurt",
+        "Chungwei Hsieh", "許士彥", "林以泓", "黃安志",
+        "孔祥宇", "Ian Chen", "潘慧君", "陳民峰",
+        "Lili Lin", "陳小葉", "李仁耀", "李英如",
+        "蔡昌樺", "陳孝魁", "陳慶源", "傅欽杰",
+      ].map((name) => `<div>${name}</div>`).join("");
 
       endingOverlay.classList.add("open");
       endingOverlay.innerHTML = `
@@ -2599,6 +2613,11 @@
               <strong>特別感謝</strong>
               <div>每一個願意認識家鄉的孩子</div>
               <div>每一個把地方故事留下來的人</div>
+            </div>
+
+            <div class="credits-section">
+              <strong>贊助共同創作者</strong>
+              <div class="credits-name-grid">${sponsorNames}</div>
             </div>
 
             <div class="credits-qr">

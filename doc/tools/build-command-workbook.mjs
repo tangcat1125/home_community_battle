@@ -62,6 +62,7 @@ const commands = [
   ["055", "評估後感謝頁與 index 單頁啟動", "成績評估看完按關閉後進入感謝頁，跑感謝贊助開發到 THE END OR REPLAY；所有啟動都放在 index，即使進其他頁網址也只看見 index；完成後發送 GitHub。", "完成", "結局評估的關閉按鈕改為進入 credits；index 重新整理為乾淨中文入口，按開始後以 iframe 內嵌玩家視窗，網址列維持 index；已檢查 GitHub 發送條件。"],
   ["056", "手牌整理放大與換牌", "點擊手牌夾區塊後，區塊要放大，讓玩家選擇棄牌換牌；不然被攻擊都無法動彈；修完上傳。", "完成", "新增 hand-manage-overlay 中央手牌整理區；手牌夾與整理換牌按鈕可開啟放大面板，玩家回合可棄牌並補牌；完成語法與 smoke test，準備 GitHub 上傳。"],
   ["057", "桌牌區獨立、說明頁與 GitHub Pages", "將桌牌放置區命名為桌牌區並獨立程式；點擊桌牌區攻擊/防禦/加成可放大整理並棄牌換牌；小人每回合結束回中心、放牌後再出發；回到開局設定改成結束遊戲；首頁新增說明頁、小咪老師、QR Code；公開 GitHub 並啟用遊戲首頁。", "完成", "新增 table-board-zone.js；玩家視窗接上 table-board-overlay 與人流中心集合節奏；index 新增卡牌說明頁、感謝共同開發者、小咪老師解說與訂閱 QR；結局與感謝幕加入 QR；完成備份與工作簿更新。"],
+  ["058", "贊助共同創作者名單", "把贊助共同創作者名單掛上去：林慶泓、陳連域、Bobo Chen、Tsai Kurt、Chungwei Hsieh、許士彥、林以泓、黃安志、孔祥宇、Ian Chen、潘慧君、陳民峰、Lili Lin、陳小葉、李仁耀、李英如、蔡昌樺、陳孝魁、陳慶源、傅欽杰。", "完成", "首頁說明頁新增贊助共同創作者名單網格；遊戲結束電影感謝幕新增贊助共同創作者專區。"],
 ];
 
 const decisions = [
@@ -113,7 +114,7 @@ const overview = workbook.worksheets.add("開發指令總覽");
 overview.showGridLines = false;
 title(overview, "A1:E1", "愛我家鄉-社區營造大作戰｜開發指令工作簿");
 overview.getRange("A2:E2").merge();
-overview.getRange("A2").values = [["本工作簿記錄從原型、玩家視窗、圖資、HUD、AI、結局分析到本輪桌牌區獨立、說明頁、QR 與 GitHub Pages 公開啟用的主要開發指令。"]];
+overview.getRange("A2").values = [["本工作簿記錄從原型、玩家視窗、圖資、HUD、AI、結局分析到本輪贊助共同創作者名單掛載的主要開發指令。"]];
 overview.getRange("A2").format = { fill: "#E0F2FE", font: { color: "#0F172A" } };
 writeTable(overview, "A4", ["編號", "主題", "使用者指令/需求", "狀態", "完成內容"], commands, [58, 150, 470, 80, 430]);
 overview.freezePanes.freezeRows(4);
@@ -145,6 +146,7 @@ writeTable(
     ["入口首頁", "老師設定入口", "index.html", "設定玩家數與 AI 代玩，進入觸控大螢幕遊戲。"],
     ["結局分析", "可列印獎狀", "player_window/player-window.html", "對應 108 課綱社會科指標並產生星芒圖。"],
     ["本輪新增", "桌牌區與說明頁", "player_window/table-board-zone.js、player_window/player-window.html、index.html", "桌牌區命名並獨立模組；桌牌區可放大整理與棄置換牌；首頁說明頁展示攻防對照、主題卡、加成卡、小咪老師與訂閱 QR。"],
+    ["本輪新增", "贊助共同創作者名單", "index.html、player_window/player-window.html", "首頁說明頁與遊戲片尾感謝幕加入 20 位贊助共同創作者名單。"],
   ],
   [160, 130, 260, 520],
 );

@@ -382,6 +382,24 @@
       font-size: 34px;
     }
 
+    .sponsor-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(92px, 1fr));
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .sponsor-list span {
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(19, 120, 184, 0.12);
+      color: #24455f;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+    }
+
     .guide-qr {
       display: grid;
       place-items: center;
@@ -631,6 +649,13 @@
           <h2>感謝贊助與共同開發</h2>
           <p>感謝每一位願意把家鄉故事帶進教室的老師、孩子與地方夥伴。這套遊戲會持續增加卡牌、音效、評量與教學支援。</p>
           <p><strong>共同開發：</strong>貓老師、小咪老師、小白二號 Codex、一起測試遊戲的學生們。</p>
+          <div class="sponsor-list" aria-label="贊助共同創作者名單">
+            <span>林慶泓</span><span>陳連域</span><span>Bobo Chen</span><span>Tsai Kurt</span>
+            <span>Chungwei Hsieh</span><span>許士彥</span><span>林以泓</span><span>黃安志</span>
+            <span>孔祥宇</span><span>Ian Chen</span><span>潘慧君</span><span>陳民峰</span>
+            <span>Lili Lin</span><span>陳小葉</span><span>李仁耀</span><span>李英如</span>
+            <span>蔡昌樺</span><span>陳孝魁</span><span>陳慶源</span><span>傅欽杰</span>
+          </div>
         </section>
         <section class="guide-qr">
           <img src="assets/guide/subscription-qr.png" alt="訂閱 QR Code">
