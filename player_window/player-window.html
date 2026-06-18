@@ -2767,8 +2767,11 @@
       render();
     }
 
+    window.endHomeCommunityBattle = (reason = "老師手動結束遊戲") => {
+      endGame(reason);
+    };
+
     window.addEventListener("message", (event) => {
-      if (event.origin !== window.location.origin) return;
       if (event.data?.type === "homeCommunityBattle:endGame") {
         endGame(event.data.reason || "老師手動結束遊戲");
       }

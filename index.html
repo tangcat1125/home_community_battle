@@ -818,10 +818,19 @@
     document.getElementById("closeGuide").addEventListener("click", closeGuide);
     document.getElementById("returnSetup").addEventListener("click", () => {
       const frame = document.getElementById("gameFrame");
-      frame.contentWindow?.postMessage({
+      const payload = {
         type: "homeCommunityBattle:endGame",
         reason: "老師手動結束遊戲",
-      }, window.location.origin);
+      };
+      try {
+        if (typeof frame.contentWindow?.endHomeCommunityBattle === "function") {
+          frame.contentWindow.endHomeCommunityBattle(payload.reason);
+          return;
+        }
+      } catch (error) {
+        console.warn("Direct end-game call failed, falling back to postMessage.", error);
+      }
+      frame.contentWindow?.postMessage(payload, "*");
     });
 
     updatePreview();
