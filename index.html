@@ -285,20 +285,6 @@
       font-size: 24px;
     }
 
-    .footer {
-      position: fixed;
-      right: 18px;
-      bottom: 14px;
-      z-index: 2;
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.72);
-      color: #24455f;
-      font-size: 13px;
-      font-weight: 900;
-      backdrop-filter: blur(8px);
-    }
-
     .game-shell {
       position: fixed;
       inset: 0;
@@ -518,8 +504,7 @@
       overflow: hidden;
     }
 
-    body.game-active .entry,
-    body.game-active .footer {
+    body.game-active .entry {
       display: none;
     }
 
@@ -534,11 +519,6 @@
       .player-count-row,
       .condition-list {
         grid-template-columns: 1fr;
-      }
-      .footer {
-        position: static;
-        margin: 14px 18px 18px;
-        width: fit-content;
       }
     }
   </style>
@@ -630,8 +610,6 @@
       <button class="start-button" id="startGame" type="button">開始遊戲</button>
     </section>
   </main>
-
-  <div class="footer">D:\Codex\home_community_battle</div>
 
   <section class="game-shell" id="gameShell" aria-label="遊戲視窗">
     <button class="return-setup" id="returnSetup" type="button">結束遊戲</button>
