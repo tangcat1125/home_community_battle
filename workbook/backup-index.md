@@ -386,3 +386,22 @@
   - 點擊手牌夾或「整理換牌」會開啟整理區。
   - 玩家在自己的回合可棄牌換牌，自動補回手牌。
   - Excel 工作簿新增第 056 筆開發指令紀錄。
+
+# 2026-06-18_before_table_board_zone_guide
+
+- 備份資料夾：`D:\Codex\home_community_battle\workbook\backups\2026-06-18_before_table_board_zone_guide`
+- 備份目的：在桌牌區命名與獨立模組、桌牌區放大整理換牌、首頁說明頁、小咪老師與 QR Code、GitHub Pages 公開啟用前保存可回復版本。
+- 備份檔案：
+  - `index.html`
+  - `player-window.html`
+  - `build-command-workbook.mjs`
+  - `README.txt`
+- 本輪修改：
+  - 新增 `player_window/table-board-zone.js`，將桌牌區欄位與整理資料獨立。
+  - 玩家可點擊桌牌區攻擊、防禦、加成欄，開啟放大的桌牌整理視窗。
+  - 玩家自己的回合可將桌牌送入墳場並補回手牌，作為桌牌區換牌機制。
+  - 人流小人與車輛在回合結束時回到畫面中心，放牌後再從中心出發到各家。
+  - `index.html` 的「回到開局設定」改為「結束遊戲」。
+  - 首頁新增說明頁，包含防禦對攻擊、主題卡、加成卡、小咪老師與訂閱 QR Code。
+  - 結局評估與電影感謝幕加入訂閱 QR Code。
+  - Excel 工作簿新增第 057 筆開發指令紀錄。

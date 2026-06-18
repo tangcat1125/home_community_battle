@@ -612,10 +612,6 @@
       animation-delay: var(--delay, 0s);
     }
 
-    .crowd-piece.returning-home {
-      animation: crowdGather 1.15s ease-in-out infinite;
-    }
-
     .meeple {
       width: 16px;
       height: 22px;
@@ -713,15 +709,6 @@
       }
     }
 
-    @keyframes crowdGather {
-      0%, 100% {
-        transform: translate(-50%, -50%) translate(0, 0) rotate(var(--tilt, 0deg)) scale(0.92);
-      }
-      50% {
-        transform: translate(-50%, -50%) translate(var(--walk-x, 8px), var(--walk-y, -5px)) rotate(var(--tilt, 0deg)) scale(1.08);
-      }
-    }
-
     .reel-hud {
       position: absolute;
       inset: 0;
@@ -763,17 +750,6 @@
       font-weight: 900;
       letter-spacing: 0.06em;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.58);
-    }
-
-    .table-zone-button {
-      min-height: 24px;
-      border-radius: 999px;
-      padding: 2px 8px;
-      color: #e8f7ff;
-      background: rgba(79, 209, 255, 0.18);
-      border: 1px solid rgba(79, 209, 255, 0.34);
-      box-shadow: none;
-      font-size: 10px;
     }
 
     .slot {
@@ -1336,79 +1312,6 @@
       display: grid;
     }
 
-    .table-board-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 129;
-      display: none;
-      place-items: center;
-      padding: 30px;
-      background:
-        radial-gradient(circle at 50% 42%, rgba(255, 232, 150, 0.18), transparent 34%),
-        rgba(2, 6, 23, 0.68);
-      backdrop-filter: blur(14px);
-    }
-
-    .table-board-overlay.open {
-      display: grid;
-    }
-
-    .table-board-card {
-      width: min(1080px, 94vw);
-      max-height: 90vh;
-      overflow: auto;
-      border-radius: 30px;
-      padding: 22px;
-      color: var(--text);
-      background:
-        linear-gradient(135deg, rgba(22, 35, 61, 0.98), rgba(9, 16, 32, 0.98)),
-        radial-gradient(circle at 18% 0%, rgba(250, 204, 21, 0.18), transparent 30%);
-      border: 1px solid rgba(250, 204, 21, 0.42);
-      box-shadow: 0 34px 90px rgba(0, 0, 0, 0.58);
-    }
-
-    .table-board-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(170px, 1fr));
-      gap: 14px;
-    }
-
-    .table-board-item {
-      min-height: 230px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-radius: 18px;
-      padding: 12px;
-      background: rgba(15, 27, 51, 0.84);
-      border: 1px solid rgba(140, 175, 255, 0.18);
-    }
-
-    .table-board-item.empty {
-      opacity: 0.72;
-      border-style: dashed;
-    }
-
-    .table-board-item img {
-      width: 100%;
-      height: 118px;
-      object-fit: contain;
-      border-radius: 12px;
-      background: rgba(2, 6, 23, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .table-board-item .name {
-      font-weight: 1000;
-      line-height: 1.25;
-    }
-
-    .table-board-item .desc {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
     .hand-manage-card {
       width: min(1180px, 94vw);
       max-height: 90vh;
@@ -1741,24 +1644,6 @@
       color: #ffffff;
     }
 
-    .credits-qr {
-      display: grid;
-      place-items: center;
-      gap: 8px;
-      margin: 26px auto 0;
-      color: #dbeafe;
-      font-weight: 900;
-    }
-
-    .credits-qr img {
-      width: 130px;
-      height: 130px;
-      border-radius: 18px;
-      background: white;
-      padding: 8px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
-    }
-
     .credits-actions {
       position: absolute;
       right: 22px;
@@ -1874,21 +1759,6 @@
       display: block;
       color: #ffe8a3;
       margin-bottom: 4px;
-    }
-
-    .ending-qr-card {
-      display: grid;
-      grid-template-columns: 86px 1fr;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .ending-qr-card img {
-      width: 82px;
-      height: 82px;
-      border-radius: 14px;
-      background: white;
-      padding: 6px;
     }
 
     .radar-wrap {
@@ -2313,16 +2183,13 @@
 
     <section class="ending-overlay" id="endingOverlay" aria-label="遊戲結束分析"></section>
     <section class="hand-manage-overlay" id="handManageOverlay" aria-label="手牌整理與換牌"></section>
-    <section class="table-board-overlay" id="tableBoardOverlay" aria-label="桌牌區整理與換牌"></section>
     <section class="card-focus-overlay" id="cardFocusOverlay" aria-label="卡牌放大閱讀"></section>
   </div>
 
   <script src="../sample-cards.js?v=20260615_complete_cards"></script>
   <script src="reel.js"></script>
-  <script src="table-board-zone.js"></script>
   <script>
     const reel = new TableReelSystem();
-    const tableBoardZone = new TableBoardZoneSystem(reel);
     const seatOrder = ["self", "right", "left", "top"];
     const tableShell = document.querySelector(".table-shell");
     const reelHud = document.getElementById("reelHud");
@@ -2339,7 +2206,6 @@
     const sidebar = document.querySelector(".sidebar");
     const endingOverlay = document.getElementById("endingOverlay");
     const handManageOverlay = document.getElementById("handManageOverlay");
-    const tableBoardOverlay = document.getElementById("tableBoardOverlay");
     const cardFocusOverlay = document.getElementById("cardFocusOverlay");
     const bgmAudio = document.getElementById("bgmAudio");
     const soundToggle = document.getElementById("btnSoundToggle");
@@ -2407,12 +2273,9 @@
     let stormEffects = [];
     let handCollapsed = false;
     let handManageOpen = false;
-    let tableBoardOpen = false;
-    let tableBoardFocusSeatIndex = 0;
     let hudCollapsed = false;
     let aiTurnRunning = false;
     let turnCounter = 1;
-    let crowdCenterUntil = 0;
     let userRotation = 0;
     let zoomScale = 1;
     let bgmEnabled = false;
@@ -2601,11 +2464,6 @@
               <div>每一個把地方故事留下來的人</div>
             </div>
 
-            <div class="credits-qr">
-              <img src="../assets/guide/subscription-qr.png" alt="訂閱 QR Code">
-              <div>訂閱支持後續共同開發</div>
-            </div>
-
             <div class="credits-end">THE END OR REPLAY AGAIN</div>
           </div>
           <div class="credits-actions">
@@ -2690,13 +2548,6 @@
                 <div class="ending-summary-card">
                   <strong>最亮眼能力</strong>
                   ${topList || "持續累積社區營造成果"}。
-                </div>
-                <div class="ending-summary-card ending-qr-card">
-                  <img src="../assets/guide/subscription-qr.png" alt="訂閱 QR Code">
-                  <div>
-                    <strong>訂閱支持</strong>
-                    掃描 QR Code，支持「愛我家鄉」後續卡牌、音效與教學模組共同開發。
-                  </div>
                 </div>
               </div>
             </section>
@@ -3204,12 +3055,11 @@
       return true;
     }
 
-    function discardBoardCard(player, lane, options = {}) {
+    function discardBoardCard(player, lane) {
       const turn = currentTurnPlayer();
       if (!turn || turn.id !== player.id) {
         pushLog(`${player.name} cannot discard board cards right now.`);
-        renderTableBoardOverlay();
-        return false;
+        return;
       }
 
       let slotValue = null;
@@ -3239,7 +3089,7 @@
         slotValue = targetList[slotIndex];
       }
 
-      if (!slotValue) return false;
+      if (!slotValue) return;
 
       const card = slotValue.card;
       if (lane.slot === "defense") {
@@ -3255,13 +3105,7 @@
       player.history.unshift(`${card.name} removed from board`);
       if (player.history.length > 6) player.history.length = 6;
       pushLog(`${player.name} removed ${card.name} from ${label}.`);
-      if (options.drawReplacement) {
-        dealToFive(player);
-        ensureOpeningThemeCard(player);
-        pushLog(`${player.name} 從桌牌區換下 ${card.name}，補回手牌。`);
-      }
       render();
-      return true;
     }
 
     function resetMatch() {
@@ -3271,8 +3115,6 @@
       attackTargetSeatIndex = null;
       handCollapsed = false;
       handManageOpen = false;
-      tableBoardOpen = false;
-      tableBoardFocusSeatIndex = 0;
       hudCollapsed = false;
       aiTurnRunning = false;
       turnCounter = 1;
@@ -3284,8 +3126,6 @@
       endReason = "";
       endingOverlay.classList.remove("open");
       endingOverlay.innerHTML = "";
-      tableBoardOverlay.classList.remove("open");
-      tableBoardOverlay.innerHTML = "";
 
       state.forEach((player, index) => {
         state[index] = createPlayer(player.seatKey, index);
@@ -3617,7 +3457,6 @@
           await new Promise((resolve) => setTimeout(resolve, 420));
           playAiTurn(turnSeatIndex);
           pushLog(`${currentTurnPlayer().name} 回合結束。`);
-          sendCrowdToCenter();
           advanceTurn();
         }
         if (!hasHumanSeat && autoSteps >= maxAutoSteps) {
@@ -3636,7 +3475,6 @@
 
       pushLog(`${player.name} 回合結束。`);
       playSfx("turnEnd");
-      sendCrowdToCenter();
       advanceTurn();
       if (state[turnSeatIndex]?.isAI) {
         runAiTurnsUntilHuman();
@@ -3644,7 +3482,6 @@
     }
 
     function placeThemeCard(player, cardIndex, explicitSlotIndex = null, options = {}) {
-      releaseCrowdFromCenter();
       const card = player.hand[cardIndex];
       if (!isMainTheme(card)) return false;
 
@@ -3689,7 +3526,6 @@
     }
 
     function placeCard(player, cardIndex, targetSeatIndex = focusSeatIndex, options = {}) {
-      releaseCrowdFromCenter();
       const card = player.hand[cardIndex];
       if (!card) return;
 
@@ -3893,7 +3729,7 @@
     }
 
     function renderReel() {
-      const focusRotation = tableBoardZone.getRotation(focusSeatIndex);
+      const focusRotation = reel.getRotation(focusSeatIndex);
       document.documentElement.style.setProperty("--reel-rotation", focusRotation);
       document.documentElement.style.setProperty("--reel-user-rotation", `${userRotation}deg`);
       document.documentElement.style.setProperty("--reel-scale", `${zoomScale}`);
@@ -3901,22 +3737,17 @@
       reelHud.innerHTML = "";
       renderCrowdTraffic();
       renderStormOverlays();
-      const groups = tableBoardZone.getLaneGroups();
+      const groups = reel.getLaneGroups();
       const lanes = [...groups.main, ...groups.front];
       state.forEach((player, seatIndex) => {
         const board = document.createElement("div");
-        board.className = `seat-board ${tableBoardZone.getSeatClass(seatIndex)}`;
+        board.className = `seat-board ${reel.getSeatClass(seatIndex)}`;
         board.innerHTML = `
           <div class="seat-board-title">
-            <span>${tableBoardZone.getTitle()}｜${tableBoardZone.getSeatLabel(seatIndex)}</span>
-            <button class="table-zone-button" type="button" data-open-table-zone="${seatIndex}">整理換牌</button>
+            <span>${reel.getSeatLabel(seatIndex)}</span>
+            <span>3攻 2防 2加成</span>
           </div>
         `;
-        board.addEventListener("click", () => openTableBoardZone(seatIndex));
-        board.querySelector("[data-open-table-zone]").onclick = (event) => {
-          event.stopPropagation();
-          openTableBoardZone(seatIndex);
-        };
 
         lanes.forEach((lane) => {
           const slot = document.createElement("div");
@@ -3961,14 +3792,6 @@
       ];
     }
 
-    function sendCrowdToCenter() {
-      crowdCenterUntil = Date.now() + 950;
-    }
-
-    function releaseCrowdFromCenter() {
-      crowdCenterUntil = 0;
-    }
-
     function seededUnit(seed) {
       const value = Math.sin(seed * 999.17) * 10000;
       return value - Math.floor(value);
@@ -3978,7 +3801,6 @@
       if (!crowdLayer) return;
       crowdLayer.innerHTML = "";
       const zones = getPlayerTrafficZones();
-      const returningHome = Date.now() < crowdCenterUntil;
       const colors = ["#ff6b8a", "#ffd86b", "#67e8a5", "#4fd1ff", "#a78bfa", "#fb923c", "#f472b6", "#34d399"];
       const vehicleColors = ["#f97316", "#38bdf8", "#22c55e", "#facc15"];
       state.forEach((player, seatIndex) => {
@@ -3990,9 +3812,9 @@
         for (let index = 0; index < meepleCount; index += 1) {
           const seed = (turnCounter + 3) * 100 + seatIndex * 29 + index;
           const piece = document.createElement("span");
-          piece.className = `crowd-piece meeple ${returningHome ? "returning-home" : ""}`;
-          const x = returningHome ? 50 + (seededUnit(seed) - 0.5) * 6 : zone.x + (seededUnit(seed) - 0.5) * zone.spreadX;
-          const y = returningHome ? 50 + (seededUnit(seed + 0.37) - 0.5) * 5 : zone.y + (seededUnit(seed + 0.37) - 0.5) * zone.spreadY;
+          piece.className = "crowd-piece meeple";
+          const x = zone.x + (seededUnit(seed) - 0.5) * zone.spreadX;
+          const y = zone.y + (seededUnit(seed + 0.37) - 0.5) * zone.spreadY;
           piece.style.setProperty("--x", `${x}%`);
           piece.style.setProperty("--y", `${y}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.73) - 0.5) * 28}deg`);
@@ -4007,10 +3829,10 @@
           const seed = (turnCounter + 7) * 77 + seatIndex * 31 + index;
           const piece = document.createElement("span");
           const vehicleType = ["bus", "train", "car"][(seatIndex + index) % 3];
-          piece.className = `crowd-piece vehicle ${vehicleType} ${returningHome ? "returning-home" : ""}`;
+          piece.className = `crowd-piece vehicle ${vehicleType}`;
           const offset = (index - 1) * 7;
-          piece.style.setProperty("--x", `${returningHome ? 50 + (seededUnit(seed) - 0.5) * 7 : zone.x + (zone.spreadX > zone.spreadY ? offset : 0) + (seededUnit(seed) - 0.5) * 8}%`);
-          piece.style.setProperty("--y", `${returningHome ? 50 + (seededUnit(seed + 0.41) - 0.5) * 6 : zone.y + (zone.spreadY >= zone.spreadX ? offset : 0) + (seededUnit(seed + 0.41) - 0.5) * 8}%`);
+          piece.style.setProperty("--x", `${zone.x + (zone.spreadX > zone.spreadY ? offset : 0) + (seededUnit(seed) - 0.5) * 8}%`);
+          piece.style.setProperty("--y", `${zone.y + (zone.spreadY >= zone.spreadX ? offset : 0) + (seededUnit(seed + 0.41) - 0.5) * 8}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.82) - 0.5) * 16}deg`);
           piece.style.setProperty("--color", vehicleColors[(seatIndex + index) % vehicleColors.length]);
           piece.style.setProperty("--delay", `${(seededUnit(seed + 1.23) * -2).toFixed(2)}s`);
@@ -4452,102 +4274,6 @@
       });
     }
 
-    function openTableBoardZone(seatIndex = focusSeatIndex) {
-      tableBoardFocusSeatIndex = seatIndex;
-      tableBoardOpen = true;
-      handManageOpen = false;
-      render();
-    }
-
-    function closeTableBoardZone() {
-      tableBoardOpen = false;
-      if (tableBoardOverlay) {
-        tableBoardOverlay.classList.remove("open");
-        tableBoardOverlay.innerHTML = "";
-      }
-    }
-
-    function renderTableBoardOverlay() {
-      if (!tableBoardOverlay) return;
-      if (!tableBoardOpen) {
-        tableBoardOverlay.classList.remove("open");
-        tableBoardOverlay.innerHTML = "";
-        return;
-      }
-
-      const player = state[tableBoardFocusSeatIndex] || currentControlPlayer();
-      const isTurn = currentTurnPlayer()?.id === player.id && !player.isAI && !gameEnded;
-      const items = tableBoardZone.getManageItems(player);
-      const itemHtml = items.map(({ lane, value }) => {
-        const card = value?.card;
-        if (!card) {
-          return `
-            <article class="table-board-item empty">
-              <div class="name">${escapeHtml(lane.label)}</div>
-              <div class="desc">${escapeHtml(lane.slotType)} 空位，等待放牌。</div>
-            </article>
-          `;
-        }
-
-        const covered = value.faceDown && !value.triggered;
-        return `
-          <article class="table-board-item">
-            ${covered ? `<div class="card face-down" aria-label="覆蓋牌"></div>` : card.image ? `<img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}">` : `<div class="empty">無圖</div>`}
-            <div class="name">${escapeHtml(lane.label)}｜${covered ? "覆蓋牌" : escapeHtml(card.name)}</div>
-            <div class="desc">${covered ? "這張牌維持覆蓋，等到被攻擊時才啟動。" : escapeHtml(card.desc || "")}</div>
-            <div class="stack-row">
-              <span class="tag">${escapeHtml(lane.slotType)}</span>
-              <span class="tag">${escapeHtml(card.rarity || "普通")}</span>
-            </div>
-            <div class="card-actions">
-              ${covered ? "" : `<button class="mini-btn" data-read-table-card="${escapeHtml(lane.key)}">放大閱讀</button>`}
-              <button class="mini-btn danger" data-exchange-table-card="${escapeHtml(lane.key)}" ${isTurn ? "" : "disabled"}>棄置換牌</button>
-            </div>
-          </article>
-        `;
-      }).join("");
-
-      tableBoardOverlay.classList.add("open");
-      tableBoardOverlay.innerHTML = `
-        <article class="table-board-card" role="dialog" aria-modal="true">
-          <div class="hand-manage-head">
-            <div>
-              <div class="hand-manage-title">${tableBoardZone.getTitle()}｜${escapeHtml(tableBoardZone.getSeatLabel(tableBoardFocusSeatIndex))}</div>
-              <div class="hand-manage-sub">放大檢視攻擊、防禦與加成。自己的回合可以把桌牌送進墳場並補回手牌，讓策略重新流動。</div>
-            </div>
-            <div class="hand-manage-actions">
-              <button class="mini-btn" data-close-table-zone="1">回到桌面</button>
-            </div>
-          </div>
-          ${isTurn ? "" : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}
-          <div class="table-board-grid">${itemHtml}</div>
-        </article>
-      `;
-
-      tableBoardOverlay.querySelector('[data-close-table-zone="1"]').onclick = (event) => {
-        event.stopPropagation();
-        closeTableBoardZone();
-      };
-      tableBoardOverlay.querySelectorAll("[data-read-table-card]").forEach((button) => {
-        button.onclick = (event) => {
-          event.stopPropagation();
-          const lane = items.find((item) => item.lane.key === button.dataset.readTableCard)?.lane;
-          const slotValue = lane ? tableBoardZone.getSlotValue(player, lane) : null;
-          if (slotValue?.card) openCardReader(slotValue.card);
-        };
-      });
-      tableBoardOverlay.querySelectorAll("[data-exchange-table-card]").forEach((button) => {
-        button.onclick = (event) => {
-          event.stopPropagation();
-          const lane = items.find((item) => item.lane.key === button.dataset.exchangeTableCard)?.lane;
-          if (lane) {
-            const exchanged = discardBoardCard(player, lane, { drawReplacement: true });
-            if (exchanged) tableBoardOpen = true;
-          }
-        };
-      });
-    }
-
     function renderHand() {
       const self = currentControlPlayer();
       const handWrap = document.createElement("div");
@@ -4776,7 +4502,6 @@
       renderPlayerHud();
       renderShop();
       renderHandManageOverlay();
-      renderTableBoardOverlay();
       renderStatus();
       renderLog();
     }
@@ -4837,11 +4562,6 @@
     handManageOverlay.addEventListener("click", (event) => {
       if (event.target === handManageOverlay) {
         closeHandManager();
-      }
-    });
-    tableBoardOverlay.addEventListener("click", (event) => {
-      if (event.target === tableBoardOverlay) {
-        closeTableBoardZone();
       }
     });
     bgmAudio.addEventListener("play", updateSoundButton);
