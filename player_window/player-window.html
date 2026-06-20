@@ -2192,6 +2192,82 @@
       line-height: 1.45;
     }
 
+    .competency-bars {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .competency-bar {
+      display: grid;
+      grid-template-columns: 64px 136px minmax(120px, 1fr) 42px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(22, 34, 61, 0.62);
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      font-size: 12px;
+    }
+
+    .competency-bar .grade {
+      color: #9de7ff;
+      font-weight: 1000;
+    }
+
+    .competency-bar .label {
+      color: #f4f8ff;
+      font-weight: 1000;
+      line-height: 1.35;
+    }
+
+    .competency-track {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .competency-fill {
+      display: block;
+      width: var(--score-width, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #38bdf8, #2563eb);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.28);
+    }
+
+    .competency-score {
+      color: #ffe8a3;
+      font-weight: 1000;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sdg-analysis {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sdg-card {
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(12, 19, 36, 0.82);
+      border: 1px solid rgba(140, 175, 255, 0.12);
+      color: #d7e5ff;
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    .sdg-card strong {
+      display: block;
+      color: #ffe8a3;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
     .certificate-card {
       position: relative;
       display: grid;
@@ -2744,6 +2820,22 @@
       .split(",")
       .map((role) => role.trim().toLowerCase() === "human" ? "human" : "ai");
     while (seatRoles.length < seatOrder.length) seatRoles.push("ai");
+    function readCardRateSettings() {
+      const limitRate = (value) => Math.min(200, Math.max(0, Number(value ?? 100))) / 100;
+      try {
+        const parsed = JSON.parse(setupParams.get("cardRates") || "{}");
+        return {
+          attack: limitRate(parsed.attack),
+          defense: limitRate(parsed.defense),
+          trap: limitRate(parsed.trap),
+          boost: limitRate(parsed.boost),
+          main: limitRate(parsed.main),
+        };
+      } catch (error) {
+        return { attack: 1, defense: 1, trap: 1, boost: 1, main: 1 };
+      }
+    }
+    const cardRateSettings = readCardRateSettings();
 
     const extendedCards = [...(window.sampleCards || [])];
     const mainThemeCards = extendedCards.filter((card) => card.type === "MainTheme");
@@ -3071,6 +3163,64 @@
       `;
     }
 
+    function renderCompetencyBars(player) {
+      return competencyIndicators.map((indicator) => {
+        const score = indicatorScore(player, indicator.key);
+        const width = Math.round((score / 5) * 100);
+        return `
+          <div class="competency-bar">
+            <span class="grade">${indicator.grade}</span>
+            <span class="label">${indicator.label}</span>
+            <span class="competency-track"><span class="competency-fill" style="--score-width:${width}%"></span></span>
+            <span class="competency-score">${score}/5</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function buildSdgAnalysis(player) {
+      const s = player.scores;
+      const stats = player.stats || {};
+      const sdgItems = [
+        {
+          code: "SDG 11 永續城鄉",
+          score: indicatorScore(player, "g4_hometown") + indicatorScore(player, "g4_life") + stats.themesPlaced,
+          best: `你能把地方主題放進社區經營中，讓家鄉特色被看見，也開始思考居民生活、觀光秩序與公共空間的平衡。`,
+          encourage: `下一次可以再多照顧民心與動線安排，讓熱鬧的人潮更穩定地變成適合居住的社區支持。`,
+        },
+        {
+          code: "SDG 8 合適工作與經濟成長",
+          score: indicatorScore(player, "g5_economy") + Math.max(0, player.cashflow) + stats.cardsBought,
+          best: `你在資源、點數、現金流與商店買卡之間做出取捨，展現把地方活動變成永續營運的能力。`,
+          encourage: `若想再進一步，可以讓收入成長時同步保留文化與生態價值，讓經濟不只是變多，也變得更穩。`,
+        },
+        {
+          code: "SDG 13 氣候行動與環境韌性",
+          score: indicatorScore(player, "g5_environment") + Math.max(0, s.ecology) + stats.defensesTriggered,
+          best: `你曾面對烏雲、攻擊或災害壓力，並透過防禦、陷阱或生態相關策略建立社區韌性。`,
+          encourage: `未來可以更早準備環境與災害應變牌，讓社區在突發事件來臨前就有保護自己的方法。`,
+        },
+        {
+          code: "SDG 17 夥伴關係",
+          score: indicatorScore(player, "g6_civic") + stats.defensesPlaced + stats.trapsPlaced,
+          best: `你運用防禦、陷阱、志工或合作型策略，展現社區營造不是單打獨鬥，而是需要共同守護。`,
+          encourage: `下一局可以更主動把合作與防守安排在前段，讓攻防關係變成穩住社區的支援網。`,
+        },
+      ].sort((a, b) => b.score - a.score);
+      const strengths = sdgItems.slice(0, 2).map((item) => `<div class="sdg-card"><strong>${item.code}</strong>${item.best}</div>`).join("");
+      const nextSteps = sdgItems.slice(-2).reverse().map((item) => `<div class="sdg-card"><strong>${item.code} 的下一步</strong>${item.encourage}</div>`).join("");
+      return `
+        <div class="sdg-analysis">
+          <div class="sdg-card">
+            <strong>SDGs 學習解析</strong>
+            從這場遊戲歷程來看，${player.name} 已經能把家鄉特色、經濟選擇、環境壓力與合作關係放在同一張地圖上思考。這代表學生不只是把卡牌打出去，也正在練習用永續發展的角度判斷地方如何被看見、如何被照顧。
+          </div>
+          ${strengths}
+          ${nextSteps}
+        </div>
+      `;
+    }
+
     function renderCredits() {
       const ranking = [...state].sort((a, b) => finalScore(b) - finalScore(a));
       const rankingLines = ranking.map((player, index) => `
@@ -3166,17 +3316,8 @@
         .map((indicator) => ({ ...indicator, score: indicatorScore(self, indicator.key) }))
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
-      const rows = competencyIndicators.map((indicator) => {
-        const score = indicatorScore(self, indicator.key);
-        return `
-          <div class="indicator-item">
-            <span class="grade">${indicator.grade}</span>
-            <span class="label">${indicator.label}</span>
-            <small>${indicator.desc}</small>
-            <span class="score">${"★".repeat(score)}${"☆".repeat(5 - score)}</span>
-          </div>
-        `;
-      }).join("");
+      const competencyBars = renderCompetencyBars(self);
+      const sdgAnalysis = buildSdgAnalysis(self);
       const rankingRows = ranking.map((player, index) => `
         <div class="ending-stat">
           <div class="rank-badge">${index + 1}</div>
@@ -3211,7 +3352,7 @@
               <div class="ending-summary">
                 <div class="ending-summary-card">
                   <strong>${self.name} 的成果摘要</strong>
-                  第 ${selfRank} 名｜總分 ${selfScore}｜本月觀光人潮 ${self.visitorFlow.toLocaleString()} 人。
+                  第 ${selfRank} 名｜總分 ${selfScore}｜本月觀光人潮 ${currentMonthlyVisitors(self).toLocaleString()} 人。
                 </div>
                 <div class="ending-summary-card">
                   <strong>最亮眼能力</strong>
@@ -3227,10 +3368,10 @@
               </div>
             </section>
             <section class="ending-section">
-              <h3>${self.name} 的學習星芒圖</h3>
+              <h3>${self.name} 的各學年社會科能力</h3>
               <div class="radar-wrap">
-                ${buildRadarSvg(self)}
-                <div class="indicator-list">${rows}</div>
+                <div class="competency-bars">${competencyBars}</div>
+                ${sdgAnalysis}
               </div>
             </section>
             <section class="ending-section certificate-section">
@@ -3245,7 +3386,7 @@
                 <div class="certificate-stats">
                   <div>名次：第 ${selfRank} 名</div>
                   <div>總分：${selfScore} 分</div>
-                  <div>人潮：${self.visitorFlow.toLocaleString()} 人</div>
+                  <div>人潮：${currentMonthlyVisitors(self).toLocaleString()} 人</div>
                   <div>亮點：${topIndicators[0]?.label || "社區營造"}</div>
                 </div>
                 <div class="certificate-footer">
@@ -3259,7 +3400,7 @@
                   親愛的 ${self.name}：你在本次《愛我家鄉・社區營造大作戰》中，嘗試用策略安排地方主題、營運卡、加成卡與防禦行動，讓家鄉被更多人看見。
                 </p>
                 <p>
-                  社區營造不是只追求人潮與收入，也要在文化、生態、民心與效率之間做取捨。你完成了一場關於家鄉特色、公共生活與永續思考的挑戰，值得被好好肯定。
+                  從 SDGs 的角度來看，你已經開始練習永續城鄉、地方經濟、環境韌性與夥伴合作的判斷。社區營造不是只追求人潮與收入，也要在文化、生態、民心與效率之間做取捨；你完成了一場關於家鄉特色、公共生活與永續思考的挑戰，值得被好好肯定。
                 </p>
                 <p>
                   願你把今天的觀察帶回生活裡，繼續發現家鄉的故事，也學會用溫柔而聰明的方法讓地方變得更好。
@@ -3323,11 +3464,30 @@
 
     const state = seatOrder.map((seatKey, seatIndex) => createPlayer(seatKey, seatIndex));
 
+    function cardRateFor(card) {
+      if (card?.type === "Attack") return cardRateSettings.attack;
+      if (card?.type === "Defense") return cardRateSettings.defense;
+      if (card?.type === "Trap") return cardRateSettings.trap;
+      if (isBoostCardType(card?.type)) return cardRateSettings.boost;
+      if (isMainTheme(card)) return cardRateSettings.main;
+      return 1;
+    }
+
+    function weightedCards(cards) {
+      const pool = [];
+      cards.forEach((card) => {
+        const copies = Math.round(cardRateFor(card) * 4);
+        for (let index = 0; index < copies; index += 1) pool.push(card);
+      });
+      return pool;
+    }
+
     function createDeck() {
       const deck = [];
       extendedCards.forEach((card, idx) => {
         if (card.type === "MainTheme") return;
-        const copyCount = card.type === "Attack" ? 2 : isBoostCardType(card.type) ? 1 : card.type === "Defense" ? 4 : 3;
+        const baseCount = card.type === "Attack" ? 2 : isBoostCardType(card.type) ? 1 : card.type === "Defense" ? 4 : card.type === "Trap" ? 3 : 3;
+        const copyCount = Math.round(baseCount * cardRateFor(card));
         for (let i = 0; i < copyCount; i += 1) {
           deck.push(cloneCard(card, `${idx}_${i}`));
         }
@@ -3744,20 +3904,21 @@
     }
 
     function buildShopMarket() {
-      const rareThemeChance = Math.random() < 0.06;
-      const rareTheme = rareThemeChance ? shuffle(mainThemeCards.filter((card) => card.image)).slice(0, 1) : [];
+      const rareThemeChance = Math.random() < 0.06 * cardRateSettings.main;
+      const rareTheme = rareThemeChance ? shuffle(weightedCards(mainThemeCards.filter((card) => card.image))).slice(0, 1) : [];
       
       // Separate support cards to decrease Boost cards appearance and ensure Defense cards availability
-      const defenseCards = shuffle(extendedCards.filter((card) => card.type === "Defense" && card.image));
-      const boostCards = shuffle(extendedCards.filter((card) => (card.type === "Utility" || card.type === "Trap") && card.image));
+      const defenseCards = shuffle(weightedCards(extendedCards.filter((card) => card.type === "Defense" && card.image)));
+      const trapCards = shuffle(weightedCards(extendedCards.filter((card) => card.type === "Trap" && card.image)));
+      const boostCards = shuffle(weightedCards(extendedCards.filter((card) => isBoostCardType(card.type) && card.image)));
       
-      // Pick 2 defense cards and 1 boost card as support cards
-      const pickedDefense = defenseCards.slice(0, 2);
-      const pickedBoost = boostCards.slice(0, 1);
-      const supportCards = [...pickedDefense, ...pickedBoost];
+      const pickedDefense = defenseCards.slice(0, cardRateSettings.defense > 0 ? 2 : 0);
+      const pickedTrap = trapCards.slice(0, cardRateSettings.trap > 0 ? 1 : 0);
+      const pickedBoost = boostCards.slice(0, cardRateSettings.boost > 0 ? 1 : 0);
+      const supportCards = [...pickedDefense, ...pickedTrap, ...pickedBoost].slice(0, 3);
       
-      const attackCards = shuffle(extendedCards.filter((card) => card.type === "Attack" && card.image)).slice(0, 1);
-      const fallback = shuffle(extendedCards.filter((card) => !isMainTheme(card) && card.image)).slice(0, Math.max(0, 4 - rareTheme.length - supportCards.length - attackCards.length));
+      const attackCards = shuffle(weightedCards(extendedCards.filter((card) => card.type === "Attack" && card.image))).slice(0, cardRateSettings.attack > 0 ? 1 : 0);
+      const fallback = shuffle(weightedCards(extendedCards.filter((card) => !isMainTheme(card) && card.image))).slice(0, Math.max(0, 4 - rareTheme.length - supportCards.length - attackCards.length));
       
       shopMarket = shuffle([...rareTheme, ...supportCards, ...attackCards, ...fallback])
         .slice(0, 4)

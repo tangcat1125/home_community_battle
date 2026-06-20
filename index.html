@@ -298,6 +298,35 @@
       line-height: 1.45;
     }
 
+    .card-rate-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card-rate-row {
+      display: grid;
+      grid-template-columns: 96px 1fr 58px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(240, 248, 255, 0.78);
+      border: 1px solid rgba(67, 164, 217, 0.16);
+      color: #24455f;
+      font-weight: 900;
+    }
+
+    .card-rate-row input {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .card-rate-value {
+      text-align: right;
+      color: #075985;
+      font-variant-numeric: tabular-nums;
+    }
+
     .preview {
       margin: 18px 0;
       padding: 15px 17px;
@@ -479,6 +508,37 @@
         </div>
       </div>
 
+      <div class="setup-block card-rate-block">
+        <div class="setup-label">卡牌出現率</div>
+        <div class="card-rate-grid" aria-label="卡牌出現率調整">
+          <label class="card-rate-row">
+            <span>攻擊卡</span>
+            <input type="range" min="0" max="200" step="10" value="100" data-card-rate="attack">
+            <span class="card-rate-value" data-card-rate-value="attack">100%</span>
+          </label>
+          <label class="card-rate-row">
+            <span>防禦卡</span>
+            <input type="range" min="0" max="200" step="10" value="100" data-card-rate="defense">
+            <span class="card-rate-value" data-card-rate-value="defense">100%</span>
+          </label>
+          <label class="card-rate-row">
+            <span>陷阱卡</span>
+            <input type="range" min="0" max="200" step="10" value="100" data-card-rate="trap">
+            <span class="card-rate-value" data-card-rate-value="trap">100%</span>
+          </label>
+          <label class="card-rate-row">
+            <span>加成卡</span>
+            <input type="range" min="0" max="200" step="10" value="100" data-card-rate="boost">
+            <span class="card-rate-value" data-card-rate-value="boost">100%</span>
+          </label>
+          <label class="card-rate-row">
+            <span>主線卡</span>
+            <input type="range" min="0" max="200" step="10" value="100" data-card-rate="main">
+            <span class="card-rate-value" data-card-rate-value="main">100%</span>
+          </label>
+        </div>
+      </div>
+
       <div class="preview" style="display: none;">
         <strong>目前設定</strong>
         <div id="setupPreview"></div>
@@ -502,6 +562,7 @@
       { name: "對家 / P4", short: "P4" },
     ];
     let playerCount = 4;
+    const cardRateKeys = ["attack", "defense", "trap", "boost", "main"];
 
     function seatRole(index) {
       if (index >= playerCount) return "ai";
@@ -511,6 +572,21 @@
 
     function currentRoles() {
       return seats.map((_, index) => seatRole(index));
+    }
+
+    function currentCardRates() {
+      return Object.fromEntries(cardRateKeys.map((key) => {
+        const input = document.querySelector(`[data-card-rate="${key}"]`);
+        return [key, Number(input?.value || 100)];
+      }));
+    }
+
+    function updateCardRateLabels() {
+      const rates = currentCardRates();
+      cardRateKeys.forEach((key) => {
+        const label = document.querySelector(`[data-card-rate-value="${key}"]`);
+        if (label) label.textContent = `${rates[key]}%`;
+      });
     }
 
     function setSeatRole(index, role) {
@@ -547,6 +623,7 @@
       const activeRoles = roles.slice(0, playerCount);
       const humanCount = activeRoles.filter((role) => role === "human").length;
       const aiCount = roles.filter((role) => role === "ai").length;
+      const rates = currentCardRates();
       const lines = seats.map((seat, index) => {
         const role = roles[index] === "human" ? "真人玩家" : "AI 代玩";
         return `${seat.name}：${role}`;
@@ -554,6 +631,7 @@
       document.getElementById("setupPreview").innerHTML = `
         <div>真人 ${humanCount} 位，AI ${aiCount} 位。遊戲時間 30 分鐘，倒閉或時間結束時結算。</div>
         <div>${lines.join("｜")}</div>
+        <div>卡牌出現率：攻擊 ${rates.attack}%｜防禦 ${rates.defense}%｜陷阱 ${rates.trap}%｜加成 ${rates.boost}%｜主線 ${rates.main}%</div>
       `;
     }
 
@@ -564,6 +642,7 @@
         teacherSetup: "1",
         mode: "touchscreen",
         winCondition: "30min-bankruptcy",
+        cardRates: JSON.stringify(currentCardRates()),
       });
       const frame = document.getElementById("gameFrame");
       frame.src = `player_window/player-window.html?${params.toString()}`;
@@ -578,6 +657,13 @@
 
     document.querySelectorAll('input[type="radio"]').forEach((input) => {
       input.addEventListener("change", updatePreview);
+    });
+
+    document.querySelectorAll("[data-card-rate]").forEach((input) => {
+      input.addEventListener("input", () => {
+        updateCardRateLabels();
+        updatePreview();
+      });
     });
 
     document.getElementById("startGame").addEventListener("click", launchGame);
@@ -598,6 +684,7 @@
       frame.contentWindow?.postMessage(payload, "*");
     });
 
+    updateCardRateLabels();
     setPlayerCount(4);
   </script>
 </body>
