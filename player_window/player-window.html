@@ -380,6 +380,57 @@
       line-height: 1.25;
     }
 
+    .flow-bars {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(6, 12, 28, 0.48);
+      border: 1px solid rgba(140, 175, 255, 0.13);
+    }
+
+    .flow-bar {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      color: #d8e6ff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .flow-track {
+      height: 13px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .flow-fill {
+      display: block;
+      height: 100%;
+      width: var(--bar-width, 4%);
+      min-width: 4%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #38bdf8, #2563eb);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.32);
+    }
+
+    .flow-fill.loss {
+      background: linear-gradient(90deg, #fb7185, #dc2626);
+      box-shadow: 0 0 14px rgba(248, 113, 113, 0.28);
+    }
+
+    .flow-delta {
+      min-width: 58px;
+      text-align: right;
+      color: #7dd3fc;
+    }
+
+    .flow-delta.loss { color: #fca5a5; }
+
     .operation-themes {
       display: grid;
       gap: 7px;
@@ -617,6 +668,16 @@
       animation: crowdGather 1.15s ease-in-out infinite;
     }
 
+    .crowd-piece.traveler {
+      z-index: 4;
+      animation: trafficTravel 2.6s cubic-bezier(0.2, 0.72, 0.28, 1) forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .crowd-piece.traveler.cash {
+      filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.72)) drop-shadow(0 7px 8px rgba(0, 0, 0, 0.35));
+    }
+
     .meeple {
       width: 16px;
       height: 22px;
@@ -720,6 +781,28 @@
       }
       50% {
         transform: translate(-50%, -50%) translate(var(--walk-x, 8px), var(--walk-y, -5px)) rotate(var(--tilt, 0deg)) scale(1.08);
+      }
+    }
+
+    @keyframes trafficTravel {
+      0% {
+        left: var(--x);
+        top: var(--y);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.78) rotate(var(--tilt, 0deg));
+      }
+      15% { opacity: 1; }
+      48% {
+        left: var(--mid-x);
+        top: var(--mid-y);
+        transform: translate(-50%, -50%) scale(1.12) rotate(var(--tilt, 0deg));
+      }
+      86% { opacity: 1; }
+      100% {
+        left: var(--to-x);
+        top: var(--to-y);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.88) rotate(var(--tilt, 0deg));
       }
     }
 
@@ -998,7 +1081,7 @@
       left: 50%;
       bottom: 18px;
       transform: translateX(-50%);
-      width: min(980px, calc(100% - 650px));
+      width: min(1040px, calc(100% - 520px));
       min-width: 720px;
       max-height: none;
       overflow: visible;
@@ -1255,9 +1338,10 @@
     .hand-grid {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: 168px;
-      justify-content: center;
-      gap: 12px;
+      grid-auto-columns: minmax(150px, 1fr);
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      justify-content: stretch;
+      gap: 10px;
       overflow-x: auto;
       overflow-y: hidden;
       padding: 0 2px 8px;
@@ -1266,7 +1350,7 @@
     }
 
     .hand-card {
-      min-height: 304px;
+      min-height: 236px;
       border-radius: 14px;
       padding: 9px;
       background: linear-gradient(180deg, rgba(25, 39, 69, 0.98), rgba(15, 24, 42, 0.98));
@@ -1283,7 +1367,7 @@
       box-shadow: 0 0 0 1px rgba(79, 209, 255, 0.14);
     }
     .hand-card-art {
-      height: 150px;
+      height: 116px;
       border-radius: 10px;
       margin-bottom: 6px;
       object-fit: contain;
@@ -1298,9 +1382,135 @@
     }
     .hand-card .meta.desc {
       display: -webkit-box;
-      -webkit-line-clamp: 4;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .tutorial-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 132;
+      display: none;
+      place-items: center;
+      padding: 28px;
+      background: rgba(2, 7, 18, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .tutorial-overlay.open {
+      display: grid;
+    }
+
+    .tutorial-card {
+      width: min(1120px, 94vw);
+      max-height: 90vh;
+      overflow: auto;
+      display: grid;
+      gap: 16px;
+      padding: 22px;
+      border-radius: 28px;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(18, 31, 58, 0.98), rgba(7, 13, 29, 0.98)),
+        radial-gradient(circle at 18% 0%, rgba(79, 209, 255, 0.2), transparent 30%);
+      border: 1px solid rgba(143, 215, 255, 0.34);
+      box-shadow: 0 34px 90px rgba(0, 0, 0, 0.58);
+    }
+
+    .tutorial-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .tutorial-title {
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.12;
+      font-weight: 1000;
+    }
+
+    .tutorial-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .tutorial-flow {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.72fr) auto minmax(260px, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .tutorial-source,
+    .tutorial-targets {
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(12, 19, 36, 0.82);
+      border: 1px solid rgba(140, 175, 255, 0.16);
+    }
+
+    .tutorial-source img,
+    .tutorial-target img {
+      width: 100%;
+      height: 160px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: rgba(3, 7, 18, 0.72);
+    }
+
+    .tutorial-source strong,
+    .tutorial-target strong {
+      display: block;
+      margin-top: 9px;
+      font-size: 16px;
+    }
+
+    .tutorial-arrow {
+      display: grid;
+      place-items: center;
+      color: #9de7ff;
+      font-size: 34px;
+      font-weight: 1000;
+    }
+
+    .tutorial-targets {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tutorial-target {
+      min-width: 0;
+    }
+
+    .tutorial-target img {
+      height: 120px;
+    }
+
+    .tutorial-note {
+      color: #dbeafe;
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(79, 209, 255, 0.1);
+      border: 1px solid rgba(79, 209, 255, 0.2);
+    }
+
+    @media (max-width: 900px) {
+      .tutorial-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .tutorial-arrow {
+        font-size: 24px;
+      }
+
+      .tutorial-targets {
+        grid-template-columns: 1fr;
+      }
     }
 
     .card-actions {
@@ -2499,6 +2709,7 @@
     <section class="hand-manage-overlay" id="handManageOverlay" aria-label="手牌整理與換牌"></section>
     <section class="table-board-overlay" id="tableBoardOverlay" aria-label="桌牌區整理與換牌"></section>
     <section class="card-focus-overlay" id="cardFocusOverlay" aria-label="卡牌放大閱讀"></section>
+    <section class="tutorial-overlay" id="tutorialOverlay" aria-label="攻防關係教學"></section>
   </div>
 
   <script src="../sample-cards.js?v=20260615_complete_cards"></script>
@@ -2525,6 +2736,7 @@
     const handManageOverlay = document.getElementById("handManageOverlay");
     const tableBoardOverlay = document.getElementById("tableBoardOverlay");
     const cardFocusOverlay = document.getElementById("cardFocusOverlay");
+    const tutorialOverlay = document.getElementById("tutorialOverlay");
     const bgmAudio = document.getElementById("bgmAudio");
     const soundToggle = document.getElementById("btnSoundToggle");
     const setupParams = new URLSearchParams(window.location.search);
@@ -2535,6 +2747,7 @@
 
     const extendedCards = [...(window.sampleCards || [])];
     const mainThemeCards = extendedCards.filter((card) => card.type === "MainTheme");
+    const isBoostCardType = (type) => ["Utility", "Heal", "Bonus"].includes(type);
     const scoreLabels = {
       income: "收入",
       tourism: "觀光",
@@ -2589,6 +2802,27 @@
       },
     };
     const aiProfileOrder = ["prankster", "operator", "slowLearner"];
+    const counterRelations = {
+      defense_guided_tour: ["attack_commodity_only", "attack_cultural_misstatement", "attack_fake_performance", "attack_lost_tradition", "attack_misused_meme", "attack_drone_photo"],
+      defense_friendly_farming: ["attack_habitat_crisis", "attack_overdevelopment", "attack_water_shortage", "attack_light_pollution"],
+      defense_route_planning: ["attack_crowd_surge", "attack_overcrowding", "attack_parking_scramble", "attack_drone_photo"],
+      defense_etiquette: ["attack_cultural_misstatement", "attack_fake_performance", "attack_lost_tradition"],
+      defense_sorting_station: ["attack_litter_mess"],
+      defense_town_meeting: ["attack_hype_cooldown", "attack_delay"],
+      defense_budget_sheet: ["attack_budget_loss", "attack_maintenance_fee", "attack_labor_shortage"],
+      defense_heritage_repair: ["attack_maintenance_fee", "attack_equipment_failure"],
+      defense_shuttle_bus: ["attack_overcrowding", "attack_parking_scramble"],
+      trap_crowd_flow_map: ["attack_crowd_surge", "attack_overcrowding", "attack_parking_scramble"],
+      trap_reservation_site: ["attack_crowd_surge", "attack_overcrowding"],
+      trap_rain_plan: ["attack_delay", "attack_hype_cooldown"],
+      trap_documentation_folder: ["attack_cultural_misstatement", "attack_commodity_only"],
+      trap_clarification_draft: ["attack_misused_meme", "attack_fake_performance"],
+      trap_emergency_fund: ["attack_budget_loss", "attack_maintenance_fee"],
+      trap_safety_checklist: ["attack_equipment_failure", "attack_drone_photo"],
+      trap_buffer_zone: ["attack_habitat_crisis", "attack_overdevelopment", "attack_light_pollution"],
+      trap_records: ["attack_hype_cooldown", "attack_delay"],
+      trap_volunteer_roster: ["attack_labor_shortage", "attack_litter_mess"],
+    };
 
     let focusSeatIndex = 0;
     let round = 1;
@@ -2604,6 +2838,7 @@
     let aiTurnRunning = false;
     let turnCounter = 1;
     let crowdCenterUntil = 0;
+    let trafficTransfers = [];
     let userRotation = 0;
     let zoomScale = 1;
     let bgmEnabled = false;
@@ -2647,9 +2882,97 @@
           <div class="reader-name">${escapeHtml(card.name)}</div>
           <div class="reader-meta">${escapeHtml(card.rarity || "卡牌")} · ${escapeHtml(card.type || "未知類型")} / Cost ${card.cost ?? 0}</div>
           <div class="reader-desc">${escapeHtml(card.desc || "這張卡目前沒有描述。")}</div>
-          <div class="reader-tip">再點一下，回到卡牌夾</div>
+          <div class="reader-tip">再點一下，看攻防關係教學</div>
         </article>
       `;
+    }
+
+    function counterCardIdsFor(card) {
+      if (!card) return [];
+      if (counterRelations[card.id]) return counterRelations[card.id];
+      if (["Attack", "Debuff"].includes(card.type)) {
+        return Object.entries(counterRelations)
+          .filter(([, attackIds]) => attackIds.includes(card.id))
+          .map(([counterId]) => counterId);
+      }
+      return [];
+    }
+
+    function relationModeFor(card) {
+      if (!card) return "overview";
+      if (counterRelations[card.id]) return "counter";
+      if (["Attack", "Debuff"].includes(card.type)) return "attack";
+      return "overview";
+    }
+
+    function relationCopyFor(card, mode, targets) {
+      if (mode === "counter") {
+        return `${card.name} 觸發時會把對應攻擊牌彈開，攻擊牌會立刻離開目標玩家身上。`;
+      }
+      if (mode === "attack") {
+        return targets.length
+          ? `${card.name} 打出後，若目標玩家有下列防禦或陷阱，攻擊會被彈開。`
+          : `${card.name} 目前沒有指定剋制牌；若沒有被彈開，最多只會停在玩家身上兩回合。`;
+      }
+      return `${card.name} 不是攻擊、防禦或陷阱牌。這裡先列出常見攻防關係，方便回到遊戲後判斷出牌順序。`;
+    }
+
+    function openCounterTutorial(card) {
+      if (!card || !tutorialOverlay) return;
+      const mode = relationModeFor(card);
+      const targetIds = counterCardIdsFor(card);
+      const fallbackIds = ["defense_guided_tour", "defense_route_planning", "trap_crowd_flow_map", "trap_documentation_folder"];
+      const targets = (targetIds.length ? targetIds : fallbackIds)
+        .map((id) => extendedCards.find((item) => item.id === id))
+        .filter(Boolean)
+        .slice(0, 6);
+      const title = mode === "counter" ? "這張牌會彈開哪些攻擊？" : mode === "attack" ? "哪些牌能彈開這張攻擊？" : "攻防關係快速教學";
+      const arrow = mode === "attack" ? "會被擋" : "彈開";
+      const note = relationCopyFor(card, mode, targets);
+
+      cardFocusOverlay.classList.remove("open");
+      cardFocusOverlay.innerHTML = "";
+      tutorialOverlay.classList.add("open");
+      tutorialOverlay.innerHTML = `
+        <article class="tutorial-card" role="dialog" aria-modal="true">
+          <div class="tutorial-head">
+            <div>
+              <div class="tutorial-title">${escapeHtml(title)}</div>
+              <div class="tutorial-sub">看完按「回到遊戲」，目前對局不會重置。</div>
+            </div>
+            <button class="mini-btn danger" type="button" data-close-tutorial="1">回到遊戲</button>
+          </div>
+          <div class="tutorial-flow">
+            <section class="tutorial-source">
+              ${card.image ? `<img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}">` : ""}
+              <strong>${escapeHtml(card.name)}</strong>
+              <div class="reader-meta">${escapeHtml(card.rarity || "卡牌")} · ${escapeHtml(card.type || "")}</div>
+            </section>
+            <div class="tutorial-arrow">${escapeHtml(arrow)}</div>
+            <section class="tutorial-targets">
+              ${targets.map((target) => `
+                <article class="tutorial-target">
+                  ${target.image ? `<img src="${escapeHtml(target.image)}" alt="${escapeHtml(target.name)}">` : ""}
+                  <strong>${escapeHtml(target.name)}</strong>
+                  <div class="reader-meta">${escapeHtml(target.rarity || "卡牌")} · ${escapeHtml(target.type || "")}</div>
+                </article>
+              `).join("")}
+            </section>
+          </div>
+          <div class="tutorial-note">${escapeHtml(note)}</div>
+        </article>
+      `;
+      tutorialOverlay.querySelector("[data-close-tutorial]").onclick = (event) => {
+        event.stopPropagation();
+        closeCounterTutorial();
+      };
+    }
+
+    function closeCounterTutorial() {
+      focusedCard = null;
+      tutorialOverlay.classList.remove("open");
+      tutorialOverlay.innerHTML = "";
+      render();
     }
 
     function closeCardReader() {
@@ -3004,7 +3327,7 @@
       const deck = [];
       extendedCards.forEach((card, idx) => {
         if (card.type === "MainTheme") return;
-        const copyCount = card.type === "Attack" ? 2 : card.type === "Utility" || card.type === "Heal" || card.type === "Defense" ? 4 : 3;
+        const copyCount = card.type === "Attack" ? 2 : isBoostCardType(card.type) ? 1 : card.type === "Defense" ? 4 : 3;
         for (let i = 0; i < copyCount; i += 1) {
           deck.push(cloneCard(card, `${idx}_${i}`));
         }
@@ -3053,6 +3376,8 @@
         cashflow: 0,
         visitorFlow: 0,
         monthlyVisitors: 120,
+        previousMonthlyVisitors: 120,
+        previousCashflow: 0,
         money: 5,
         luck: 0,
         population: 3,
@@ -3126,6 +3451,89 @@
       return Math.max(0, player.monthlyVisitors + player.visitorFlow + player.scores.tourism * 60);
     }
 
+    function snapshotFlowBaseline(player) {
+      player.previousMonthlyVisitors = currentMonthlyVisitors(player);
+      player.previousCashflow = player.cashflow;
+    }
+
+    function playerAttractionScore(player) {
+      const attackPressure = player.board.attack.filter(Boolean).length * 4;
+      const stormPressure = hasActiveStorm(player) ? 8 : 0;
+      const themeCount = player.board.theme.filter(Boolean).length;
+      return (
+        player.scores.tourism * 3
+        + player.scores.income * 2
+        + player.scores.publicSupport
+        + player.scores.culture
+        + player.cashflow * 2
+        + themeCount * 2
+        + Math.floor(player.points / 4)
+        - attackPressure
+        - stormPressure
+      );
+    }
+
+    function drainVisitors(player, amount) {
+      let remaining = Math.max(0, Math.floor(amount));
+      const fromFlow = Math.min(Math.max(0, player.visitorFlow), remaining);
+      player.visitorFlow -= fromFlow;
+      remaining -= fromFlow;
+      const baselineFloor = 80;
+      const fromMonthly = Math.min(Math.max(0, player.monthlyVisitors - baselineFloor), remaining);
+      player.monthlyVisitors -= fromMonthly;
+      return fromFlow + fromMonthly;
+    }
+
+    function queueTrafficTransfer(fromPlayer, toPlayer, visitors = 0, cash = 0, reason = "status") {
+      if (!fromPlayer || !toPlayer || fromPlayer.id === toPlayer.id) return;
+      if (visitors <= 0 && cash <= 0) return;
+      trafficTransfers.push({
+        from: fromPlayer.seatIndex,
+        to: toPlayer.seatIndex,
+        visitors: Math.floor(visitors),
+        cash: Math.floor(cash),
+        reason,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 2800,
+      });
+      trafficTransfers = trafficTransfers.slice(-12);
+    }
+
+    function settleCommunityMigration(triggerPlayer = null) {
+      const candidates = state.filter((player) => !isBankrupt(player));
+      if (candidates.length < 2) return "";
+      const ranked = candidates
+        .map((player) => ({ player, score: playerAttractionScore(player) }))
+        .sort((a, b) => a.score - b.score);
+      const weakest = ranked[0];
+      const strongest = ranked[ranked.length - 1];
+      if (!weakest || !strongest || weakest.player.id === strongest.player.id) return "";
+      const gap = strongest.score - weakest.score;
+      const stormed = hasActiveStorm(weakest.player);
+      const attacked = weakest.player.board.attack.some(Boolean);
+      if (gap < 5 && !stormed && !attacked) return "";
+
+      const pressure = gap + (stormed ? 7 : 0) + (attacked ? 5 : 0) + (triggerPlayer?.id === weakest.player.id ? 2 : 0);
+      const visitorShift = drainVisitors(weakest.player, clamp(40 + pressure * 9, 40, 220));
+      const cashShift = weakest.player.cashflow > 0 && pressure >= 9 ? 1 : 0;
+      if (cashShift) {
+        weakest.player.cashflow = Math.max(0, weakest.player.cashflow - cashShift);
+        strongest.player.cashflow += cashShift;
+      }
+      if (visitorShift > 0) {
+        strongest.player.visitorFlow += visitorShift;
+      }
+      if (visitorShift > 0 || cashShift > 0) {
+        queueTrafficTransfer(weakest.player, strongest.player, visitorShift, cashShift, stormed ? "storm" : attacked ? "attack" : "appeal");
+        weakest.player.history.unshift(`人流${visitorShift ? ` -${visitorShift}` : ""}${cashShift ? `，金流 -${cashShift}` : ""}`);
+        strongest.player.history.unshift(`吸引人流${visitorShift ? ` +${visitorShift}` : ""}${cashShift ? `，金流 +${cashShift}` : ""}`);
+        if (weakest.player.history.length > 6) weakest.player.history.length = 6;
+        if (strongest.player.history.length > 6) strongest.player.history.length = 6;
+        return `${weakest.player.name} 的人流${cashShift ? "與金流" : ""}轉往 ${strongest.player.name}`;
+      }
+      return "";
+    }
+
     function hasActiveStorm(player) {
       return stormEffects.some((effect) => effect.seatIndex === player.seatIndex && effect.untilTurn >= turnCounter);
     }
@@ -3161,15 +3569,15 @@
     }
 
     function shiftVisitorsAway(sourcePlayer, amount, attacker = null) {
-      const loss = Math.max(0, Math.min(sourcePlayer.visitorFlow, amount));
+      const loss = drainVisitors(sourcePlayer, amount);
       if (loss <= 0) return 0;
-      sourcePlayer.visitorFlow -= loss;
       const receivers = state.filter((player) => player.id !== sourcePlayer.id && !isBankrupt(player) && !hasActiveStorm(player));
       if (!receivers.length) return loss;
       const share = Math.max(1, Math.floor(loss / receivers.length));
       receivers.forEach((player) => {
         const bonus = attacker && player.id === attacker.id ? Math.max(1, Math.floor(share * 0.5)) : share;
         player.visitorFlow += bonus;
+        queueTrafficTransfer(sourcePlayer, player, bonus, 0, "attack");
       });
       return loss;
     }
@@ -3344,6 +3752,8 @@
       const self = currentControlPlayer();
       const card = shopMarket[index];
       if (!card) return;
+      selectedCardIndex = null;
+      attackTargetSeatIndex = null;
 
       const offer = getShopOffer(card, self);
       const cost = offer.cost;
@@ -3363,6 +3773,7 @@
         self.discardPile.unshift(bought);
         pushLog(`${self.name} 用 ${cost} 點購買 ${card.name}，手牌已滿，先放入棄牌堆。`);
       }
+      handCollapsed = false;
       render();
     }
 
@@ -3496,6 +3907,33 @@
       return true;
     }
 
+    function removeBoardAttack(player, slotIndex, reason = "attack expired") {
+      const slot = player?.board?.attack?.[slotIndex];
+      if (!slot?.card) return null;
+
+      const card = slot.card;
+      player.board.attack[slotIndex] = null;
+      pushGraveyard(player, card, reason);
+      player.history.unshift(`${card.name} left attack zone`);
+      if (player.history.length > 6) player.history.length = 6;
+      return card;
+    }
+
+    function tickAttackCards(player) {
+      if (!player?.board?.attack) return 0;
+
+      let expired = 0;
+      player.board.attack.forEach((slot, index) => {
+        if (!slot?.card) return;
+        slot.remainingTurns = Number.isFinite(slot.remainingTurns) ? slot.remainingTurns - 1 : 1;
+        if (slot.remainingTurns <= 0) {
+          removeBoardAttack(player, index, "attack:two-turn-limit");
+          expired += 1;
+        }
+      });
+      return expired;
+    }
+
     function resetMatch() {
       round = 1;
       turnSeatIndex = 0;
@@ -3508,6 +3946,9 @@
       hudCollapsed = false;
       aiTurnRunning = false;
       turnCounter = 1;
+      stormEffects = [];
+      trafficTransfers = [];
+      crowdCenterUntil = 0;
       focusSeatIndex = 0;
       userRotation = 0;
       zoomScale = 1;
@@ -3689,30 +4130,20 @@
       const player = state[seatIndex];
       turnSeatIndex = seatIndex;
       focusSeatIndex = seatIndex;
+      snapshotFlowBaseline(player);
+      const expiredAttacks = tickAttackCards(player);
       player.stats.turnsTaken += 1;
       player.energy = player.maxEnergy;
       player.points += player.cashflow;
       player.manpower += player.population > 5 ? 2 : 1;
       player.time += 1;
       player.tech += 1;
-      // 1. 攻擊卡最多存在兩個回合
-      player.board.attack = player.board.attack.map((slot) => {
-        if (!slot) return null;
-        if (!slot.roundsLeft) {
-          slot.roundsLeft = 2; // Initialize to 2 rounds
-        }
-        slot.roundsLeft -= 1;
-        if (slot.roundsLeft <= 0) {
-          pushGraveyard(player, slot.card, '攻擊時效過期');
-          pushLog(`危機事件 ${slot.card.name} 存在回合數已到，自動消失。`);
-          return null;
-        }
-        return slot;
-      });
 
       dealToFive(player);
       ensureOpeningThemeCard(player);
-      pushLog(`${player.name} 開始回合${player.cashflow ? `，現金流 +${player.cashflow}` : ""}。`);
+      const migrationNote = settleCommunityMigration(player);
+      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}${expiredAttacks ? `，${expiredAttacks} 張攻擊卡停留滿兩回合後離場` : ""}。`);
+      if (migrationNote) pushLog(`人流觀望：${migrationNote}。`);
     }
 
     function nextAliveSeatIndex(fromIndex) {
@@ -3983,10 +4414,13 @@
             triggered: true,
             note: `攻擊 ${slotIndex + 1}`,
             placedBy: player.name,
+            remainingTurns: 2,
+            placedTurn: turnCounter,
+            sourceId: player.id,
           };
         }
         player.stats.attacksMade += 1;
-        result = resolveAttack(target, card, player);
+        result = resolveAttack(target, card, player, slotIndex);
       } else if (lane === "defense") {
         const slotIndex = player.board.defense.findIndex((slot) => !slot);
         if (slotIndex < 0) {
@@ -4092,11 +4526,12 @@
       return true;
     }
 
-        function resolveAttack(target, card, source) {
+    function resolveAttack(target, card, source, attackSlotIndex = -1) {
       const damage = card.effect?.damage || 0;
       const trapSlot = target.board.trap[0];
       const defenseSlotIndex = target.board.defense.findIndex((slot) => slot && slot.faceDown);
       let blocked = 0;
+      let reflected = false;
       let notes = [];
 
       // Check if attack hits defense/trap for dramatic animation clash overlay
@@ -4111,12 +4546,10 @@
         source.hp = Math.max(0, source.hp - trapDamage);
         source.stats.damageTaken += trapDamage;
         target.stats.trapsTriggered += 1;
-        
         defendedCard = trapSlot.card;
         defendedType = "陷阱";
-        
-        // Make the trap card disappear from board after resolving
         target.board.trap[0] = null;
+        reflected = true;
       } else if (defenseSlotIndex >= 0) {
         const defenseSlot = target.board.defense[defenseSlotIndex];
         defenseSlot.faceDown = false;
@@ -4131,8 +4564,8 @@
         defendedType = "防禦";
         
         playSfx("defense");
-        // Make the defense card disappear from board after resolving
         target.board.defense[defenseSlotIndex] = null;
+        reflected = true;
       }
 
       if (defendedCard) {
@@ -4166,6 +4599,26 @@
         setTimeout(() => {
           clashOverlay.classList.remove("open");
         }, 2600);
+      }
+
+      if (reflected && attackSlotIndex >= 0) {
+        const bounced = removeBoardAttack(target, attackSlotIndex, "attack:reflected");
+        if (bounced) notes.push(`${bounced.name} 被防禦/陷阱彈開。`);
+        playSfx("defense");
+        target.history.unshift(`${card.name} 被彈開，沒有造成傷害`);
+        source.history.unshift(`${card.name} 被 ${target.name} 彈開`);
+        if (target.history.length > 6) target.history.length = 6;
+        if (source.history.length > 6) source.history.length = 6;
+        return `${target.name} 的防禦/陷阱啟動，${card.name} 被彈開，沒有造成傷害${notes.length ? `（${notes.join("、")}）` : ""}。`;
+      }
+
+      if (reflected) {
+        reflected = true;
+        target.history.unshift(`${card.name} 被彈開，沒有造成傷害`);
+        source.history.unshift(`${card.name} 被 ${target.name} 彈開`);
+        if (target.history.length > 6) target.history.length = 6;
+        if (source.history.length > 6) source.history.length = 6;
+        return `${target.name} 的防禦/陷阱啟動，${card.name} 被彈開，沒有造成傷害${notes.length ? `（${notes.join("、")}）` : ""}。`;
       }
 
       const finalDamage = Math.max(0, damage - blocked);
@@ -4348,6 +4801,35 @@
           crowdLayer.appendChild(piece);
         }
       });
+
+      trafficTransfers = trafficTransfers.filter((transfer) => transfer.expiresAt > Date.now());
+      trafficTransfers.forEach((transfer, transferIndex) => {
+        const fromZone = zones[transfer.from];
+        const toZone = zones[transfer.to];
+        if (!fromZone || !toZone) return;
+        const pieces = clamp(Math.ceil((transfer.visitors || 0) / 70) + (transfer.cash > 0 ? 1 : 0), 1, 5);
+        for (let index = 0; index < pieces; index += 1) {
+          const seed = (turnCounter + 13) * 91 + transferIndex * 37 + index;
+          const isCash = transfer.cash > 0 && index === pieces - 1;
+          const piece = document.createElement("span");
+          const vehicleType = ["car", "bus", "train"][(transferIndex + index) % 3];
+          piece.className = isCash ? `crowd-piece traveler cash vehicle ${vehicleType}` : "crowd-piece traveler meeple";
+          const fromX = fromZone.x + (seededUnit(seed) - 0.5) * Math.min(fromZone.spreadX, 14);
+          const fromY = fromZone.y + (seededUnit(seed + 0.23) - 0.5) * Math.min(fromZone.spreadY, 14);
+          const toX = toZone.x + (seededUnit(seed + 0.47) - 0.5) * Math.min(toZone.spreadX, 14);
+          const toY = toZone.y + (seededUnit(seed + 0.71) - 0.5) * Math.min(toZone.spreadY, 14);
+          piece.style.setProperty("--x", `${fromX}%`);
+          piece.style.setProperty("--y", `${fromY}%`);
+          piece.style.setProperty("--to-x", `${toX}%`);
+          piece.style.setProperty("--to-y", `${toY}%`);
+          piece.style.setProperty("--mid-x", `${(fromX + toX) / 2 + (seededUnit(seed + 0.91) - 0.5) * 8}%`);
+          piece.style.setProperty("--mid-y", `${(fromY + toY) / 2 + (seededUnit(seed + 1.07) - 0.5) * 8}%`);
+          piece.style.setProperty("--tilt", `${fromZone.tilt + (seededUnit(seed + 1.31) - 0.5) * 20}deg`);
+          piece.style.setProperty("--color", isCash ? "#facc15" : colors[(transfer.from * 3 + index) % colors.length]);
+          piece.style.setProperty("--delay", `${(index * 0.08).toFixed(2)}s`);
+          crowdLayer.appendChild(piece);
+        }
+      });
     }
 
     function renderStormOverlays() {
@@ -4398,6 +4880,9 @@
       const faceDown = slotValue.faceDown && !slotValue.triggered;
       const card = slotValue.card;
       const tagText = faceDown ? "覆蓋" : `${laneKindLabel(lane.kind)} / Cost ${card.cost}`;
+      const noteText = lane.slot === "attack" && Number.isFinite(slotValue.remainingTurns)
+        ? `剩餘 ${slotValue.remainingTurns} 回合`
+        : slotValue.note || lane.label;
       return `
         <div class="card ${faceDown ? "face-down" : "table-readable"} table-kind-${lane.kind}" ${!faceDown ? `data-table-card="1"` : ""}>
           ${!faceDown && card.image ? `<img class="table-card-art" src="${card.image}" alt="${card.name}">` : ""}
@@ -4405,7 +4890,7 @@
           <div class="meta">${faceDown ? "尚未觸發" : card.desc}</div>
           <div class="tag-row">
             <span class="tag">${tagText}</span>
-            <span class="tag">${slotValue.note || lane.label}</span>
+            <span class="tag">${noteText}</span>
           </div>
           ${seatIndex === 0 && (lane.slot === "boost" || lane.slot === "defense") ? `
             <div class="card-actions">
@@ -4529,8 +5014,24 @@
       `;
     }
 
+    function renderFlowBar(label, current, previous, suffix = "") {
+      const delta = current - previous;
+      const width = clamp(Math.round((Math.abs(delta) / Math.max(1, Math.abs(previous), Math.abs(current))) * 100), 4, 100);
+      const deltaText = `${delta >= 0 ? "+" : ""}${delta.toLocaleString()}${suffix}`;
+      return `
+        <div class="flow-bar">
+          <span>${label}</span>
+          <span class="flow-track"><span class="flow-fill ${delta < 0 ? "loss" : ""}" style="--bar-width:${width}%"></span></span>
+          <span class="flow-delta ${delta < 0 ? "loss" : ""}">${deltaText}</span>
+        </div>
+      `;
+    }
+
     function renderPlayerHud() {
       const self = currentControlPlayer();
+      const currentVisitors = currentMonthlyVisitors(self);
+      const previousVisitors = Number(self.previousMonthlyVisitors ?? currentVisitors);
+      const previousCashflow = Number(self.previousCashflow ?? self.cashflow);
       const operatingThemes = self.board.theme
         .map((slotValue, index) => ({ slotValue, index }))
         .filter(({ slotValue }) => slotValue);
@@ -4567,11 +5068,15 @@
           <div class="operation-title">營運中的主題</div>
           ${themeHtml}
         </div>
+        <div class="flow-bars" aria-label="人流與金流變化">
+          ${renderFlowBar("人流", currentVisitors, previousVisitors, "人")}
+          ${renderFlowBar("金流", self.cashflow, previousCashflow)}
+        </div>
         <div class="player-hud-lines">
           <div>護甲 ${self.armor} | 能量 ${self.energy}/${self.maxEnergy}</div>
           <div>點數 ${self.points} | 現金流 ${self.cashflow >= 0 ? "+" : ""}${self.cashflow} | 錢 ${self.money}</div>
           <div><span class="clock-pill">剩餘 ${formatRemainingTime()}</span></div>
-          <div>本月觀光人潮 ${currentMonthlyVisitors(self).toLocaleString()} 人</div>
+          <div>本月觀光人潮 ${currentVisitors.toLocaleString()} 人</div>
         </div>
         <div class="hud-actions" style="margin-top: 14px; display: flex; gap: 8px; border-top: 1px solid rgba(140, 175, 255, 0.14); padding-top: 14px;">
           <button class="primary" id="btnEndTurn" style="flex: 1; padding: 10px 12px; font-size: 13px; font-weight: 800; border-radius: 12px;">結束回合</button>
@@ -5222,7 +5727,12 @@
     }
     cardFocusOverlay.addEventListener("click", (event) => {
       event.stopPropagation();
-      if (focusedCard) closeCardReader();
+      if (focusedCard) openCounterTutorial(focusedCard);
+    });
+    tutorialOverlay.addEventListener("click", (event) => {
+      if (event.target === tutorialOverlay) {
+        closeCounterTutorial();
+      }
     });
     handManageOverlay.addEventListener("click", (event) => {
       if (event.target === handManageOverlay) {
@@ -5259,7 +5769,7 @@
         return;
       }
 
-      if (selectedCardIndex !== null && !event.target.closest(".slot") && !event.target.closest(".hand-wrap")) {
+      if (selectedCardIndex !== null && !shopOpen && !event.target.closest(".slot") && !event.target.closest(".hand-wrap")) {
         const placed = placeSelectedHandCardAtDesk();
         if (placed) {
           event.preventDefault();

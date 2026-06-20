@@ -24,7 +24,7 @@
       color: var(--ink);
       font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.62) 42%, rgba(255, 255, 255, 0.1)),
+        linear-gradient(180deg, rgba(236, 250, 255, 0.14), rgba(43, 172, 213, 0.18)),
         url("assets/taiwan-community-table-map.png") center / cover fixed no-repeat;
       overflow-x: hidden;
     }
@@ -34,9 +34,9 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.92), transparent 24%),
-        radial-gradient(circle at 82% 12%, rgba(255, 232, 170, 0.66), transparent 20%),
-        linear-gradient(180deg, rgba(118, 209, 255, 0.12), rgba(6, 69, 110, 0.18));
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.5) 48%, rgba(255, 255, 255, 0.18)),
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.7), transparent 18%),
+        radial-gradient(circle at 82% 8%, rgba(231, 255, 250, 0.58), transparent 20%);
       pointer-events: none;
     }
 
@@ -45,82 +45,122 @@
       z-index: 1;
       min-height: 100vh;
       display: grid;
-      grid-template-columns: minmax(420px, 0.94fr) minmax(460px, 0.72fr);
-      gap: clamp(22px, 4vw, 54px);
+      grid-template-columns: minmax(520px, 1.12fr) minmax(460px, 0.86fr);
+      gap: clamp(28px, 3.8vw, 64px);
       align-items: center;
-      padding: clamp(26px, 5vw, 74px);
+      padding: clamp(28px, 3.2vw, 56px);
     }
 
     .hero,
     .setup-panel {
       border: 1px solid rgba(255, 255, 255, 0.68);
-      background: var(--paper);
-      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
       box-shadow: var(--shadow);
     }
 
     .hero {
-      border-radius: 38px;
-      padding: clamp(28px, 4vw, 52px);
+      min-height: min(82vh, 650px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 36px;
+      padding: clamp(42px, 5vw, 72px);
     }
 
     .badge {
       display: inline-flex;
-      padding: 9px 14px;
+      width: fit-content;
+      padding: 11px 17px;
       border-radius: 999px;
-      background: rgba(19, 120, 184, 0.12);
+      background: rgba(198, 231, 244, 0.82);
       color: #075985;
       font-weight: 900;
       letter-spacing: 0.04em;
+      font-size: clamp(14px, 1.1vw, 18px);
     }
 
     h1 {
-      margin: 22px 0 14px;
-      font-size: clamp(46px, 6vw, 88px);
-      line-height: 0.98;
-      letter-spacing: 0.02em;
+      margin: 28px 0 16px;
+      font-size: clamp(56px, 5.8vw, 94px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      color: #112d46;
     }
 
     .subtitle {
       margin: 0;
       color: #0f766e;
-      font-size: clamp(22px, 2.1vw, 34px);
+      font-size: clamp(24px, 2.25vw, 36px);
       font-weight: 900;
     }
 
     .description {
       max-width: 760px;
       color: #31556f;
-      font-size: clamp(16px, 1.3vw, 21px);
+      font-size: clamp(17px, 1.25vw, 22px);
       line-height: 1.75;
+      margin-top: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .guide-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+      border-radius: 18px;
+      padding: 14px 28px;
+      color: white;
+      background: linear-gradient(180deg, #7aa3ca, #486982);
+      box-shadow: 0 16px 34px rgba(50, 83, 111, 0.28);
+      font-size: 17px;
+      font-weight: 1000;
+      cursor: pointer;
+      text-decoration: none;
     }
 
     .setup-panel {
-      border-radius: 32px;
-      padding: 26px;
+      border-radius: 34px;
+      padding: clamp(28px, 3.2vw, 44px);
       max-height: calc(100vh - 52px);
       overflow: auto;
     }
 
     .setup-panel h2 {
       margin: 0 0 8px;
-      font-size: clamp(28px, 3vw, 42px);
+      font-size: clamp(38px, 3.7vw, 56px);
+      line-height: 1.05;
+      color: #112d46;
     }
 
     .setup-copy {
       color: #42657e;
       line-height: 1.65;
-      margin: 0 0 16px;
+      margin: 0 0 22px;
+      font-size: clamp(15px, 1.1vw, 18px);
     }
 
     .setup-block { margin-top: 16px; }
 
+    .setup-block.player-count-block,
+    .condition-list,
+    .preview {
+      display: none;
+    }
+
     .setup-label {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       color: #345a74;
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 1000;
-      letter-spacing: 0.08em;
+      letter-spacing: 0;
     }
 
     .player-count-row {
@@ -168,14 +208,15 @@
     .seat-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      gap: 14px;
     }
 
     .seat-card {
       border-radius: 22px;
-      padding: 16px;
-      background: var(--panel);
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.86);
       border: 1px solid rgba(23, 50, 74, 0.12);
+      box-shadow: 0 12px 30px rgba(23, 50, 74, 0.08);
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
@@ -188,8 +229,9 @@
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 1000;
+      font-size: 18px;
     }
 
     .seat-head span:last-child {
@@ -200,18 +242,20 @@
     .role-toggle {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
     }
 
     .role-toggle label {
       display: grid;
       place-items: center;
-      min-height: 56px;
+      min-height: 64px;
       border-radius: 17px;
-      border: 2px solid rgba(19, 120, 184, 0.12);
-      background: rgba(240, 248, 255, 0.86);
+      border: 2px solid rgba(67, 164, 217, 0.22);
+      background: rgba(240, 248, 255, 0.92);
       cursor: pointer;
       font-weight: 1000;
+      color: #17324a;
+      font-size: 17px;
     }
 
     .role-toggle label:has(input:checked) {
@@ -222,8 +266,8 @@
     }
 
     .role-toggle label.ai:has(input:checked) {
-      background: linear-gradient(180deg, #ffbf5b, var(--orange));
-      box-shadow: 0 12px 24px rgba(192, 107, 17, 0.22);
+      background: linear-gradient(180deg, #2fb7ff, var(--blue));
+      box-shadow: 0 12px 24px rgba(19, 120, 184, 0.22);
     }
 
     .role-toggle input {
@@ -265,8 +309,11 @@
 
     .start-button {
       width: 100%;
-      min-height: 74px;
-      font-size: 24px;
+      min-height: 84px;
+      margin-top: 18px;
+      border-radius: 18px;
+      font-size: clamp(24px, 2vw, 32px);
+      background: linear-gradient(180deg, #35b5f2, #1587c9);
     }
 
     .footer {
@@ -334,6 +381,12 @@
         padding: 18px;
       }
       .setup-panel { max-height: none; }
+      .hero {
+        min-height: auto;
+      }
+      .seat-list {
+        grid-template-columns: 1fr;
+      }
       .player-count-row,
       .condition-list {
         grid-template-columns: 1fr;
@@ -353,20 +406,19 @@
       <h1>愛我家鄉<br>社區營造大作戰</h1>
       <p class="subtitle">讓家鄉被看見，也讓家鄉住得下去。</p>
       <p class="description">
-        老師先設定真人玩家與 AI 代玩，學生再用主線卡、經營卡、攻擊卡、防禦卡、陷阱與加成，在觀光、收入、文化、生態、民心與效率之間做取捨。
+        老師先設定真人玩家與 AI 代玩，學生再用主線卡、經營卡、攻擊卡、防禦卡、陷阱與加成，
+        在觀光、收入、文化、生態、民心與效率之間做取捨。
       </p>
-      <div style="margin-top: 24px;">
-        <a href="guide/guide-page.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none; padding: 14px 24px; border-radius: 18px; font-weight: bold; font-size: 16px; background: linear-gradient(180deg, #7aa2c8, #49677f); color: white; box-shadow: 0 10px 20px rgba(73, 103, 127, 0.15); transition: transform 0.16s ease, filter 0.16s ease;">
-          📖 開啟卡牌攻防教學說明頁
-        </a>
+      <div class="hero-actions">
+        <a class="guide-button" id="openGuide" href="guide-page.html">開啟卡牌攻防教學說明頁</a>
       </div>
     </section>
 
-    <section class="setup-panel" aria-label="老師開局設定">
+    <section class="setup-panel" aria-label="開局設定">
       <h2>開局設定</h2>
-      <p class="setup-copy">選擇玩家數，並決定座位是否交給 AI 代玩。</p>
+      <p class="setup-copy">小校可以只保留一位真人玩家，其餘座位交給 AI 代玩，仍然能跑完整四方局。</p>
 
-      <div class="setup-block" style="display: none;">
+      <div class="setup-block player-count-block">
         <div class="setup-label">玩家數</div>
         <div class="player-count-row" aria-label="玩家數">
           <button class="ghost" type="button" data-player-count="1">1 位玩家</button>
@@ -413,16 +465,16 @@
         </div>
       </div>
 
-      <div class="setup-block" style="display: none;">
-        <div class="setup-label">勝敗條件</div>
+      <div class="setup-block">
+        <div class="setup-label">勝負條件</div>
         <div class="condition-list">
           <div class="condition-pill">
             <strong>30 分鐘</strong>
-            <span>時間到後結算社區經營成果。</span>
+            <span>時間結束或社區倒閉時結算。</span>
           </div>
           <div class="condition-pill">
             <strong>玩家倒閉</strong>
-            <span>生命值或資源歸零時，進入結算。</span>
+            <span>健康值、資源與收入都會影響勝負。</span>
           </div>
         </div>
       </div>
@@ -483,11 +535,8 @@
         button.classList.toggle("active", Number(button.dataset.playerCount) === playerCount);
       });
       for (let index = 0; index < seats.length; index += 1) {
-        if (index < playerCount) {
-          setSeatRole(index, "human");
-        } else {
-          setSeatRole(index, "ai");
-        }
+        if (index === 0 && index < playerCount) setSeatRole(index, "human");
+        if (index > 0) setSeatRole(index, "ai");
       }
       updatePreview();
     }
@@ -503,7 +552,7 @@
         return `${seat.name}：${role}`;
       });
       document.getElementById("setupPreview").innerHTML = `
-        <div>真人 ${humanCount} 位，AI ${aiCount} 位。勝敗條件：30 分鐘或玩家倒閉。</div>
+        <div>真人 ${humanCount} 位，AI ${aiCount} 位。遊戲時間 30 分鐘，倒閉或時間結束時結算。</div>
         <div>${lines.join("｜")}</div>
       `;
     }
