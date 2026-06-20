@@ -3456,6 +3456,22 @@
       player.previousCashflow = player.cashflow;
     }
 
+    function settleVisitorFlowForTurn(player) {
+      const incoming = Math.max(0, Math.floor(player.visitorFlow || 0));
+      if (incoming <= 0) return 0;
+
+      const pressure = (hasActiveStorm(player) ? 0.45 : 0) + player.board.attack.filter(Boolean).length * 0.12;
+      const stableRate = clamp(0.62 - pressure, 0.25, 0.68);
+      const stableVisitors = Math.floor(incoming * stableRate);
+      const lingeringVisitors = Math.max(0, incoming - stableVisitors);
+
+      player.monthlyVisitors += stableVisitors;
+      player.visitorFlow = lingeringVisitors;
+      player.history.unshift(`活動人潮沉澱 +${stableVisitors.toLocaleString()}，持續流動 ${lingeringVisitors.toLocaleString()}`);
+      if (player.history.length > 6) player.history.length = 6;
+      return stableVisitors;
+    }
+
     function playerAttractionScore(player) {
       const attackPressure = player.board.attack.filter(Boolean).length * 4;
       const stormPressure = hasActiveStorm(player) ? 8 : 0;
@@ -4131,6 +4147,7 @@
       turnSeatIndex = seatIndex;
       focusSeatIndex = seatIndex;
       snapshotFlowBaseline(player);
+      const stabilizedVisitors = settleVisitorFlowForTurn(player);
       const expiredAttacks = tickAttackCards(player);
       player.stats.turnsTaken += 1;
       player.energy = player.maxEnergy;
@@ -4142,7 +4159,7 @@
       dealToFive(player);
       ensureOpeningThemeCard(player);
       const migrationNote = settleCommunityMigration(player);
-      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}${expiredAttacks ? `，${expiredAttacks} 張攻擊卡停留滿兩回合後離場` : ""}。`);
+      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}${stabilizedVisitors ? `，活動人潮穩定 +${stabilizedVisitors.toLocaleString()}` : ""}${expiredAttacks ? `，${expiredAttacks} 張攻擊卡停留滿兩回合後離場` : ""}。`);
       if (migrationNote) pushLog(`人流觀望：${migrationNote}。`);
     }
 
