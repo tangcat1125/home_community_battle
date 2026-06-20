@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -380,105 +380,6 @@
       line-height: 1.25;
     }
 
-    .metric-bars {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(148, 163, 184, 0.18);
-    }
-
-    .metric-bar {
-      display: grid;
-      grid-template-columns: 72px 1fr auto;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-    }
-
-    .metric-label {
-      color: #dbeafe;
-      font-weight: 900;
-    }
-
-    .metric-track {
-      position: relative;
-      height: 12px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.32);
-    }
-
-    .metric-fill {
-      width: var(--metric-width, 0%);
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #38bdf8, #67e8f9);
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
-      transition: width 0.48s ease;
-    }
-
-    .metric-bar.good .metric-fill {
-      background: linear-gradient(90deg, #22c55e, #a3e635);
-      box-shadow: 0 0 14px rgba(34, 197, 94, 0.35);
-    }
-
-    .metric-bar.warn .metric-fill {
-      background: linear-gradient(90deg, #f97316, #facc15);
-      box-shadow: 0 0 14px rgba(249, 115, 22, 0.35);
-    }
-
-    .metric-bar.danger .metric-fill {
-      background: linear-gradient(90deg, #ef4444, #fb7185);
-      box-shadow: 0 0 18px rgba(239, 68, 68, 0.5);
-    }
-
-    .metric-value {
-      min-width: 62px;
-      text-align: right;
-      color: #e0f2fe;
-      font-weight: 900;
-    }
-
-    .metric-delta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      margin-left: 4px;
-      padding: 2px 5px;
-      border-radius: 999px;
-      color: #bbf7d0;
-      background: rgba(22, 163, 74, 0.2);
-      border: 1px solid rgba(74, 222, 128, 0.28);
-      font-size: 11px;
-    }
-
-    .metric-delta.negative {
-      color: #fecdd3;
-      background: rgba(190, 18, 60, 0.26);
-      border-color: rgba(251, 113, 133, 0.42);
-      animation: warningPulse 1.2s ease-in-out infinite;
-    }
-
-    .metric-alert {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      color: #fecdd3;
-      background: rgba(127, 29, 29, 0.36);
-      border: 1px solid rgba(251, 113, 133, 0.36);
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    @keyframes warningPulse {
-      0%, 100% { filter: brightness(1); transform: translateY(0); }
-      50% { filter: brightness(1.32); transform: translateY(-1px); }
-    }
-
     .operation-themes {
       display: grid;
       gap: 7px;
@@ -709,14 +610,11 @@
       filter: drop-shadow(0 7px 8px rgba(0, 0, 0, 0.35));
       animation: crowdWalk 4.8s ease-in-out infinite;
       animation-delay: var(--delay, 0s);
+      transition: left 3.2s cubic-bezier(0.68, -0.6, 0.32, 1.6), top 3.2s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     }
 
     .crowd-piece.returning-home {
       animation: crowdGather 1.15s ease-in-out infinite;
-    }
-
-    .crowd-piece.departing {
-      animation: crowdDepart 1.65s cubic-bezier(0.16, 0.9, 0.24, 1) both, crowdWalk 4.8s ease-in-out 1.65s infinite;
     }
 
     .meeple {
@@ -776,9 +674,9 @@
       background: url("../assets/effects/storm-cloud-creature-overlay.png") center / contain no-repeat;
       border: 0;
       box-shadow: none;
-      opacity: var(--cloud-opacity, 0.48);
-      mix-blend-mode: multiply;
-      filter: drop-shadow(0 24px 34px rgba(0, 0, 0, 0.44)) saturate(0.92);
+      opacity: 0.28; /* Opacity adjusted for perfect visibility without blocking meeple movement */
+      mix-blend-mode: screen; /* Changed blend mode for better glowing clouds in dark mode */
+      filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.5)) saturate(1.2);
       animation: stormFloat 3.8s ease-in-out infinite;
     }
 
@@ -825,25 +723,6 @@
       }
     }
 
-    @keyframes crowdDepart {
-      0% {
-        left: var(--from-x, 50%);
-        top: var(--from-y, 50%);
-        opacity: 0.55;
-        transform: translate(-50%, -50%) scale(0.72) rotate(var(--tilt, 0deg));
-      }
-      58% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.12) rotate(var(--tilt, 0deg));
-      }
-      100% {
-        left: var(--x);
-        top: var(--y);
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1) rotate(var(--tilt, 0deg));
-      }
-    }
-
     .reel-hud {
       position: absolute;
       inset: 0;
@@ -854,11 +733,11 @@
 
     .seat-board {
       position: absolute;
-      width: 570px;
-      height: 250px;
+      width: 430px;
+      height: 230px;
       display: grid;
-      grid-template-columns: repeat(9, 1fr);
-      grid-template-rows: 26px 96px 96px;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: 26px 86px 86px;
       gap: 5px;
       padding: 9px;
       border-radius: 18px;
@@ -964,10 +843,19 @@
 
     .card.face-down {
       background:
-        radial-gradient(circle at 50% 36%, rgba(79, 209, 255, 0.18), transparent 32%),
-        linear-gradient(135deg, rgba(18, 31, 58, 0.98), rgba(10, 16, 32, 0.98)),
-        repeating-linear-gradient(45deg, rgba(79, 209, 255, 0.16) 0 8px, rgba(124, 92, 255, 0.16) 8px 16px);
-      border-color: rgba(79, 209, 255, 0.36);
+        radial-gradient(circle at 50% 36%, rgba(168, 85, 247, 0.28), transparent 32%),
+        linear-gradient(135deg, rgba(55, 20, 90, 0.98), rgba(28, 8, 48, 0.98)),
+        repeating-linear-gradient(45deg, rgba(168, 85, 247, 0.2) 0 8px, rgba(124, 58, 237, 0.2) 8px 16px);
+      border-color: rgba(168, 85, 247, 0.58);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    
+    .card.face-down::before {
+      background:
+        radial-gradient(circle at 50% 45%, rgba(168, 85, 247, 0.34), transparent 42%),
+        repeating-linear-gradient(45deg, rgba(168, 85, 247, 0.22) 0 6px, rgba(255, 255, 255, 0.04) 6px 12px) !important;
+      border: 1px solid rgba(168, 85, 247, 0.42) !important;
+      color: #f3e8ff !important;
     }
 
     .table-card-art {
@@ -1427,7 +1315,7 @@
     .card-focus-overlay {
       position: fixed;
       inset: 0;
-      z-index: 130;
+      z-index: 210;
       display: none;
       place-items: center;
       padding: 28px;
@@ -1476,7 +1364,7 @@
     }
 
     .table-board-card {
-      width: min(1240px, 96vw);
+      width: min(1080px, 94vw);
       max-height: 90vh;
       overflow: auto;
       border-radius: 30px;
@@ -1491,7 +1379,7 @@
 
     .table-board-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
       gap: 14px;
     }
 
@@ -2046,14 +1934,29 @@
 
     .indicator-item {
       display: grid;
-      gap: 8px;
-      align-items: start;
-      padding: 12px;
-      border-radius: 16px;
+      grid-template-columns: 60px 120px 1fr 50px;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 12px;
       background: rgba(22, 34, 61, 0.62);
       border: 1px solid rgba(140, 175, 255, 0.10);
-      font-size: 12px;
+      font-size: 11px;
       min-width: 0;
+    }
+    .indicator-bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .indicator-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 999px;
+      width: 0;
     }
 
     .indicator-item .grade {
@@ -2293,9 +2196,9 @@
       .seat-grid { position: static; display: grid; grid-template-columns: 1fr; gap: 12px; padding: 12px; }
       .reel-board { width: 100vw; height: 100vh; }
       .seat-board {
-        width: 430px;
-        height: 210px;
-        grid-template-columns: repeat(9, 1fr);
+        width: 360px;
+        height: 184px;
+        grid-template-columns: repeat(8, 1fr);
         grid-template-rows: 24px 70px 70px;
         gap: 4px;
         padding: 7px;
@@ -2386,6 +2289,141 @@
         background: white;
       }
     }
+  
+    /* Clash Overlay Styles */
+    .clash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      place-items: center;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(10px);
+    }
+    .clash-overlay.open {
+      display: grid;
+    }
+    .clash-stage {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .clash-card {
+      width: 180px;
+      height: 270px;
+      border-radius: 16px;
+      background: #1e293b;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .clash-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .clash-label {
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .clash-vs-symbol {
+      font-size: 48px;
+      font-weight: 900;
+      color: #ff3b57;
+      text-shadow: 0 0 20px rgba(255, 59, 87, 0.6);
+      animation: vsPulse 1s infinite alternate;
+    }
+    .clash-banner {
+      position: absolute;
+      bottom: 12%;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      background: linear-gradient(90deg, transparent, rgba(255, 59, 87, 0.4), transparent);
+      padding: 8px 60px;
+    }
+    
+    /* Animations */
+    .clash-card.attack-side {
+      transform: translateX(-200px);
+      animation: attackEnter 0.5s forwards ease-out;
+    }
+    .clash-card.defense-side {
+      transform: translateX(200px) rotateY(180deg);
+      animation: defenseEnter 0.5s forwards ease-out;
+    }
+    .clash-card.defense-side.reveal {
+      transform: translateX(200px) rotateY(0deg) !important;
+    }
+    .clash-card.attack-side.bounced {
+      transform: translateX(-300px) translateY(-100px) rotate(-35deg) !important;
+      opacity: 0;
+      filter: blur(4px);
+    }
+    
+    @keyframes vsPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.1); opacity: 1; }
+    }
+    @keyframes attackEnter {
+      to { transform: translateX(-40px); }
+    }
+    @keyframes defenseEnter {
+      to { transform: translateX(40px) rotateY(180deg); }
+    }
+
+  
+    /* End Turn Circle Button in Hand Card System */
+    .end-turn-circle {
+      position: absolute;
+      right: -86px;
+      bottom: 14px;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.25;
+      box-shadow: 
+        0 10px 20px rgba(16, 185, 129, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      z-index: 90;
+      transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+    }
+    .end-turn-circle:hover {
+      transform: scale(1.08);
+      filter: brightness(1.08);
+      box-shadow: 
+        0 12px 24px rgba(16, 185, 129, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+    .end-turn-circle:active {
+      transform: scale(0.95);
+    }
+
   </style>
 </head>
 <body>
@@ -2395,12 +2433,7 @@
         <button class="primary" id="btnZoomIn" aria-label="放大">+</button>
         <button class="ghost" id="btnZoomOut" aria-label="縮小">-</button>
         <button class="ghost" id="btnResetView" aria-label="回到玩家視角">r</button>
-      </div>
-      <div class="tool-row">
         <button class="ghost" id="btnToggleHud">HUD</button>
-        <button class="primary" id="btnEndTurn">結束回合</button>
-        <button class="danger" id="btnAutoAI">AI</button>
-        <button class="ghost sound-toggle" id="btnSoundToggle" aria-label="播放背景音樂" title="播放背景音樂">🔇</button>
       </div>
     </div>
 
@@ -2439,6 +2472,28 @@
         </section>
       </aside>
     </main>
+
+    
+  <!-- 攻防/陷阱對決衝突動畫遮罩 -->
+  <div class="clash-overlay" id="clashOverlay">
+    <div class="clash-stage">
+      <div class="clash-card attack-side" id="clashAttackCard">
+        <img id="clashAttackImg" src="" alt="">
+        <div class="clash-label">攻擊入侵</div>
+      </div>
+      <div class="clash-vs-symbol">VS</div>
+      <div class="clash-card defense-side face-down" id="clashDefenseCard">
+        <div class="clash-card-inner">
+          <div class="clash-card-back"></div>
+          <div class="clash-card-front">
+            <img id="clashDefenseImg" src="" alt="">
+          </div>
+        </div>
+        <div class="clash-label" id="clashDefenseLabel">隱藏防線</div>
+      </div>
+    </div>
+    <div class="clash-banner" id="clashBanner">觸發防禦！</div>
+  </div>
 
     <section class="ending-overlay" id="endingOverlay" aria-label="遊戲結束分析"></section>
     <section class="hand-manage-overlay" id="handManageOverlay" aria-label="手牌整理與換牌"></section>
@@ -2498,17 +2553,24 @@
     const GAME_DURATION_MS = 30 * 60 * 1000;
     const bankruptHp = 0;
     const bankruptMoney = -1;
-    const competencyIndicators = [
-      { key: "g4_hometown", grade: "小四", label: "認識家鄉特色", desc: "能從地方主題與營造卡理解家鄉特色。" },
-      { key: "g4_planning", grade: "小四", label: "社區營造規劃", desc: "能安排導覽、故事、分流與基礎設施。" },
-      { key: "g4_life", grade: "小四", label: "公共生活照顧", desc: "能兼顧民心、居民感受與社區秩序。" },
-      { key: "g5_region", grade: "小五下", label: "區域互動理解", desc: "能看見觀光、人潮與地方產業的連動。" },
-      { key: "g5_economy", grade: "小五下", label: "資源成本判斷", desc: "能管理金錢、人力、時間、技術與效率。" },
-      { key: "g5_environment", grade: "小五下", label: "環境永續思考", desc: "能避免過度觀光與生態失衡。" },
-      { key: "g6_civic", grade: "小六", label: "公民參與合作", desc: "能透過防禦、會議與志工處理公共問題。" },
-      { key: "g6_culture", grade: "小六", label: "多元文化尊重", desc: "能保護文化故事，不只追求收入與流量。" },
-      { key: "g6_problem", grade: "小六", label: "衝突問題解決", desc: "能面對攻擊、陷阱與突發事件後調整策略。" },
-    ];
+      const competencyIndicators = [
+    { key: "g4_hometown", grade: "小四", label: "認知家鄉特色", desc: "引導學生認識家鄉自然與人文特色。" },
+    { key: "g4_planning", grade: "小四", label: "規劃能力", desc: "引導學生進行營運資源與地方特色的整合規劃。" },
+    { key: "g4_life", grade: "小四", label: "生活連結", desc: "鼓勵學生主動關懷社區與在地生活。" },
+    { key: "g5_region", grade: "小五", label: "跨區整合思考", desc: "培養學生進行多元主題與跨區域的思考能力。" },
+    { key: "g5_economy", grade: "小五", label: "資源與成本", desc: "教導學生進行營運成本與資源的評估。" },
+    { key: "g5_environment", grade: "小五", label: "環境永續", desc: "提升學生對綠色生態與環境保護的重視。" },
+    { key: "g6_civic", grade: "小六", label: "參與和協作", desc: "引導學生學習團隊合作與社區營造的實踐。" },
+    { key: "g6_culture", grade: "小六", label: "多元傳承", desc: "培養學生對文化資產與歷史故事的保存意識。" },
+    { key: "g6_problem", grade: "小六", label: "衝突與解決", desc: "訓練學生面對問題時的解決力與應變力。" }
+  ];
+
+  const sdgsIndicators = [
+    { key: "g4_hometown", grade: "SDG 11", label: "學生察覺社區議題", desc: "引導學生敏銳覺察社區的議題與需要。" },
+    { key: "g5_economy", grade: "SDG 8", label: "永續營運與資源評估", desc: "教導學生評估營運資源與永續發展。" },
+    { key: "g5_environment", grade: "SDG 13", label: "環境保護與生態保育", desc: "提升學生對綠能、氣候行動與環境保育的重視。" },
+    { key: "g6_civic", grade: "SDG 17", label: "地方夥伴關係與協同合作", desc: "引導學生學習跨團隊合作與多元夥伴關係建立。" }
+  ];
     const aiProfiles = {
       prankster: {
         label: "頑皮的小學生",
@@ -2527,7 +2589,6 @@
       },
     };
     const aiProfileOrder = ["prankster", "operator", "slowLearner"];
-    const MAX_EXCHANGES_PER_TURN = 3;
 
     let focusSeatIndex = 0;
     let round = 1;
@@ -2543,8 +2604,6 @@
     let aiTurnRunning = false;
     let turnCounter = 1;
     let crowdCenterUntil = 0;
-    let crowdTravelUntil = 0;
-    let crowdReleaseTimer = null;
     let userRotation = 0;
     let zoomScale = 1;
     let bgmEnabled = false;
@@ -2955,7 +3014,7 @@
 
     function createEmptyBoard() {
       return {
-        trap: [null, null],
+        trap: [null],
         boost: [null, null],
         attack: [null, null, null],
         defense: [null, null],
@@ -2971,6 +3030,12 @@
       const role = seatRoles[seatIndex] || "ai";
       const aiProfileKey = role === "ai" ? getAiProfileKey(seatIndex) : null;
       return {
+        discardsThisTurn: 0,
+        visualVisitorFlow: 0,
+        visualCashflow: 0,
+        visualTourism: 0,
+        visualIncome: 0,
+        
         seatKey,
         seatIndex,
         id: seatKey,
@@ -2988,7 +3053,6 @@
         cashflow: 0,
         visitorFlow: 0,
         monthlyVisitors: 120,
-        metricBaseline: null,
         money: 5,
         luck: 0,
         population: 3,
@@ -3006,7 +3070,6 @@
         hand: [],
         discardPile: [],
         graveyard: [],
-        exchangesThisTurn: 0,
         board: createEmptyBoard(),
         stats: {
           turnsTaken: 0,
@@ -3061,37 +3124,6 @@
 
     function currentMonthlyVisitors(player) {
       return Math.max(0, player.monthlyVisitors + player.visitorFlow + player.scores.tourism * 60);
-    }
-
-    function satisfactionValue(player) {
-      const stormPenalty = hasActiveStorm(player) ? 14 : 0;
-      return clamp(58 + player.scores.publicSupport * 11 + player.scores.ecology * 5 - stormPenalty, 0, 100);
-    }
-
-    function happinessValue(player) {
-      const hpFactor = Math.round((player.hp / Math.max(1, player.maxHp)) * 22);
-      return clamp(42 + hpFactor + player.scores.culture * 6 + player.scores.publicSupport * 8 + player.scores.ecology * 4, 0, 100);
-    }
-
-    function metricSnapshot(player) {
-      return {
-        cashflow: Number(player.cashflow || 0),
-        money: Number(player.points || 0),
-        visitors: currentMonthlyVisitors(player),
-        satisfaction: satisfactionValue(player),
-        happiness: happinessValue(player),
-      };
-    }
-
-    function ensureMetricBaseline(player) {
-      if (!player.metricBaseline) {
-        player.metricBaseline = metricSnapshot(player);
-      }
-      return player.metricBaseline;
-    }
-
-    function resetMetricBaseline(player) {
-      player.metricBaseline = metricSnapshot(player);
     }
 
     function hasActiveStorm(player) {
@@ -3159,7 +3191,7 @@
       });
       player.board.attack = [null, null, null];
       player.board.defense = [null, null];
-      player.board.trap = [null, null];
+      player.board.trap = [null];
       player.board.boost = [null, null];
       player.board.theme = [null, null, null, null];
       player.armor = 0;
@@ -3272,21 +3304,6 @@
       }
     }
 
-    function refillHandIfEmpty(player) {
-      if (!player || player.hand.length > 0) return false;
-      dealToFive(player);
-      ensureOpeningThemeCard(player);
-      return player.hand.length > 0;
-    }
-
-    function canExchangeThisTurn(player) {
-      return (player.exchangesThisTurn || 0) < MAX_EXCHANGES_PER_TURN;
-    }
-
-    function registerExchange(player) {
-      player.exchangesThisTurn = (player.exchangesThisTurn || 0) + 1;
-    }
-
     function ensureOpeningThemeCard(player) {
       if (player.stats.openingThemeGranted) return;
       if (player.hand.some(isMainTheme) || player.board.theme.some((slot) => slot?.card)) return;
@@ -3305,12 +3322,21 @@
     function buildShopMarket() {
       const rareThemeChance = Math.random() < 0.06;
       const rareTheme = rareThemeChance ? shuffle(mainThemeCards.filter((card) => card.image)).slice(0, 1) : [];
-      const trapAndDefenseCards = shuffle(extendedCards.filter((card) => (card.type === "Trap" || card.type === "Defense") && card.image)).slice(0, 2);
-      const supportCards = shuffle(extendedCards.filter((card) => card.type !== "Attack" && card.type !== "Trap" && card.type !== "Defense" && !isMainTheme(card) && card.image)).slice(0, 2);
+      
+      // Separate support cards to decrease Boost cards appearance and ensure Defense cards availability
+      const defenseCards = shuffle(extendedCards.filter((card) => card.type === "Defense" && card.image));
+      const boostCards = shuffle(extendedCards.filter((card) => (card.type === "Utility" || card.type === "Trap") && card.image));
+      
+      // Pick 2 defense cards and 1 boost card as support cards
+      const pickedDefense = defenseCards.slice(0, 2);
+      const pickedBoost = boostCards.slice(0, 1);
+      const supportCards = [...pickedDefense, ...pickedBoost];
+      
       const attackCards = shuffle(extendedCards.filter((card) => card.type === "Attack" && card.image)).slice(0, 1);
-      const fallback = shuffle(extendedCards.filter((card) => !isMainTheme(card) && card.image)).slice(0, Math.max(0, 5 - rareTheme.length - trapAndDefenseCards.length - supportCards.length - attackCards.length));
-      shopMarket = shuffle([...rareTheme, ...trapAndDefenseCards, ...supportCards, ...attackCards, ...fallback])
-        .slice(0, 5)
+      const fallback = shuffle(extendedCards.filter((card) => !isMainTheme(card) && card.image)).slice(0, Math.max(0, 4 - rareTheme.length - supportCards.length - attackCards.length));
+      
+      shopMarket = shuffle([...rareTheme, ...supportCards, ...attackCards, ...fallback])
+        .slice(0, 4)
         .map((card, index) => cloneCard(card, `shop_${turnCounter}_${index}`));
     }
 
@@ -3386,9 +3412,8 @@
         renderHandManageOverlay();
         return false;
       }
-      if (!canExchangeThisTurn(player)) {
-        pushLog(`${player.name} 本回合已經換過 ${MAX_EXCHANGES_PER_TURN} 張牌，不能再換了。`);
-        renderHandManageOverlay();
+      if (player.discardsThisTurn >= 3) {
+        pushLog(`${player.name} 每回合最多只能棄牌 3 次！`);
         return false;
       }
 
@@ -3404,10 +3429,9 @@
       player.history.unshift(`${card.name} discarded from hand`);
       if (player.history.length > 6) player.history.length = 6;
 
-      registerExchange(player);
-      const refilled = refillHandIfEmpty(player);
+      player.discardsThisTurn += 1;
       selectedCardIndex = null;
-      pushLog(`${player.name} 棄掉 ${card.name}（本回合換牌 ${player.exchangesThisTurn}/${MAX_EXCHANGES_PER_TURN}）${refilled ? "，手牌打空後補滿。" : "，暫不補牌。"}`);
+      pushLog(`${player.name} 棄掉手牌 ${card.name} [棄牌次數: ${player.discardsThisTurn}/3]，下回合開始才會補牌。`);
       render();
       return true;
     }
@@ -3416,11 +3440,6 @@
       const turn = currentTurnPlayer();
       if (!turn || turn.id !== player.id) {
         pushLog(`${player.name} cannot discard board cards right now.`);
-        renderTableBoardOverlay();
-        return false;
-      }
-      if (!canExchangeThisTurn(player)) {
-        pushLog(`${player.name} 本回合已經換過 ${MAX_EXCHANGES_PER_TURN} 張牌，不能再整理換牌。`);
         renderTableBoardOverlay();
         return false;
       }
@@ -3438,10 +3457,10 @@
         targetList = player.board.defense;
         slotIndex = lane.slotIndex;
         slotValue = targetList[slotIndex];
-      } else if (lane.slot === "trap") {
+      } else if (lane.key === "trap") {
         targetList = player.board.trap;
-        slotIndex = lane.slotIndex;
-        slotValue = targetList[slotIndex];
+        slotIndex = 0;
+        slotValue = targetList[0];
       } else if (lane.slot === "boost") {
         targetList = player.board.boost;
         slotIndex = lane.slotIndex;
@@ -3463,16 +3482,16 @@
         applyScores(player, card.scores, -1);
       }
 
+      if (player.discardsThisTurn >= 3) {
+        pushLog(`${player.name} 每回合最多只能棄牌 3 次！`);
+        return false;
+      }
       targetList[slotIndex] = null;
       pushGraveyard(player, card, `board:${lane.key}`);
       player.history.unshift(`${card.name} removed from board`);
       if (player.history.length > 6) player.history.length = 6;
-      registerExchange(player);
-      pushLog(`${player.name} removed ${card.name} from ${label}.`);
-      if (options.drawReplacement) {
-        const refilled = refillHandIfEmpty(player);
-        pushLog(`${player.name} 從桌牌區換下 ${card.name}（本回合換牌 ${player.exchangesThisTurn}/${MAX_EXCHANGES_PER_TURN}）${refilled ? "，手牌打空後補滿。" : "，暫不補牌。"}`);
-      }
+      player.discardsThisTurn += 1;
+      pushLog(`${player.name} 棄置桌面 ${card.name} [棄牌次數: ${player.discardsThisTurn}/3]。`);
       render();
       return true;
     }
@@ -3504,6 +3523,10 @@
         state[index] = createPlayer(player.seatKey, index);
         dealToFive(state[index]);
         ensureOpeningThemeCard(state[index]);
+        state[index].visualVisitorFlow = state[index].visitorFlow;
+        state[index].visualCashflow = state[index].cashflow;
+        state[index].visualTourism = state[index].scores.tourism;
+        state[index].visualIncome = state[index].scores.income;
         state[index].history.push("Player state reset.");
       });
 
@@ -3649,6 +3672,16 @@
 
     function beginTurn(seatIndex) {
       if (checkGameEnd()) return;
+      
+      // Sync visual stats at turn boundary
+      state.forEach(p => {
+        p.visualVisitorFlow = p.visitorFlow;
+        p.visualCashflow = p.cashflow;
+        p.visualTourism = p.scores.tourism;
+        p.visualIncome = p.scores.income;
+        p.discardsThisTurn = 0; // Reset discard count for new turn
+      });
+      
       const expiredStorms = expireStormEffects();
       if (expiredStorms > 0) {
         pushLog(`烏雲逐漸散去，${expiredStorms} 個社區恢復晴朗。`);
@@ -3656,20 +3689,30 @@
       const player = state[seatIndex];
       turnSeatIndex = seatIndex;
       focusSeatIndex = seatIndex;
-      resetMetricBaseline(player);
       player.stats.turnsTaken += 1;
-      player.exchangesThisTurn = 0;
       player.energy = player.maxEnergy;
       player.points += player.cashflow;
       player.manpower += player.population > 5 ? 2 : 1;
       player.time += 1;
       player.tech += 1;
-      const stormPenalty = hasActiveStorm(player) ? 120 : 0;
-      const visitorDelta = Math.round(player.visitorFlow * 0.12 + player.scores.tourism * 18 + player.scores.publicSupport * 8 - stormPenalty);
-      player.monthlyVisitors = Math.max(0, player.monthlyVisitors + visitorDelta);
+      // 1. 攻擊卡最多存在兩個回合
+      player.board.attack = player.board.attack.map((slot) => {
+        if (!slot) return null;
+        if (!slot.roundsLeft) {
+          slot.roundsLeft = 2; // Initialize to 2 rounds
+        }
+        slot.roundsLeft -= 1;
+        if (slot.roundsLeft <= 0) {
+          pushGraveyard(player, slot.card, '攻擊時效過期');
+          pushLog(`危機事件 ${slot.card.name} 存在回合數已到，自動消失。`);
+          return null;
+        }
+        return slot;
+      });
+
       dealToFive(player);
       ensureOpeningThemeCard(player);
-      pushLog(`${player.name} 開始回合${player.cashflow ? `，收取現金流 +${player.cashflow}` : ""}${visitorDelta ? `，人潮 ${visitorDelta > 0 ? "+" : ""}${visitorDelta}` : ""}。`);
+      pushLog(`${player.name} 開始回合${player.cashflow ? `，現金流 +${player.cashflow}` : ""}。`);
     }
 
     function nextAliveSeatIndex(fromIndex) {
@@ -3939,6 +3982,7 @@
             faceDown: false,
             triggered: true,
             note: `攻擊 ${slotIndex + 1}`,
+            placedBy: player.name,
           };
         }
         player.stats.attacksMade += 1;
@@ -4048,14 +4092,17 @@
       return true;
     }
 
-    function resolveAttack(target, card, source) {
+        function resolveAttack(target, card, source) {
       const damage = card.effect?.damage || 0;
-      const trapSlotIndex = target.board.trap.findIndex((slot) => slot && !slot.triggered);
-      const trapSlot = trapSlotIndex >= 0 ? target.board.trap[trapSlotIndex] : null;
+      const trapSlot = target.board.trap[0];
       const defenseSlotIndex = target.board.defense.findIndex((slot) => slot && slot.faceDown);
       let blocked = 0;
       let notes = [];
 
+      // Check if attack hits defense/trap for dramatic animation clash overlay
+      let defendedCard = null;
+      let defendedType = "";
+      
       if (trapSlot && !trapSlot.triggered) {
         trapSlot.triggered = true;
         trapSlot.faceDown = false;
@@ -4064,12 +4111,13 @@
         source.hp = Math.max(0, source.hp - trapDamage);
         source.stats.damageTaken += trapDamage;
         target.stats.trapsTriggered += 1;
-        target.board.trap[trapSlotIndex] = null;
-        pushGraveyard(target, trapSlot.card, "triggered-trap");
-        blocked = Math.max(blocked, trapSlot.card.effect?.block || damage);
-      }
-
-      if (defenseSlotIndex >= 0) {
+        
+        defendedCard = trapSlot.card;
+        defendedType = "陷阱";
+        
+        // Make the trap card disappear from board after resolving
+        target.board.trap[0] = null;
+      } else if (defenseSlotIndex >= 0) {
         const defenseSlot = target.board.defense[defenseSlotIndex];
         defenseSlot.faceDown = false;
         defenseSlot.triggered = true;
@@ -4078,7 +4126,46 @@
         target.stats.defensesTriggered += 1;
         const cleared = clearStormForPlayer(target, "防禦成功，烏雲散去");
         if (cleared) notes.push(cleared);
+        
+        defendedCard = defenseSlot.card;
+        defendedType = "防禦";
+        
         playSfx("defense");
+        // Make the defense card disappear from board after resolving
+        target.board.defense[defenseSlotIndex] = null;
+      }
+
+      if (defendedCard) {
+        const clashOverlay = document.getElementById("clashOverlay");
+        document.getElementById("clashAttackImg").src = card.image || "";
+        document.getElementById("clashDefenseImg").src = defendedCard.image || "";
+        document.getElementById("clashDefenseLabel").innerText = defendedCard.name;
+        document.getElementById("clashBanner").innerText = `觸發${defendedType}反制！`;
+        
+        // Open overlay
+        clashOverlay.classList.add("open");
+        const attackEl = document.getElementById("clashAttackCard");
+        const defenseEl = document.getElementById("clashDefenseCard");
+        
+        attackEl.className = "clash-card attack-side";
+        defenseEl.className = "clash-card defense-side";
+        
+        // Step 1: Rise and flip defense/trap
+        setTimeout(() => {
+          defenseEl.classList.add("reveal");
+          playSfx("defense");
+        }, 300);
+
+        // Step 2: Bounce the attack card away
+        setTimeout(() => {
+          attackEl.classList.add("bounced");
+          playSfx("disaster");
+        }, 1200);
+
+        // Step 3: Fade out clash overlay
+        setTimeout(() => {
+          clashOverlay.classList.remove("open");
+        }, 2600);
       }
 
       const finalDamage = Math.max(0, damage - blocked);
@@ -4086,19 +4173,22 @@
       source.stats.damageDealt += finalDamage;
       target.stats.damageTaken += finalDamage;
       addStormEffect(source, 1, "backlash");
+      
       if (defenseSlotIndex < 0) {
         addStormEffect(target, Math.max(1, Math.ceil(finalDamage / 4)), "attacked");
       }
+      
       const sourceBacklashLoss = shiftVisitorsAway(source, 80, target);
       const targetVisitorLoss = shiftVisitorsAway(target, Math.max(160, finalDamage * 45), source);
       playSfx("attack");
-      target.history.unshift(`${card.name} dealt ${finalDamage} damage`);
-      source.history.unshift(`攻擊造成烏雲，人流 -${sourceBacklashLoss}`);
-      target.history.unshift(`黑雲壓境，人流 -${targetVisitorLoss}`);
+      
+      target.history.unshift(`${card.name} 造成了 ${finalDamage} 點傷害`);
+      source.history.unshift(`因反噬，人潮 -${sourceBacklashLoss}`);
+      target.history.unshift(`遭受攻擊，人潮 -${targetVisitorLoss}`);
       if (target.history.length > 6) target.history.length = 6;
       if (source.history.length > 6) source.history.length = 6;
 
-      return `${source.name} attacked ${target.name} for ${damage} damage${blocked ? `, blocked ${blocked}` : ""}${notes.length ? ` (${notes.join(", ")})` : ""}。黑雲壓到 ${target.name}，${targetVisitorLoss} 人流轉往其他社區；${source.name} 也因攻擊背負烏雲，流失 ${sourceBacklashLoss} 人流。`;
+      return `${source.name} 攻擊了 ${target.name} 造成 ${damage} 點傷害${blocked ? `，被防禦抵消了 ${blocked}` : ""}${notes.length ? ` (${notes.join(", ")})` : ""}。人潮由 ${target.name} 流失 ${targetVisitorLoss} 往 ${source.name}；${source.name} 也因遭反噬而流失 ${sourceBacklashLoss} 人潮。`;
     }
 
     function autoAIPlay() {
@@ -4184,25 +4274,11 @@
     }
 
     function sendCrowdToCenter() {
-      crowdCenterUntil = Date.now() + 1050;
-      crowdTravelUntil = 0;
-      if (crowdReleaseTimer) {
-        clearTimeout(crowdReleaseTimer);
-      }
-      crowdReleaseTimer = setTimeout(() => {
-        crowdCenterUntil = 0;
-        crowdTravelUntil = Date.now() + 1750;
-        render();
-      }, 1080);
+      crowdCenterUntil = Date.now() + 950;
     }
 
     function releaseCrowdFromCenter() {
       crowdCenterUntil = 0;
-      crowdTravelUntil = Date.now() + 1550;
-      if (crowdReleaseTimer) {
-        clearTimeout(crowdReleaseTimer);
-        crowdReleaseTimer = null;
-      }
     }
 
     function seededUnit(seed) {
@@ -4215,25 +4291,39 @@
       crowdLayer.innerHTML = "";
       const zones = getPlayerTrafficZones();
       const returningHome = Date.now() < crowdCenterUntil;
-      const departing = !returningHome && Date.now() < crowdTravelUntil;
       const colors = ["#ff6b8a", "#ffd86b", "#67e8a5", "#4fd1ff", "#a78bfa", "#fb923c", "#f472b6", "#34d399"];
       const vehicleColors = ["#f97316", "#38bdf8", "#22c55e", "#facc15"];
       state.forEach((player, seatIndex) => {
         const zone = zones[seatIndex];
-        const heat = Math.max(0, player.visitorFlow || 0) + Math.max(0, player.scores?.tourism || 0) + Math.max(0, player.cashflow || 0);
+        const heat = Math.max(0, player.visualVisitorFlow || 0) + Math.max(0, player.visualTourism || 0) + Math.max(0, player.visualCashflow || 0);
         const meepleCount = clamp(4 + heat * 2, 4, 18);
-        const vehicleCount = clamp(Math.floor((Math.max(0, player.cashflow || 0) + Math.max(0, player.scores?.income || 0)) / 2), 0, 3);
+        const vehicleCount = clamp(Math.floor((Math.max(0, player.visualCashflow || 0) + Math.max(0, player.visualIncome || 0)) / 2), 0, 3);
 
         for (let index = 0; index < meepleCount; index += 1) {
           const seed = (turnCounter + 3) * 100 + seatIndex * 29 + index;
           const piece = document.createElement("span");
-          piece.className = `crowd-piece meeple ${returningHome ? "returning-home" : departing ? "departing" : ""}`;
-          const x = returningHome ? 50 + (seededUnit(seed) - 0.5) * 6 : zone.x + (seededUnit(seed) - 0.5) * zone.spreadX;
-          const y = returningHome ? 50 + (seededUnit(seed + 0.37) - 0.5) * 5 : zone.y + (seededUnit(seed + 0.37) - 0.5) * zone.spreadY;
+          piece.className = `crowd-piece meeple ${returningHome ? "returning-home" : ""}`;
+          // Hesitancy / Change of mind logic: If destination has storm cloud, meeples tilt away or relocate
+          const targetHasStorm = hasActiveStorm(player);
+          let targetZone = zone;
+          let hesitateScale = 1.0;
+          if (targetHasStorm && !returningHome) {
+            // Strong visual effect: Meeples hesitate (stay closer to center) or run to other players
+            const changeMind = seededUnit(seed + 0.5) < 0.45;
+            if (changeMind) {
+              const alternativeSeats = [0, 1, 2, 3].filter(s => s !== seatIndex && !isBankrupt(state[s]));
+              if (alternativeSeats.length) {
+                const newSeat = alternativeSeats[Math.floor(seededUnit(seed + 0.9) * alternativeSeats.length)];
+                targetZone = zones[newSeat];
+              }
+            } else {
+              hesitateScale = 0.5; // Hesitate closer to center
+            }
+          }
+          const x = returningHome ? 50 + (seededUnit(seed) - 0.5) * 6 : (targetZone.x * hesitateScale + 50 * (1 - hesitateScale)) + (seededUnit(seed) - 0.5) * targetZone.spreadX;
+          const y = returningHome ? 50 + (seededUnit(seed + 0.37) - 0.5) * 5 : (targetZone.y * hesitateScale + 50 * (1 - hesitateScale)) + (seededUnit(seed + 0.37) - 0.5) * targetZone.spreadY;
           piece.style.setProperty("--x", `${x}%`);
           piece.style.setProperty("--y", `${y}%`);
-          piece.style.setProperty("--from-x", `${50 + (seededUnit(seed) - 0.5) * 5}%`);
-          piece.style.setProperty("--from-y", `${50 + (seededUnit(seed + 0.37) - 0.5) * 4}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.73) - 0.5) * 28}deg`);
           piece.style.setProperty("--color", colors[(seatIndex * 3 + index) % colors.length]);
           piece.style.setProperty("--delay", `${(seededUnit(seed + 1.11) * -2).toFixed(2)}s`);
@@ -4246,12 +4336,10 @@
           const seed = (turnCounter + 7) * 77 + seatIndex * 31 + index;
           const piece = document.createElement("span");
           const vehicleType = ["bus", "train", "car"][(seatIndex + index) % 3];
-          piece.className = `crowd-piece vehicle ${vehicleType} ${returningHome ? "returning-home" : departing ? "departing" : ""}`;
+          piece.className = `crowd-piece vehicle ${vehicleType} ${returningHome ? "returning-home" : ""}`;
           const offset = (index - 1) * 7;
           piece.style.setProperty("--x", `${returningHome ? 50 + (seededUnit(seed) - 0.5) * 7 : zone.x + (zone.spreadX > zone.spreadY ? offset : 0) + (seededUnit(seed) - 0.5) * 8}%`);
           piece.style.setProperty("--y", `${returningHome ? 50 + (seededUnit(seed + 0.41) - 0.5) * 6 : zone.y + (zone.spreadY >= zone.spreadX ? offset : 0) + (seededUnit(seed + 0.41) - 0.5) * 8}%`);
-          piece.style.setProperty("--from-x", `${50 + (seededUnit(seed) - 0.5) * 6}%`);
-          piece.style.setProperty("--from-y", `${50 + (seededUnit(seed + 0.41) - 0.5) * 5}%`);
           piece.style.setProperty("--tilt", `${zone.tilt + (seededUnit(seed + 0.82) - 0.5) * 16}deg`);
           piece.style.setProperty("--color", vehicleColors[(seatIndex + index) % vehicleColors.length]);
           piece.style.setProperty("--delay", `${(seededUnit(seed + 1.23) * -2).toFixed(2)}s`);
@@ -4294,7 +4382,7 @@
       if (!player || !lane) return null;
       if (lane.slot === "attack") return player.board.attack[lane.slotIndex];
       if (lane.slot === "defense") return player.board.defense[lane.slotIndex];
-      if (lane.slot === "trap") return player.board.trap[lane.slotIndex];
+      if (lane.key === "trap") return player.board.trap[0];
       if (lane.slot === "boost") return player.board.boost[lane.slotIndex];
       return null;
     }
@@ -4319,9 +4407,14 @@
             <span class="tag">${tagText}</span>
             <span class="tag">${slotValue.note || lane.label}</span>
           </div>
-          ${seatIndex === 0 && (lane.slot === "boost" || lane.slot === "defense" || lane.slot === "trap") ? `
+          ${seatIndex === 0 && (lane.slot === "boost" || lane.slot === "defense") ? `
             <div class="card-actions">
               <button class="mini-btn danger" data-discard-board="1">棄置</button>
+            </div>
+          ` : ""}
+          ${lane.slot === "attack" && slotValue.placedBy ? `
+            <div style="font-size: 9px; color: #ff8fa3; padding: 2px 4px; background: rgba(255, 107, 138, 0.15); border-radius: 4px; margin-top: 4px; text-align: center; font-weight: 800;">
+              ${escapeHtml(slotValue.placedBy)} 投放
             </div>
           ` : ""}
         </div>
@@ -4438,33 +4531,6 @@
 
     function renderPlayerHud() {
       const self = currentControlPlayer();
-      const baseline = ensureMetricBaseline(self);
-      const metrics = metricSnapshot(self);
-      const metricRows = [
-        { key: "cashflow", label: "金流", value: metrics.cashflow, max: 12 },
-        { key: "money", label: "資金", value: metrics.money, max: 40 },
-        { key: "visitors", label: "人潮", value: metrics.visitors, max: 2400 },
-        { key: "satisfaction", label: "滿意度", value: metrics.satisfaction, max: 100 },
-        { key: "happiness", label: "幸福度", value: metrics.happiness, max: 100 },
-      ];
-      const metricHtml = metricRows.map((metric) => {
-        const delta = Math.round(metric.value - Number(baseline[metric.key] || 0));
-        const width = clamp(Math.round((Math.max(0, metric.value) / metric.max) * 100), 3, 100);
-        const mood = delta < 0 || metric.value < metric.max * 0.32 ? "danger" : metric.value < metric.max * 0.55 ? "warn" : "good";
-        const formattedValue = metric.key === "visitors" ? `${Math.round(metric.value).toLocaleString()}人` : Math.round(metric.value).toLocaleString();
-        const deltaText = delta === 0 ? "±0" : `${delta > 0 ? "+" : ""}${delta.toLocaleString()}`;
-        return `
-          <div class="metric-bar ${mood}">
-            <span class="metric-label">${metric.label}</span>
-            <span class="metric-track"><span class="metric-fill" style="--metric-width:${width}%"></span></span>
-            <span class="metric-value">${formattedValue}<span class="metric-delta ${delta < 0 ? "negative" : ""}">${deltaText}</span></span>
-          </div>
-        `;
-      }).join("");
-      const warningHtml = metricRows
-        .filter((metric) => metric.value - Number(baseline[metric.key] || 0) < 0)
-        .map((metric) => metric.label)
-        .join("、");
       const operatingThemes = self.board.theme
         .map((slotValue, index) => ({ slotValue, index }))
         .filter(({ slotValue }) => slotValue);
@@ -4507,9 +4573,25 @@
           <div><span class="clock-pill">剩餘 ${formatRemainingTime()}</span></div>
           <div>本月觀光人潮 ${currentMonthlyVisitors(self).toLocaleString()} 人</div>
         </div>
-        <div class="metric-bars">${metricHtml}</div>
-        ${warningHtml ? `<div class="metric-alert">紅色警示：${warningHtml} 本回合下降，請考慮防禦、陷阱或調整營運。</div>` : ""}
+        <div class="hud-actions" style="margin-top: 14px; display: flex; gap: 8px; border-top: 1px solid rgba(140, 175, 255, 0.14); padding-top: 14px;">
+          <button class="primary" id="btnEndTurn" style="flex: 1; padding: 10px 12px; font-size: 13px; font-weight: 800; border-radius: 12px;">結束回合</button>
+          <button class="danger" id="btnAutoAI" style="padding: 10px 14px; font-size: 13px; font-weight: 800; border-radius: 12px;">AI</button>
+          <button class="ghost sound-toggle" id="btnSoundToggle" style="padding: 10px 14px; font-size: 16px; border-radius: 12px;" title="播放背景音樂">🔇</button>
+        </div>
       `;
+
+      // Re-bind click listeners because DOM elements are recreated dynamically
+      const endTurnBtn = playerHud.querySelector("#btnEndTurn");
+      if (endTurnBtn) endTurnBtn.onclick = endPlayerTurn;
+      
+      const autoAiBtn = playerHud.querySelector("#btnAutoAI");
+      if (autoAiBtn) autoAiBtn.onclick = autoAIPlay;
+      
+      const soundBtn = playerHud.querySelector("#btnSoundToggle");
+      if (soundBtn) {
+        soundBtn.onclick = () => setBgmEnabled(!bgmEnabled);
+      }
+      updateSoundButton();
     }
 
     function scoreSummary(scores = {}) {
@@ -4657,7 +4739,6 @@
       }
 
       const isTurn = currentTurnPlayer()?.id === self.id && !self.isAI && !gameEnded;
-      const exchangeLeft = Math.max(0, MAX_EXCHANGES_PER_TURN - (self.exchangesThisTurn || 0));
       const cards = self.hand.slice(0, 5);
       const cardHtml = cards.length ? cards.map((card, index) => `
         <article class="hand-manage-item">
@@ -4672,7 +4753,7 @@
             </div>
             <div class="card-actions">
               <button class="mini-btn" data-read-hand-card="${index}">放大閱讀</button>
-              <button class="mini-btn danger" data-exchange-hand-card="${index}" ${isTurn && exchangeLeft > 0 ? "" : "disabled"}>棄牌換牌</button>
+              <button class="mini-btn danger" data-exchange-hand-card="${index}" ${isTurn ? "" : "disabled"}>棄牌換牌</button>
             </div>
           </div>
         </article>
@@ -4684,14 +4765,14 @@
           <div class="hand-manage-head">
             <div>
               <div class="hand-manage-title">手牌整理區</div>
-              <div class="hand-manage-sub">點卡牌可以放大閱讀；自己的回合最多換 ${MAX_EXCHANGES_PER_TURN} 張，本回合還可換 ${exchangeLeft} 張。棄牌不會立刻補牌，手牌打空或下回合開始才會補滿。</div>
+              <div class="hand-manage-sub">點卡牌可以放大閱讀；自己的回合可以棄牌換牌，避免被攻擊壓住後完全動不了。</div>
             </div>
             <div class="hand-manage-actions">
               <button class="mini-btn" data-close-hand-manager="1">關閉整理</button>
               <button class="mini-btn danger" data-collapse-from-manager="1">收成手牌夾</button>
             </div>
           </div>
-          ${isTurn ? (exchangeLeft > 0 ? "" : `<div class="turn-warning">本回合換牌次數已用完，請先出牌或結束回合。</div>`) : `<div class="turn-warning">現在不是你的行動回合，先查看手牌；輪到你時才能棄牌換牌。</div>`}
+          ${isTurn ? "" : `<div class="turn-warning">現在不是你的行動回合，先查看手牌；輪到你時才能棄牌換牌。</div>`}
           <div class="hand-manage-grid">${cardHtml}</div>
         </article>
       `;
@@ -4748,7 +4829,6 @@
 
       const player = state[tableBoardFocusSeatIndex] || currentControlPlayer();
       const isTurn = currentTurnPlayer()?.id === player.id && !player.isAI && !gameEnded;
-      const exchangeLeft = Math.max(0, MAX_EXCHANGES_PER_TURN - (player.exchangesThisTurn || 0));
       const items = tableBoardZone.getManageItems(player);
       const itemHtml = items.map(({ lane, value }) => {
         const card = value?.card;
@@ -4762,6 +4842,10 @@
         }
 
         const covered = value.faceDown && !value.triggered;
+        const isAttackSlot = lane.slot === "attack";
+        const placedByLabel = isAttackSlot && value.placedBy ? `<span class="tag" style="background: rgba(255, 107, 138, 0.25); border-color: rgba(255, 107, 138, 0.4); color: #ff8fa3;">${escapeHtml(value.placedBy)} 投放</span>` : "";
+        const disableDiscard = (isAttackSlot || !isTurn);
+
         return `
           <article class="table-board-item">
             ${covered ? `<div class="card face-down" aria-label="覆蓋牌"></div>` : card.image ? `<img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}">` : `<div class="empty">無圖</div>`}
@@ -4770,10 +4854,15 @@
             <div class="stack-row">
               <span class="tag">${escapeHtml(lane.slotType)}</span>
               <span class="tag">${escapeHtml(card.rarity || "普通")}</span>
+              ${placedByLabel}
             </div>
             <div class="card-actions">
               ${covered ? "" : `<button class="mini-btn" data-read-table-card="${escapeHtml(lane.key)}">放大閱讀</button>`}
-              <button class="mini-btn danger" data-exchange-table-card="${escapeHtml(lane.key)}" ${isTurn && exchangeLeft > 0 ? "" : "disabled"}>棄置換牌</button>
+              ${isAttackSlot ? `
+                <button class="mini-btn" style="opacity: 0.65; cursor: not-allowed;" title="危機事件不可自行撤除" disabled>不可棄置</button>
+              ` : `
+                <button class="mini-btn danger" data-exchange-table-card="${escapeHtml(lane.key)}" ${disableDiscard ? "disabled" : ""}>棄置換牌</button>
+              `}
             </div>
           </article>
         `;
@@ -4785,13 +4874,13 @@
           <div class="hand-manage-head">
             <div>
               <div class="hand-manage-title">${tableBoardZone.getTitle()}｜${escapeHtml(tableBoardZone.getSeatLabel(tableBoardFocusSeatIndex))}</div>
-              <div class="hand-manage-sub">放大檢視攻擊、防禦、陷阱與加成。自己的回合最多整理換牌 ${MAX_EXCHANGES_PER_TURN} 張，本回合還可換 ${exchangeLeft} 張；棄置後進墳場，不會立刻補牌。</div>
+              <div class="hand-manage-sub">放大檢視攻擊、防禦與加成。自己的回合可以把桌牌送進墳場並補回手牌，讓策略重新流動。</div>
             </div>
             <div class="hand-manage-actions">
               <button class="mini-btn" data-close-table-zone="1">關閉整理</button>
             </div>
           </div>
-          ${isTurn ? (exchangeLeft > 0 ? "" : `<div class="turn-warning">本回合換牌次數已用完。</div>`) : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}
+          ${isTurn ? "" : `<div class="turn-warning">目前只能查看；輪到這位玩家時才能棄置換牌。</div>`}
           <div class="table-board-grid">${itemHtml}</div>
         </article>
       `;
@@ -4866,6 +4955,8 @@
               <span>${self.isAI ? "AI 代玩中" : "點牌即可出牌"}</span>
             </span>
           </div>
+        
+          <button class="end-turn-circle" id="btnHandEndTurn">結束<br>回合</button>
         `;
 
         handWrap.querySelector('[data-collapse-hand="1"]').onclick = (event) => {
@@ -4887,6 +4978,14 @@
           event.stopPropagation();
           openHandManager();
         };
+
+        const handEndTurnBtn = handWrap.querySelector("#btnHandEndTurn");
+        if (handEndTurnBtn) {
+          handEndTurnBtn.onclick = (event) => {
+            event.stopPropagation();
+            endPlayerTurn();
+          };
+        }
 
         const handGrid = document.createElement("div");
         handGrid.className = "hand-grid";
@@ -5051,14 +5150,31 @@
       renderTableBoardOverlay();
       renderStatus();
       renderLog();
+
+      // Hide left toolbox when any full screen overlay / reader is open
+      const anyOverlayOpen = !!focusedCard || handManageOpen || tableBoardOpen;
+      const toolbox = document.querySelector(".left-toolbox");
+      if (toolbox) {
+        toolbox.style.display = anyOverlayOpen ? "none" : "";
+      }
+
+      // Hide parent page's "結束遊戲" button when overlays are open in the iframe
+      try {
+        const parentBtn = window.parent.document.getElementById("returnSetup");
+        if (parentBtn) {
+          parentBtn.style.display = anyOverlayOpen ? "none" : "";
+        }
+      } catch (e) {}
     }
 
     function updateSoundButton() {
+      const btn = document.getElementById("btnSoundToggle");
+      if (!btn) return;
       const isPlaying = bgmEnabled && !bgmAudio.paused;
-      soundToggle.classList.toggle("playing", isPlaying);
-      soundToggle.textContent = isPlaying ? "🔊" : "🔇";
-      soundToggle.setAttribute("aria-label", isPlaying ? "關閉背景音樂" : "播放背景音樂");
-      soundToggle.title = isPlaying ? "關閉背景音樂" : "播放背景音樂";
+      btn.classList.toggle("playing", isPlaying);
+      btn.textContent = isPlaying ? "🔊" : "🔇";
+      btn.setAttribute("aria-label", isPlaying ? "關閉背景音樂" : "播放背景音樂");
+      btn.title = isPlaying ? "關閉背景音樂" : "播放背景音樂";
     }
 
     async function setBgmEnabled(enabled) {
@@ -5097,11 +5213,13 @@
       layout.classList.add("sidebar-hidden");
       render();
     });
-    document.getElementById("btnEndTurn").addEventListener("click", endPlayerTurn);
-    document.getElementById("btnAutoAI").addEventListener("click", autoAIPlay);
-    soundToggle.addEventListener("click", () => {
-      setBgmEnabled(!bgmEnabled);
-    });
+    // Turn actions are bound dynamically inside renderPlayerHud
+    const staticSoundToggle = document.getElementById("btnSoundToggle");
+    if (staticSoundToggle) {
+      staticSoundToggle.addEventListener("click", () => {
+        setBgmEnabled(!bgmEnabled);
+      });
+    }
     cardFocusOverlay.addEventListener("click", (event) => {
       event.stopPropagation();
       if (focusedCard) closeCardReader();

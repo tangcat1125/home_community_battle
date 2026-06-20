@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { SpreadsheetFile, Workbook } from "@oai/artifact-tool";
 
-const rootDir = "D:/Codex/home_community_battle";
+const rootDir = "C:/Users/Admin/Downloads/home_community_battle-20260619T110427Z-3-001/home_community_battle";
 const outputPath = `${rootDir}/doc/愛我家鄉_開發指令工作簿.xlsx`;
 
 const commands = [
@@ -63,9 +63,8 @@ const commands = [
   ["056", "手牌整理放大與換牌", "點擊手牌夾區塊後，區塊要放大，讓玩家選擇棄牌換牌；不然被攻擊都無法動彈；修完上傳。", "完成", "新增 hand-manage-overlay 中央手牌整理區；手牌夾與整理換牌按鈕可開啟放大面板，玩家回合可棄牌並補牌；完成語法與 smoke test，準備 GitHub 上傳。"],
   ["057", "桌牌區獨立、說明頁與 GitHub Pages", "將桌牌放置區命名為桌牌區並獨立程式；點擊桌牌區攻擊/防禦/加成可放大整理並棄牌換牌；小人每回合結束回中心、放牌後再出發；回到開局設定改成結束遊戲；首頁新增說明頁、小咪老師、QR Code；公開 GitHub 並啟用遊戲首頁。", "完成", "新增 table-board-zone.js；玩家視窗接上 table-board-overlay 與人流中心集合節奏；index 新增卡牌說明頁、感謝共同開發者、小咪老師解說與訂閱 QR；結局與感謝幕加入 QR；完成備份與工作簿更新。"],
   ["058", "贊助共同創作者名單", "把贊助共同創作者名單掛上去：林慶泓、陳連域、Bobo Chen、Tsai Kurt、Chungwei Hsieh、許士彥、林以泓、黃安志、孔祥宇、Ian Chen、潘慧君、陳民峰、Lili Lin、陳小葉、李仁耀、李英如、蔡昌樺、陳孝魁、陳慶源、傅欽杰。", "完成", "首頁說明頁新增贊助共同創作者名單網格；遊戲結束電影感謝幕新增贊助共同創作者專區。"],
-  ["059", "教案、玩家手冊與教師指引", "設計教學教案，要符合 108 課綱模式教案；另外是玩家操作手冊，寫給小學生看的；教學指引也寫一下；做成 doc 和 pdf 檔，另存在 doc 資料夾。", "完成", "新增三份文件：108 課綱模式教案、小學生玩家操作手冊、教師教學指引；各自輸出 DOCX 與 PDF，並加入文件生成腳本與 PDF 生成腳本。"],
-  ["060", "陷阱卡槽、商店與換牌限制", "少了陷阱卡卡牌夾；桌牌區要多兩張陷阱卡對應並再拉大；陷阱卡可直接抵觸攻擊卡；換牌機制一回合只能換三張，出完手牌才刷手牌，不可棄牌馬上補；商店要買得到陷阱卡與防禦卡。", "完成", "桌牌區改成 3 攻、2 防、2 加成、2 陷阱；陷阱觸發後抵銷攻擊並進墳場；商店保證納入防禦/陷阱候選；手牌與桌牌整理換牌每回合最多 3 張，棄置不立即補牌，手牌打空或下回合開始才補滿。"],
-  ["061", "人流動畫與玩家指標直條圖", "人流系統沒有動；玩家結束牌局後，小人與車輛要開始移動到各家；金流、滿意度、幸福度與人流要在玩家訊息中以直條圖呈現，每回合增減明顯，增加顯示 + 號，減少出現紅色警示。", "完成", "新增人流聚集中央後自動出發到四家的 departing 動畫；回合開始依主題、人流、民心與烏雲調整本月人潮；玩家 HUD 新增金流、資金、人潮、滿意度、幸福度直條圖與本回合正負增減提示，下降時顯示紅色警示。"],
+  ["059", "圖卡一致性與未備圖卡移除", "缺少的圖卡直接從資料庫去掉紀錄。主線卡有文字但沒有圖卡的，也從程式中除去文字，確保只用現有圖卡進行遊戲。", "完成", "移除 8 張無圖主線卡、營造卡、功能卡、無圖防禦卡(拍照規範)及事件卡。"],
+  ["060", "加成卡圖文效果對齊與工作簿更新", "根據實體圖片的中文字標題與數值，更新卡片資料庫的 name, desc 與 effect 設定，並補上所有 image_mapping.txt 記錄與更新工作簿設定。", "完成", "完成 20 張加成卡（含交通加班、環境加分、神奇貴人、大成功、祖先保佑等）的真實圖文功能對齊，並同步更新 txt 檔案。"],
 ];
 
 const decisions = [
@@ -117,7 +116,7 @@ const overview = workbook.worksheets.add("開發指令總覽");
 overview.showGridLines = false;
 title(overview, "A1:E1", "愛我家鄉-社區營造大作戰｜開發指令工作簿");
 overview.getRange("A2:E2").merge();
-overview.getRange("A2").values = [["本工作簿記錄從原型、玩家視窗、圖資、HUD、AI、結局分析到本輪 108 課綱教案、玩家手冊與教師教學指引輸出的主要開發指令。"]];
+overview.getRange("A2").values = [["本工作簿記錄從原型、玩家視窗、圖資、HUD、AI、結局分析到本輪贊助共同創作者名單掛載的主要開發指令。"]];
 overview.getRange("A2").format = { fill: "#E0F2FE", font: { color: "#0F172A" } };
 writeTable(overview, "A4", ["編號", "主題", "使用者指令/需求", "狀態", "完成內容"], commands, [58, 150, 470, 80, 430]);
 overview.freezePanes.freezeRows(4);
@@ -150,7 +149,6 @@ writeTable(
     ["結局分析", "可列印獎狀", "player_window/player-window.html", "對應 108 課綱社會科指標並產生星芒圖。"],
     ["本輪新增", "桌牌區與說明頁", "player_window/table-board-zone.js、player_window/player-window.html、index.html", "桌牌區命名並獨立模組；桌牌區可放大整理與棄置換牌；首頁說明頁展示攻防對照、主題卡、加成卡、小咪老師與訂閱 QR。"],
     ["本輪新增", "贊助共同創作者名單", "index.html、player_window/player-window.html", "首頁說明頁與遊戲片尾感謝幕加入 20 位贊助共同創作者名單。"],
-    ["本輪新增", "教學文件", "doc/*.docx、doc/*.pdf、doc/tools/build-teaching-docs.py、doc/tools/build-teaching-pdfs.py", "新增 108 課綱模式教案、小學生玩家操作手冊、教師教學指引，並各自輸出 DOCX 與 PDF。"],
   ],
   [160, 130, 260, 520],
 );
